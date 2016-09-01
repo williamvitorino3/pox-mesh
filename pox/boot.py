@@ -1,4 +1,4 @@
-#!/bin/sh -
+ #!/bin/sh -
 
 # Copyright 2011,2012,2013 James McCauley
 #
@@ -40,7 +40,7 @@ fi
 exec python $OPT "$0" $FLG "$@"
 '''
 
-from __future__ import print_function
+from __future__ import print_function        # Nova implementação do print, faz print "a", "b" ->>> 'a', 'b'
 
 import logging
 import logging.config
@@ -58,7 +58,7 @@ core = None
 import pox.openflow
 from pox.lib.util import str_to_bool
 
-# Function to run on main thread
+# Função a ser executada no thread principal
 _main_thread_function = None
 
 try:
@@ -72,7 +72,13 @@ def _do_import (name):
   Returns its module name if it was loaded or False on failure.
   """
 
+  """
+  Tenta importar o componente.
+  Retorna o nome do módulo se foi carregado ou False em caso de falha.
+  """
+
   def show_fail ():
+    # Mostra a falha ocorrida
     traceback.print_exc()
     print("Could not import module:", name)
 
@@ -82,12 +88,16 @@ def _do_import (name):
       return False
 
     name = names_to_try.pop(0)
+    # Atribui a 1º posição da lista à "name".
+    # Tratando "names_to_try"como uma fila.
 
     if name in sys.modules:
+      # Verifica se "name" já foi importado.
       return name
 
     try:
       __import__(name, level=0)
+      # Tenta importar o modulo em tempo de execução.
       return name
     except ImportError:
       # There are two cases why this might happen:
@@ -102,35 +112,50 @@ def _do_import (name):
       # Sorting out the two cases is an ugly hack.
 
       message = str(sys.exc_info()[1].args[0])
+      # Atribui em forma de String, o 1° argumento do parametro "value"
+      # retornado por "sys.exec_info()".
       s = message.rsplit(" ", 1)
+      # Retorna uma lista de duas posições, contendo a quebra da string "message" em duas.
+      # a mesma será separada no ultimo " " encontrado.
 
       # Sadly, PyPy isn't consistent with CPython here.
       #TODO: Check on this behavior in pypy 2.0.
+
+      #PyPy não é consistente com python aqui.
+      #Verificar este comportamento em pypy 2.0.
       if s[0] == "No module named" and (name.endswith(s[1]) or __pypy__):
-        # It was the one we tried to import itself. (Case 1)
-        # If we have other names to try, try them!
+        # Foi o que nós tentamos importar. (Caso 1)
+        # Se temos outros nomes para tentar, então chamamos
+        # o metodo recursivamente.
         return do_import2(base_name, names_to_try)
       elif message == "Import by filename is not supported.":
         print(message)
         import os.path
+        # https://docs.python.org/2/library/os.path.html
         n = name.replace("/", ".").replace("\\", ".")
+        # Subistitui todos os "/" por "." e os "\\" por ".";
         n = n.replace( os.path.sep, ".")
+        # Subistitui todos os separadores padroes do sistema por ".";
         if n.startswith("pox.") or n.startswith("ext."):
-          n = n[4:]
+            # Se n comeca com "pox." ou "ext.";
+            n = n[4:]
+            # O prefixo é retirado de n;
         print("Maybe you meant to run '%s'?" % (n,))
+        # Sugere uma alternativa de bibliotea.
         return False
       else:
-        # This means we found the module we were looking for, but one
-        # of its dependencies was missing.
+        # Isto significa que encontramos o módulo que procurávamos,
+        # mas uma de suas dependências estava falta.
         show_fail()
         return False
     except:
-      # There was some other sort of exception while trying to load the
-      # module.  Just print a trace and call it a day.
+      # Havia algum outro tipo de exceção ao tentar carregar o módulo.
+      # Basta imprimir um rastreamento e chamá-lo um dia.
       show_fail()
       return False
 
   return do_import2(name, ["pox." + name, name])
+  # Chama a função recursivamente.
 
 
 def _do_imports (components):
@@ -139,14 +164,28 @@ def _do_imports (components):
 
   Returns map of component_name->name,module,members on success,
   or False on failure
+
+  Importa uma lista de componentes.
+
+  Retorna cada um dos componentes listados->nome, modulo, membros em
+  caso de sucesso ou Falso em caso de falha.
   """
+
   done = {}
   for name in components:
-    if name in done: continue
+    if name in done:
+        # Nome já foi importado
+        continue
+
     r = _do_import(name)
+    # Tenta importar o componente.
+    # r irá receber o nome do componente caso dê certo
+    # e False caso dê errado
     if r is False:
       return False
     members = dict(inspect.getmembers(sys.modules[r]))
+    # members recebe em forma de dicionário
+    # os membros do modulo que r tem o nome.
     done[name] = (r,sys.modules[r],members)
 
   return done
@@ -154,9 +193,14 @@ def _do_imports (components):
 
 def _do_launch (argv):
   component_order = []
+  # Lista vazia
+
   components = {}
+  # Dicionario vazio
 
   curargs = {}
+  # Dicionario vazio
+
   pox_options = curargs
 
   for arg in argv:
@@ -436,17 +480,30 @@ def _pre_startup ():
   but before any components are loaded.  This gives a chance to do
   early setup (e.g., configure logging before a component has a chance
   to try to log something!).
+
+  Essa função é chamada depois que todas as opções de varíola foram lidos,
+  mas antes de todos os componentes serem carregados.
+  Isso dá uma chance para fazer a configuração inicial
+  (por exemplo, configurar o log antes que um componente tenha
+  uma chance para tentar registrar algo!).
   """
 
   _setup_logging()
+  # Configura o arquivo de logging
 
   if _options.verbose:
     logging.getLogger().setLevel(logging.DEBUG)
+    # Seta o level do logging para debug
 
   if _options.enable_openflow:
     pox.openflow._launch() # Default OpenFlow launch
-
-
+    # Lancamento padrão do OpenFlow
+"""
+    Ver arquivos:
+    -> _options
+    -> core
+    -> openflow.of_01
+"""
 def _post_startup ():
   if _options.enable_openflow:
     if core._openflow_wanted:
@@ -462,9 +519,18 @@ def _post_startup ():
 def _setup_logging ():
   # First do some basic log config...
 
+  # Primeiro algumas configurações de log básico.
+
   # This is kind of a hack, but we need to keep track of the handler we
   # install so that we can, for example, uninstall it later.  This code
   # originally lived in pox.core, so we explicitly reference it here.
+  """
+  Este é tipo de um hack, mas precisamos acompanhar o manipulador que
+  vamos instalar para que nós possamos, por exemplo, desinstalá-lo mais tarde.
+  Este código, originalmente, viviam em pox.core, então nós vamos explicitamente
+  referenciá-lo aqui.
+  """
+
   pox.core._default_log_handler = logging.StreamHandler()
   formatter = logging.Formatter(logging.BASIC_FORMAT)
   pox.core._default_log_handler.setFormatter(formatter)
@@ -473,6 +539,8 @@ def _setup_logging ():
 
 
   # Now set up from config file if specified...
+  # Agora configure do arquivo de configuração se especificada...
+
   #TODO:
   #  I think we could move most of the special log stuff into
   #  the log module.  You'd just have to make a point to put the log
@@ -483,9 +551,11 @@ def _setup_logging ():
     if not os.path.exists(_options.log_config):
       print("Could not find logging config file:", _options.log_config)
       sys.exit(2)
-    logging.config.fileConfig(_options.log_config,
+    logging.config. (_options.log_config,
                               disable_existing_loggers=True)
-
+    """
+    Lê a configuração do arquivo ConfigParser formato _options.log_config.
+    """
 
 def set_main_function (f):
   global _main_thread_function
@@ -506,12 +576,17 @@ def boot (argv = None):
   Start up POX.
   """
 
-  # Add pox directory to path
+  # Adiciona o diretorio pox à path do python
   base = sys.path[0]
+  '''
+  sys.path[0] é o diretório que contém o script que foi usado para chamar
+  o interpretador Python.
+  '''
   sys.path.insert(0, os.path.abspath(os.path.join(base, 'pox')))
   sys.path.insert(0, os.path.abspath(os.path.join(base, 'ext')))
 
   thread_count = threading.active_count()
+  # Retorna a quantidade de threads ativas
 
   quiet = False
 
@@ -519,7 +594,7 @@ def boot (argv = None):
     if argv is None:
       argv = sys.argv[1:]
 
-    # Always load cli (first!)
+    # Sempre carrega cli (primeiro!)
     #TODO: Can we just get rid of the normal options yet?
     pre = []
     while len(argv):
