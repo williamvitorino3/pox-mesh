@@ -1,4 +1,4 @@
- #!/bin/sh -
+#!/bin/sh -
 
 # Copyright 2011,2012,2013 James McCauley
 #
@@ -83,6 +83,10 @@ def _do_import (name):
     print("Could not import module:", name)
 
   def do_import2 (base_name, names_to_try):
+    '''
+    Tenta importar as funçoes "names_to_try"
+    do modulo "base_name".
+    '''
     if len(names_to_try) == 0:
       print("Module not found:", base_name)
       return False
@@ -145,7 +149,7 @@ def _do_import (name):
         return False
       else:
         # Isto significa que encontramos o módulo que procurávamos,
-        # mas uma de suas dependências estava falta.
+        # mas uma de suas dependências estava faltando.
         show_fail()
         return False
     except:
@@ -164,7 +168,8 @@ def _do_imports (components):
 
   Returns map of component_name->name,module,members on success,
   or False on failure
-
+  """
+  """
   Importa uma lista de componentes.
 
   Retorna cada um dos componentes listados->nome, modulo, membros em
@@ -193,80 +198,136 @@ def _do_imports (components):
 
 def _do_launch (argv):
   component_order = []
+  # Ordem dos componentes
   # Lista vazia
 
   components = {}
+  # Componentes
   # Dicionario vazio
 
   curargs = {}
+  # Argumentos atuais
   # Dicionario vazio
 
   pox_options = curargs
+  # Opções do POX
+  # Copia a referência do objeto curargs para pox_options
 
   for arg in argv:
-    if not arg.startswith("-"):
-      if arg not in components:
-        components[arg] = []
-      curargs = {}
-      components[arg].append(curargs)
-      component_order.append(arg)
-    else:
+    # arg(argumento)
+    if not arg.startswith("-"):         # Se arg não inicia com "-"
+      if arg not in components:             # Se arg não estiver em componentes
+        components[arg] = []                # Adiciona uma lista vazia para a chave arg
+      curargs = {}                      # Reatribui um dicionario vazio a curargs
+      components[arg].append(curargs)   # Adiciona curargs a lista de componentes na posicao arg
+      component_order.append(arg)       # Adiciona arg a lista de ordem dos componentes
+  else:                                     # Se arg inicia com "-"
       arg = arg.lstrip("-").split("=", 1)
-      arg[0] = arg[0].replace("-", "_")
-      if len(arg) == 1: arg.append(True)
+      # Retira "-" arg e atribui uma lista de string com uma ou duas substrings
+      # da arg, separadas por "=".
+      arg[0] = arg[0].replace("-", "_")     # Substitui todos os "-" por "_" de agr[0]
+      if len(arg) == 1:     # Se arg[0] for uma lista de uma só posicao
+          arg.append(True)      # Adiciona True no final
       curargs[arg[0]] = arg[1]
+      # atribui o valor de arg[1] em curargs na posicao corespondente à string arg[0]
 
   _options.process_options(pox_options)
+  # Não sei
   global core
-  if pox.core.core is not None:
+  # Chama o objeto core como global
+  if pox.core.core is not None:     # Verififar arquivo core
     core = pox.core.core
     core.getLogger('boot').debug('Using existing POX core')
   else:
     core = pox.core.initialize(_options.threaded_selecthub,
                                _options.epoll_selecthub,
                                _options.handle_signals)
-
+  # Só quando olhar a core.py
   _pre_startup()
+  # Todas as opções do POX foram lidas.
   modules = _do_imports(n.split(':')[0] for n in component_order)
+  # Modulos recebe uma lista com:
+  #     -> Dicionario, contendo informações sobre os modulos importados.
+  #     -> False, se não for possível importar o módulo
   if modules is False:
     return False
 
   inst = {}
+  # Dicionário vazio
+
   for name in component_order:
+    # Passapor todos os componentes da lista component_order
+    # atribui esse valos a name.
     cname = name
+    # pra que serve "cname"?
+
     inst[name] = inst.get(name, -1) + 1
+    # Atribui ao dicionario na chave "name", oq ele contiver com essa chave + 1
+    # ou -1 + 1 se ele não tiver uma chave "name".
     params = components[name][inst[name]]
+    # params recebe o valor dos componentes na chave name na posição
+    # correspondente ao valor de inst[name].
     name = name.split(":", 1)
+    # Atribui a name uma lista de strings com a string name quebrada
+    # em no máximo duas posições, quebra essa feita no primeiro
+    # caracter ":" que aparecer.
+
     launch = name[1] if len(name) == 2 else "launch"
+    # launch recebe a segunda posicao da linta name, se ela contiver
+    # duas posicoes, se não, ele recebe a string "launch".
+
     name = name[0]
+    # name recebe a string da primeira posicao da lista name.
 
     name,module,members = modules[name]
+    # Pega os elementos de modules na chave name e atribui às variáveis
+    # simultaneamente. (Atribuição multipla)
 
-    if launch in members:
+    if launch in members:       # Se launch estiver em members
       f = members[launch]
-      # We explicitly test for a function and not an arbitrary callable
-      if type(f) is not types.FunctionType:
-        print(launch, "in", name, "isn't a function!")
-        return False
+      # atribui o mendo com a chave saunch à f
+
+      # We explicitly test for a function and not an arbitrary callable.
+      # Testamos explicitamente para uma função e não um arbitrário callable.
+      if type(f) is not types.FunctionType:             # Se f não for uma função
+        print(launch, "in", name, "isn't a function!")  # Diz não é uma função
+        return False                                    # Retorna falso
 
       if getattr(f, '_pox_eval_args', False):
+        # Verifica se o metodo '_pox_eval_args' existe em f.
         import ast
-        for k,v in params.items():
+        '''
+        O módulo ast ajuda aplicações Python para processar árvores do Python
+        sintaxe abstrata gramática. A própria sintaxe abstrata pode mudar com
+        cada versão Python; Este módulo ajuda a descobrir programaticamente
+        o que a gramática atual se parece.
+        '''
+
+        for k,v in params.items():              # Declarado na linha 267
+        #  Copia a chave -> k e o valor -> v das posições do dicionario params.
           if isinstance(v, str):
+            # Se o objeto v é da classe string.
             try:
               params[k] = ast.literal_eval(v)
+              # Verifica se o valor de v é código python
             except:
               # Leave it as a string
               pass
 
       multi = False
-      if f.__code__.co_argcount > 0:
+      if f.__code__.co_argcount > 0:# Se a função f receber algum argumento.
         #FIXME: This code doesn't look quite right to me and may be broken
         #       in some cases.  We should refactor to use inspect anyway,
         #       which should hopefully just fix it.
+        '''
+        FIXME: Esse código não parece muito bem para mim e pode ser quebrado em alguns
+        casos. Nós devemos refatorar para uso de qualquer forma, inspecionar
+        que esperemos que deve apenas corrigi-lo.
+        '''
         if (f.__code__.co_varnames[f.__code__.co_argcount-1]
             == '__INSTANCE__'):
           # It's a multi-instance-aware component.
+          # É um componente de reconhecimento de instância de multipla.
 
           multi = True
 
@@ -276,13 +337,22 @@ def _do_launch (argv):
           # 3. True if this is the last instance, False otherwise
           # The last is just a comparison between #1 and #2, but it's
           # convenient.
+
+          # Parâmetro especial __INSTANCE__ é passado uma tupla com:
+          # 1. O numero da instancia(0...n-1)
+          # O total de instancias deste módulo.
+          # 3. True se esta for a ultima instancia, False so não.
+          # O último é apenas uma comparação entre o #1 e #2, mas é conveniente.
+
+
           params['__INSTANCE__'] = (inst[cname], len(components[cname]),
            inst[cname] + 1 == len(components[cname]))
 
       if multi == False and len(components[cname]) != 1:
+        # Verifica se existe mais de um objeto de multi.
         print(name, "does not accept multiple instances")
         return False
-
+        # Cansei... Vou pular isso... Fllw
       try:
         if f(**params) is False:
           # Abort startup
@@ -367,30 +437,44 @@ def _do_launch (argv):
 class Options (object):
   def set (self, given_name, value):
     name = given_name.replace("-", "_")
+    # Substitui os "-" de given_namepor "_" e atribui à name
     if name.startswith("_") or hasattr(Options, name):
+      # Verifica se name inicia com "_"
+      # Verifica se given_name pertence à classe Options.
       # Hey, what's that about?
       print("Illegal option:", given_name)
       return False
     has_field = hasattr(self, name)
+    # Verifica se name pertence ao objeto self.
     has_setter = hasattr(self, "_set_" + name)
+    # Verifica se o objeto self tem um setter para name.
     if has_field == False and has_setter == False:
+      # Name desconhecido para a classe Options.
       print("Unknown option:", given_name)
       return False
-    if has_setter:
+    if has_setter:  # Se tiver setter.
       setter = getattr(self, "_set_" + name)
-      setter(given_name, name, value)
+      # getattr == O valor do atributo "nome" do objeto.
+      # Atribui a setter o valor do retorno da função.
+      setter(given_name, name, value)   # Seta os atributos.
     else:
       if isinstance(getattr(self, name), bool):
+        # Verifica se name é um atributo booleano.
         # Automatic bool-ization
         value = str_to_bool(value)
+        # Transforma value em string.
       setattr(self, name, value)
+      # Atribui value ao atributo name do objeto self.
     return True
+# Fecha set.
 
   def process_options (self, options):
     for k,v in options.iteritems():
       if self.set(k, v) is False:
+        # Opção options[k] desconhecida para a classe Options.
         # Bad option!
         sys.exit(1)
+        # Fecha o processo informando que ouve erro.
 
 
 _help_text = """
@@ -417,9 +501,9 @@ The 'help' component can give help for other components.  Start with:
 """.strip()
 
 
-class POXOptions (Options):
+class POXOptions (Options):             # Classe filha da classe Options.
   def __init__ (self):
-#    self.cli = True
+  #    self.cli = True
     self.verbose = False
     self.enable_openflow = True
     self.log_config = None
@@ -429,27 +513,33 @@ class POXOptions (Options):
 
   def _set_h (self, given_name, name, value):
     self._set_help(given_name, name, value)
+    # Chama metodo que mostra texto de ajuda e fecha o processo.
 
   def _set_help (self, given_name, name, value):
     print(_help_text)
     #TODO: Summarize options, etc.
     sys.exit(0)
+    # Mostra texto de ajuda e fecha o processo.
 
   def _set_version (self, given_name, name, value):
     global core
-    if core is None:
-      core = pox.core.initialize()
-    print(core._get_python_version())
-    sys.exit(0)
+    # Pega a variável core do arquivo como global.
+    if core is None:    # Se core não tiver cido inicializada.
+      core = pox.core.initialize()  # Inicializa o objeto.
+    print(core._get_python_version())   # Pinta a verção do core.
+    sys.exit(0) # Encerra o processo.
 
-  def _set_unthreaded_sh (self, given_name, name, value):
+  def _set_unthreaded_sh(self, given_name, name, value):
     self.threaded_selecthub = False
+    # Atualiza o valor do parametro threaded_selecthub do objeto POXOprtions
 
   def _set_epoll_sh (self, given_name, name, value):
     self.epoll_selecthub = str_to_bool(value)
+    # Atribui valor ao parametro epoll_selecthub do objeto POXOptions
 
   def _set_no_openflow (self, given_name, name, value):
     self.enable_openflow = not str_to_bool(value)
+    # Atribui valor ao parametro enable_openflow do objeto POXOptions
 
 #  def _set_no_cli (self, given_name, name, value):
 #    self.cli = not str_to_bool(value)
@@ -458,18 +548,23 @@ class POXOptions (Options):
     if value is True:
       # I think I use a better method for finding the path elsewhere...
       p = os.path.dirname(os.path.realpath(__file__))
+      # Atribui a p o diretorio em q __file__ está.
       value = os.path.join(p, "..", "logging.cfg")
+      # Atribui a value o local onde logging.cfg está.
     self.log_config = value
+    # Atribui o valor de Value ao parametro log_config do objeto POXOptions
 
-  def _set_debug (self, given_name, name, value):
+  def _set_debug(self, given_name, name, value):
     value = str_to_bool(value)
-    if value:
+    # Pega um valor booleano a partir de value
+    if value: # Se value for verdadeiro
       # Debug implies no openflow and no CLI and verbose
       #TODO: Is this really an option we need/want?
       self.verbose = True
+      # Atribui Verdadeiro ao atributo verbose do objeto POXOptions
       self.enable_openflow = False
-#      self.cli = False
-
+      # Atribui Falso ao atributo enable_openflow do objeto POXOptions
+      # self.cli = False
 
 _options = POXOptions()
 
@@ -481,7 +576,7 @@ def _pre_startup ():
   early setup (e.g., configure logging before a component has a chance
   to try to log something!).
 
-  Essa função é chamada depois que todas as opções de varíola foram lidos,
+  Essa função é chamada depois que todas as opções do POX foram lidas,
   mas antes de todos os componentes serem carregados.
   Isso dá uma chance para fazer a configuração inicial
   (por exemplo, configurar o log antes que um componente tenha
@@ -551,8 +646,7 @@ def _setup_logging ():
     if not os.path.exists(_options.log_config):
       print("Could not find logging config file:", _options.log_config)
       sys.exit(2)
-    logging.config. (_options.log_config,
-                              disable_existing_loggers=True)
+    logging.config(_options.log_config, disable_existing_loggers=True)
     """
     Lê a configuração do arquivo ConfigParser formato _options.log_config.
     """
