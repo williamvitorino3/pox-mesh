@@ -1,4 +1,5 @@
 #!/bin/sh -
+# coding=utf-8
 
 # Copyright 2011,2012,2013 James McCauley
 #
@@ -20,7 +21,7 @@
 # is a good idea if you're using Python from MacPorts, for example.
 # We fall back to just "python" and hope that works.
 
-#TODO: Make runnable by itself (paths need adjusting, etc.).
+# TODO: Make runnable by itself (paths need adjusting, etc.).
 
 ''''true
 export OPT="-u -O"
@@ -40,7 +41,7 @@ fi
 exec python $OPT "$0" $FLG "$@"
 '''
 
-from __future__ import print_function        # Nova implementação do print, faz print "a", "b" ->>> 'a', 'b'
+from __future__ import print_function  # Nova implementação do print, faz print "a", "b" ->>> 'a', 'b'
 
 import logging
 import logging.config
@@ -53,6 +54,7 @@ import types
 import threading
 
 import pox.core
+
 core = None
 
 import pox.openflow
@@ -66,7 +68,8 @@ try:
 except ImportError:
   __pypy__ = None
 
-def _do_import (name):
+
+def _do_import(name):
   """
   Try to import the named component.
   Returns its module name if it was loaded or False on failure.
@@ -77,12 +80,12 @@ def _do_import (name):
   Retorna o nome do módulo se foi carregado ou False em caso de falha.
   """
 
-  def show_fail ():
+  def show_fail():
     # Mostra a falha ocorrida
     traceback.print_exc()
     print("Could not import module:", name)
 
-  def do_import2 (base_name, names_to_try):
+  def do_import2(base_name, names_to_try):
     '''
     Tenta importar as funçoes "names_to_try"
     do modulo "base_name".
@@ -123,10 +126,10 @@ def _do_import (name):
       # a mesma será separada no ultimo " " encontrado.
 
       # Sadly, PyPy isn't consistent with CPython here.
-      #TODO: Check on this behavior in pypy 2.0.
+      # TODO: Check on this behavior in pypy 2.0.
 
-      #PyPy não é consistente com python aqui.
-      #Verificar este comportamento em pypy 2.0.
+      # PyPy não é consistente com python aqui.
+      # Verificar este comportamento em pypy 2.0.
       if s[0] == "No module named" and (name.endswith(s[1]) or __pypy__):
         # Foi o que nós tentamos importar. (Caso 1)
         # Se temos outros nomes para tentar, então chamamos
@@ -138,12 +141,12 @@ def _do_import (name):
         # https://docs.python.org/2/library/os.path.html
         n = name.replace("/", ".").replace("\\", ".")
         # Subistitui todos os "/" por "." e os "\\" por ".";
-        n = n.replace( os.path.sep, ".")
+        n = n.replace(os.path.sep, ".")
         # Subistitui todos os separadores padroes do sistema por ".";
         if n.startswith("pox.") or n.startswith("ext."):
-            # Se n comeca com "pox." ou "ext.";
-            n = n[4:]
-            # O prefixo é retirado de n;
+          # Se n comeca com "pox." ou "ext.";
+          n = n[4:]
+          # O prefixo é retirado de n;
         print("Maybe you meant to run '%s'?" % (n,))
         # Sugere uma alternativa de bibliotea.
         return False
@@ -162,7 +165,7 @@ def _do_import (name):
   # Chama a função recursivamente.
 
 
-def _do_imports (components):
+def _do_imports(components):
   """
   Import each of the listed components
 
@@ -179,8 +182,8 @@ def _do_imports (components):
   done = {}
   for name in components:
     if name in done:
-        # Nome já foi importado
-        continue
+      # Nome já foi importado
+      continue
 
     r = _do_import(name)
     # Tenta importar o componente.
@@ -191,12 +194,12 @@ def _do_imports (components):
     members = dict(inspect.getmembers(sys.modules[r]))
     # members recebe em forma de dicionário
     # os membros do modulo que r tem o nome.
-    done[name] = (r,sys.modules[r],members)
+    done[name] = (r, sys.modules[r], members)
 
   return done
 
 
-def _do_launch (argv):
+def _do_launch(argv):
   component_order = []
   # Ordem dos componentes
   # Lista vazia
@@ -215,27 +218,28 @@ def _do_launch (argv):
 
   for arg in argv:
     # arg(argumento)
-    if not arg.startswith("-"):         # Se arg não inicia com "-"
-      if arg not in components:             # Se arg não estiver em componentes
-        components[arg] = []                # Adiciona uma lista vazia para a chave arg
-      curargs = {}                      # Reatribui um dicionario vazio a curargs
-      components[arg].append(curargs)   # Adiciona curargs a lista de componentes na posicao arg
-      component_order.append(arg)       # Adiciona arg a lista de ordem dos componentes
-  else:                                     # Se arg inicia com "-"
-      arg = arg.lstrip("-").split("=", 1)
-      # Retira "-" arg e atribui uma lista de string com uma ou duas substrings
-      # da arg, separadas por "=".
-      arg[0] = arg[0].replace("-", "_")     # Substitui todos os "-" por "_" de agr[0]
-      if len(arg) == 1:     # Se arg[0] for uma lista de uma só posicao
-          arg.append(True)      # Adiciona True no final
-      curargs[arg[0]] = arg[1]
-      # atribui o valor de arg[1] em curargs na posicao corespondente à string arg[0]
+    if not arg.startswith("-"):  # Se arg não inicia com "-"
+      if arg not in components:  # Se arg não estiver em componentes
+        components[arg] = []  # Adiciona uma lista vazia para a chave arg
+      curargs = {}  # Reatribui um dicionario vazio a curargs
+      components[arg].append(curargs)  # Adiciona curargs a lista de componentes na posicao arg
+      component_order.append(arg)  # Adiciona arg a lista de ordem dos componentes
+  else:  # Se arg inicia com "-"
+    arg = arg.lstrip("-").split("=", 1)
+    # Retira "-" arg e atribui uma lista de string com uma ou duas substrings
+    # da arg, separadas por "=".
+    arg[0] = arg[0].replace("-", "_")  # Substitui todos os "-" por "_" de agr[0]
+    if len(arg) == 1:  # Se arg[0] for uma lista de uma só posicao
+      arg.append(True)  # Adiciona True no final
+    curargs[arg[0]] = arg[1]
+    # atribui o valor de arg[1] em curargs na posicao corespondente à string arg[0]
 
   _options.process_options(pox_options)
-  # Não sei
+  # Se a opção for desconhecida encerra o processo.
+
   global core
   # Chama o objeto core como global
-  if pox.core.core is not None:     # Verififar arquivo core
+  if pox.core.core is not None:  # Verififar arquivo core
     core = pox.core.core
     core.getLogger('boot').debug('Using existing POX core')
   else:
@@ -279,19 +283,19 @@ def _do_launch (argv):
     name = name[0]
     # name recebe a string da primeira posicao da lista name.
 
-    name,module,members = modules[name]
+    name, module, members = modules[name]
     # Pega os elementos de modules na chave name e atribui às variáveis
     # simultaneamente. (Atribuição multipla)
 
-    if launch in members:       # Se launch estiver em members
+    if launch in members:  # Se launch estiver em members
       f = members[launch]
       # atribui o mendo com a chave saunch à f
 
       # We explicitly test for a function and not an arbitrary callable.
       # Testamos explicitamente para uma função e não um arbitrário callable.
-      if type(f) is not types.FunctionType:             # Se f não for uma função
+      if type(f) is not types.FunctionType:  # Se f não for uma função
         print(launch, "in", name, "isn't a function!")  # Diz não é uma função
-        return False                                    # Retorna falso
+        return False  # Retorna falso
 
       if getattr(f, '_pox_eval_args', False):
         # Verifica se o metodo '_pox_eval_args' existe em f.
@@ -303,8 +307,8 @@ def _do_launch (argv):
         o que a gramática atual se parece.
         '''
 
-        for k,v in params.items():              # Declarado na linha 267
-        #  Copia a chave -> k e o valor -> v das posições do dicionario params.
+        for k, v in params.items():  # Declarado na linha 267
+          #  Copia a chave -> k e o valor -> v das posições do dicionario params.
           if isinstance(v, str):
             # Se o objeto v é da classe string.
             try:
@@ -315,8 +319,8 @@ def _do_launch (argv):
               pass
 
       multi = False
-      if f.__code__.co_argcount > 0:# Se a função f receber algum argumento.
-        #FIXME: This code doesn't look quite right to me and may be broken
+      if f.__code__.co_argcount > 0:  # Se a função f receber algum argumento.
+        # FIXME: This code doesn't look quite right to me and may be broken
         #       in some cases.  We should refactor to use inspect anyway,
         #       which should hopefully just fix it.
         '''
@@ -324,8 +328,8 @@ def _do_launch (argv):
         casos. Nós devemos refatorar para uso de qualquer forma, inspecionar
         que esperemos que deve apenas corrigi-lo.
         '''
-        if (f.__code__.co_varnames[f.__code__.co_argcount-1]
-            == '__INSTANCE__'):
+        if (f.__code__.co_varnames[f.__code__.co_argcount - 1]
+              == '__INSTANCE__'):
           # It's a multi-instance-aware component.
           # É um componente de reconhecimento de instância de multipla.
 
@@ -346,7 +350,7 @@ def _do_launch (argv):
 
 
           params['__INSTANCE__'] = (inst[cname], len(components[cname]),
-           inst[cname] + 1 == len(components[cname]))
+                                    inst[cname] + 1 == len(components[cname]))
 
       if multi == False and len(components[cname]) != 1:
         # Verifica se existe mais de um objeto de multi.
@@ -361,7 +365,7 @@ def _do_launch (argv):
         instText = ''
         if inst[cname] > 0:
           instText = "instance {0} of ".format(inst[cname] + 1)
-        print("Error executing {2}{0}.{1}:".format(name,launch,instText))
+        print("Error executing {2}{0}.{1}:".format(name, launch, instText))
         if inspect.currentframe() is sys.exc_info()[2].tb_frame:
           # Error is with calling the function
           # Try to give some useful feedback
@@ -379,7 +383,7 @@ def _do_launch (argv):
           defaults = [EMPTY] * (argcount - len(defaults)) + defaults
           args = {}
           for n, a in enumerate(argnames):
-            args[a] = [EMPTY,EMPTY]
+            args[a] = [EMPTY, EMPTY]
             if n < len(defaults):
               args[a][0] = defaults[n]
             if a in params:
@@ -391,31 +395,31 @@ def _do_launch (argv):
           if f.__doc__ is not None:
             print("Documentation for {0}:".format(name))
             doc = f.__doc__.split("\n")
-            #TODO: only strip the same leading space as was on the first
+            # TODO: only strip the same leading space as was on the first
             #      line
             doc = map(str.strip, doc)
-            print('',("\n ".join(doc)).strip())
+            print('', ("\n ".join(doc)).strip())
 
-          #print(params)
-          #print(args)
+          # print(params)
+          # print(args)
 
           print("Parameters for {0}:".format(name))
           if len(args) == 0:
             print(" None.")
           else:
             print(" {0:25} {1:25} {2:25}".format("Name", "Default",
-                                                "Active"))
+                                                 "Active"))
             print(" {0:25} {0:25} {0:25}".format("-" * 15))
 
-            for k,v in args.iteritems():
-              print(" {0:25} {1:25} {2:25}".format(k,str(v[0]),
-                    str(v[1] if v[1] is not EMPTY else v[0])))
+            for k, v in args.iteritems():
+              print(" {0:25} {1:25} {2:25}".format(k, str(v[0]),
+                                                   str(v[1] if v[1] is not EMPTY else v[0])))
 
           if len(params):
             print("This component does not have a parameter named "
                   + "'{0}'.".format(params.keys()[0]))
             return False
-          missing = [k for k,x in args.iteritems()
+          missing = [k for k, x in args.iteritems()
                      if x[1] is EMPTY and x[0] is EMPTY]
           if len(missing):
             print("You must specify a value for the '{0}' "
@@ -434,8 +438,8 @@ def _do_launch (argv):
   return True
 
 
-class Options (object):
-  def set (self, given_name, value):
+class Options(object):
+  def set(self, given_name, value):
     name = given_name.replace("-", "_")
     # Substitui os "-" de given_namepor "_" e atribui à name
     if name.startswith("_") or hasattr(Options, name):
@@ -456,7 +460,7 @@ class Options (object):
       setter = getattr(self, "_set_" + name)
       # getattr == O valor do atributo "nome" do objeto.
       # Atribui a setter o valor do retorno da função.
-      setter(given_name, name, value)   # Seta os atributos.
+      setter(given_name, name, value)  # Seta os atributos.
     else:
       if isinstance(getattr(self, name), bool):
         # Verifica se name é um atributo booleano.
@@ -466,10 +470,11 @@ class Options (object):
       setattr(self, name, value)
       # Atribui value ao atributo name do objeto self.
     return True
-# Fecha set.
 
-  def process_options (self, options):
-    for k,v in options.iteritems():
+  # Fecha set.
+
+  def process_options(self, options):
+    for k, v in options.iteritems():
       if self.set(k, v) is False:
         # Opção options[k] desconhecida para a classe Options.
         # Bad option!
@@ -501,9 +506,9 @@ The 'help' component can give help for other components.  Start with:
 """.strip()
 
 
-class POXOptions (Options):             # Classe filha da classe Options.
-  def __init__ (self):
-  #    self.cli = True
+class POXOptions(Options):  # Classe filha da classe Options.
+  def __init__(self):
+    #    self.cli = True
     self.verbose = False
     self.enable_openflow = True
     self.log_config = None
@@ -511,40 +516,40 @@ class POXOptions (Options):             # Classe filha da classe Options.
     self.epoll_selecthub = False
     self.handle_signals = True
 
-  def _set_h (self, given_name, name, value):
+  def _set_h(self, given_name, name, value):
     self._set_help(given_name, name, value)
     # Chama metodo que mostra texto de ajuda e fecha o processo.
 
-  def _set_help (self, given_name, name, value):
+  def _set_help(self, given_name, name, value):
     print(_help_text)
-    #TODO: Summarize options, etc.
+    # TODO: Summarize options, etc.
     sys.exit(0)
     # Mostra texto de ajuda e fecha o processo.
 
-  def _set_version (self, given_name, name, value):
+  def _set_version(self, given_name, name, value):
     global core
     # Pega a variável core do arquivo como global.
-    if core is None:    # Se core não tiver cido inicializada.
+    if core is None:  # Se core não tiver cido inicializada.
       core = pox.core.initialize()  # Inicializa o objeto.
-    print(core._get_python_version())   # Pinta a verção do core.
-    sys.exit(0) # Encerra o processo.
+    print(core._get_python_version())  # Pinta a verção do core.
+    sys.exit(0)  # Encerra o processo.
 
   def _set_unthreaded_sh(self, given_name, name, value):
     self.threaded_selecthub = False
     # Atualiza o valor do parametro threaded_selecthub do objeto POXOprtions
 
-  def _set_epoll_sh (self, given_name, name, value):
+  def _set_epoll_sh(self, given_name, name, value):
     self.epoll_selecthub = str_to_bool(value)
     # Atribui valor ao parametro epoll_selecthub do objeto POXOptions
 
-  def _set_no_openflow (self, given_name, name, value):
+  def _set_no_openflow(self, given_name, name, value):
     self.enable_openflow = not str_to_bool(value)
     # Atribui valor ao parametro enable_openflow do objeto POXOptions
 
-#  def _set_no_cli (self, given_name, name, value):
-#    self.cli = not str_to_bool(value)
+  #  def _set_no_cli (self, given_name, name, value):
+  #    self.cli = not str_to_bool(value)
 
-  def _set_log_config (self, given_name, name, value):
+  def _set_log_config(self, given_name, name, value):
     if value is True:
       # I think I use a better method for finding the path elsewhere...
       p = os.path.dirname(os.path.realpath(__file__))
@@ -557,19 +562,23 @@ class POXOptions (Options):             # Classe filha da classe Options.
   def _set_debug(self, given_name, name, value):
     value = str_to_bool(value)
     # Pega um valor booleano a partir de value
-    if value: # Se value for verdadeiro
+    if value:  # Se value for verdadeiro
       # Debug implies no openflow and no CLI and verbose
-      #TODO: Is this really an option we need/want?
+      # TODO: Is this really an option we need/want?
       self.verbose = True
       # Atribui Verdadeiro ao atributo verbose do objeto POXOptions
       self.enable_openflow = False
       # Atribui Falso ao atributo enable_openflow do objeto POXOptions
       # self.cli = False
 
+
 _options = POXOptions()
 
 
-def _pre_startup ():
+# Cria um Objeto POXOptions
+
+
+def _pre_startup():
   """
   This function is called after all the POX options have been read in
   but before any components are loaded.  This gives a chance to do
@@ -591,27 +600,34 @@ def _pre_startup ():
     # Seta o level do logging para debug
 
   if _options.enable_openflow:
-    pox.openflow._launch() # Default OpenFlow launch
+    pox.openflow._launch()  # Default OpenFlow launch
     # Lancamento padrão do OpenFlow
+
+
 """
     Ver arquivos:
     -> _options
     -> core
     -> openflow.of_01
 """
-def _post_startup ():
+
+
+def _post_startup():
   if _options.enable_openflow:
+    # Se o openflow do objeto _options estiver habilitado
     if core._openflow_wanted:
+      # Se o core estiver em espera
       if not core.hasComponent("of_01"):
         # Launch a default of_01
-        import pox.openflow.of_01
+        import pox.openflow.of_01  # Importa esse arquivo.
         pox.openflow.of_01.launch()
+        # roda o openflow.
     else:
       logging.getLogger("boot").debug("Not launching of_01")
+      # Debuga o log.
 
 
-
-def _setup_logging ():
+def _setup_logging():
   # First do some basic log config...
 
   # Primeiro algumas configurações de log básico.
@@ -632,11 +648,11 @@ def _setup_logging ():
   logging.getLogger().addHandler(pox.core._default_log_handler)
   logging.getLogger().setLevel(logging.INFO)
 
-
   # Now set up from config file if specified...
+
   # Agora configure do arquivo de configuração se especificada...
 
-  #TODO:
+  # TODO:
   #  I think we could move most of the special log stuff into
   #  the log module.  You'd just have to make a point to put the log
   #  module first on the commandline if you wanted later component
@@ -647,11 +663,10 @@ def _setup_logging ():
       print("Could not find logging config file:", _options.log_config)
       sys.exit(2)
     logging.config(_options.log_config, disable_existing_loggers=True)
-    """
-    Lê a configuração do arquivo ConfigParser formato _options.log_config.
-    """
+    # Lê a configuração do arquivo ConfigParser formato _options.log_config.
 
-def set_main_function (f):
+
+def set_main_function(f):
   global _main_thread_function
   if _main_thread_function == f: return True
   if _main_thread_function is not None:
@@ -659,15 +674,18 @@ def set_main_function (f):
     lg = logging.getLogger("boot")
     lg.error("Could not set main thread function to: " + str(f))
     lg.error("The main thread function is already "
-        + "taken by: " + str(_main_thread_function))
+             + "taken by: " + str(_main_thread_function))
     return False
   _main_thread_function = f
   return True
 
 
-def boot (argv = None):
+# Inicia o OpenFlow
+def boot(argv=None):
   """
   Start up POX.
+
+  Inicia POX.
   """
 
   # Adiciona o diretorio pox à path do python
@@ -689,60 +707,66 @@ def boot (argv = None):
       argv = sys.argv[1:]
 
     # Sempre carrega cli (primeiro!)
-    #TODO: Can we just get rid of the normal options yet?
+    # TODO: Can we just get rid of the normal options yet?
     pre = []
-    while len(argv):
-      if argv[0].startswith("-"):
+    # pre recebe uma lista vázia.
+    while len(argv):  # Enquanto argv não estiver vázio.
+      if argv[0].startswith("-"):  # Se a primeira posição começar com "-".
         pre.append(argv.pop(0))
+        # Remove a primeira posição de argv e adiciona no final de pre.
       else:
         break
+        # Sai do laço.
     argv = pre + "py --disable".split() + argv
+    # Atribui a argv a concatenação destas listas.
 
-    if _do_launch(argv):
-      _post_startup()
-      core.goUp()
+    if _do_launch(argv):  # Se o objeto pode ser carregado.
+      _post_startup()  # Inicia OpenFlow
+      core.goUp()  # Faz alguma coisa.
     else:
-      #return
-      quiet = True
-      raise RuntimeError()
+      quiet = True  # Atribui a True para essa variável
+      raise RuntimeError()  # Cria um RubtimeError.
 
-  except SystemExit:
-    return
-  except:
-    if not quiet:
-      traceback.print_exc()
+  except SystemExit:  # Se ocorrer o erro SystemExit.
+    return  # Sai da função.
+  except:  # Qualquer outra exeção.
+    if not quiet:  # Se não estiver quieto
+      traceback.print_exc()  # Printa a exceção.
 
     # Try to exit normally, but do a hard exit if we don't.
+    # Tente sair normalmente, mas fazer uma saída difícil, se não o fizermos.
     # This is sort of a hack.  What's the better option?  Raise
     # the going down event on core even though we never went up?
 
     try:
       for _ in range(4):
-        if threading.active_count() <= thread_count:
+        if threading.active_count() <= thread_count:  # Verifica se a thread atual é a q está no contador.
           # Normal exit
           return
         time.sleep(0.25)
     except:
       pass
 
-    os._exit(1)
+    os._exit(1)   # Saída com algum erro.
     return
 
   if _main_thread_function:
     _main_thread_function()
+    # Função principal à ser executada.
   else:
-    #core.acquire()
+    # core.acquire()
     try:
       while True:
         if core.quit_condition.acquire(False):
           core.quit_condition.wait(10)
           core.quit_condition.release()
-        if not core.running: break
+        if not core.running:  # Se o core não estiver rodando...
+          break   # Sai do laço.
     except:
       pass
-    #core.scheduler._thread.join() # Sleazy
+      # core.scheduler._thread.join() # Sleazy
 
   try:
-    pox.core.core.quit()
+    pox.core.core.quit()    # Fecha o core.
   except:
     pass
