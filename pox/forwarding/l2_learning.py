@@ -75,6 +75,11 @@ class LearningSwitch (EventMixin):
      6a) Send buffered packet out appopriate port
   """
   def __init__ (self, connection, transparent):
+    """
+    Metodo construtor da classe.
+    :param connection: Conexão.
+    :param transparent: Transparência.
+    """
     # Switch we'll be adding L2 learning switch capabilities to
     self.connection = connection
     self.transparent = transparent
@@ -90,12 +95,21 @@ class LearningSwitch (EventMixin):
 
   def _handle_PacketIn (self, event):
     """
+    Lida com pacotes em mensagens do interruptor para implementar o algoritmo acima.
+    :param event: Evento relacionado.
+    :return: Sem retorno.
+    """
+    """
     Handles packet in messages from the switch to implement above algorithm.
     """
 
     packet = event.parse()
 
     def flood ():
+      """
+      Enche os pacotes
+      :return: Sem retorno.
+      """
       """ Floods the packet """
       if event.ofp.buffer_id == -1:
         log.warning("Not flooding unbuffered packet on %s",
@@ -114,6 +128,11 @@ class LearningSwitch (EventMixin):
       self.connection.send(msg)
 
     def drop (duration = None):
+      """
+      Descarta o pacote e, opcionalmente, instalar um fluxo de continuar soltando outros semelhantes por um tempo.
+      :param duration: Duração do pacote.
+      :return: Sem retorno.
+      """
       """
       Drops this packet and optionally installs a flow to continue
       dropping similar ones for a while
@@ -167,6 +186,9 @@ class LearningSwitch (EventMixin):
 
 class l2_learning (EventMixin):
   """
+  Aguarda os Switches OpenFlow conectarem-se e torna-os Switches de aprendizagem.
+  """
+  """
   Waits for OpenFlow switches to connect and makes them learning switches.
   """
   def __init__ (self, transparent):
@@ -174,11 +196,21 @@ class l2_learning (EventMixin):
     self.transparent = transparent
 
   def _handle_ConnectionUp (self, event):
+    """
+    Identifica as conexões.
+    :param event: Evento relacionado.
+    :return: Sem retorno.
+    """
     log.debug("Connection %s" % (event.connection,))
     LearningSwitch(event.connection, self.transparent)
 
 
 def launch (transparent=False):
+  """
+  Inicia os Switches de aprendizagem.
+  :param transparent: Transoarência.
+  :return: Sem retorno.
+  """
   """
   Starts an L2 learning switch.
   """

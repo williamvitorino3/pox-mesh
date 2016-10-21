@@ -18,14 +18,27 @@ import pox.openflow.ofcommand as ofcommand
 
 class dumb_l2_switch (EventMixin):
   def __init__ (self):
+    """
+    Construtor da classe.
+    """
     log.info("Starting")
     self.listenTo(core)
     self.st = {}
     
   def _handle_GoingUpEvent (self, event):
+    """
+    Lista os eventos.
+    :param event: Evento.
+    :return: Sem retorno.
+    """
     self.listenTo(core.openflow)
         
   def _handle_PacketIn (self, event):
+    """
+    Método de entrada de pacotes.
+    :param event: Evento.
+    :return: Sem retorno.
+    """
     """Packet entry method.
     Drop LLDP packets (or we get confused) and attempt learning and forwarding
     """
@@ -53,6 +66,13 @@ class dumb_l2_switch (EventMixin):
     self.forward_l2_packet(con, inport, packet, packet.arr, buffer_id)
       
   def do_l2_learning(self, con, inport, packet):
+    """
+    Dado um pacote, aprende a fonte e pega um switch ou importação.
+    :param con:
+    :param inport: importação.
+    :param packet: Pacote.
+    :return: Sem retorno.
+    """
     """Given a packet, learn the source and peg to a switch/inport 
     """
     # learn MAC on incoming port
@@ -76,7 +96,16 @@ class dumb_l2_switch (EventMixin):
     # Replace any old entry for (switch,mac).
     #mac = mac_to_int(packet.src)
   
-  def forward_l2_packet(self, con, inport, packet, buf, bufid):   
+  def forward_l2_packet(self, con, inport, packet, buf, bufid):
+    """
+    Se nós aprendemos o destino MAC, cria um fluxo e enviaa apenas fora de sua entrada. Se não, cria e manda o pacote.
+    :param con:
+    :param inport:
+    :param packet:
+    :param buf:
+    :param bufid:
+    :return:
+    """
     """If we've learned the destination MAC set up a flow and
     send only out of its inport.  Else, flood.
     """
