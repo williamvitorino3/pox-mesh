@@ -17,19 +17,28 @@ Turns your complex OpenFlow switches into stupid hubs.
 """
 
 from pox.core import core
-import pox.openflow.libopenflow_01 as of
+import pox.openflow.libopenflow_01 as of    # Tem q saber oq isso faz
 from pox.lib.util import dpidToStr
 
-log = core.getLogger()
+log = core.getLogger()    # Cria um log do sistema
 
 
 def _handle_ConnectionUp (event):
+  """
+  Identifica as conexões.
+  :param event: Evento relacionado.
+  :return: Sem retorno.
+  """
   msg = of.ofp_flow_mod()
   msg.actions.append(of.ofp_action_output(port = of.OFPP_FLOOD))
   event.connection.send(msg)
   log.info("Hubifying %s", dpidToStr(event.dpid))
 
 def launch ():
+  """
+  Inicia o hub.
+  :return: Sem retorno.
+  """
   core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp)
 
   log.info("Hub running.")
