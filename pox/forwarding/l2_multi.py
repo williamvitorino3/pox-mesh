@@ -27,6 +27,15 @@ Depends on openflow.discovery
 Works with openflow.spanning_tree
 """
 
+"""
+Um primeiro tiro desarrumado em um switch L2 independente que
+aprende endereços Ethernet em toda a rede e escolhe caminhos
+curtos entre eles.
+
+Depende do openflow.discovery
+Trabalha com openflow.spanning_tree #Arvore de abrabgência...
+"""
+
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
 from pox.lib.revent import *
