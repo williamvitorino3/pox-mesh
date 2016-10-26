@@ -14,6 +14,7 @@
 
 pcap_traces = False
 
+"função para iniciar(lançar)"
 def launch ():
   global pcap_traces
   pcap_traces = True

@@ -19,11 +19,33 @@ data structures.
 Lots of stuff could be improved and the naming is pretty awful.
 """
 
+"""
+
+Várias coisas para converter entre OpenFlow e JSON -friendly
+estruturas de dados.
+
+Os lotes do material poderia ser melhorado e a nomeação é terrível .
+"""
+
 from pox.lib.util import fields_of,is_scalar
 import pox.openflow.libopenflow_01 as of
 
 def _fix_of_int (n):
+
+  """
+  basestring( ) 
+  Este tipo abstrato é a superclasse para stre unicode. 
+  Ele não pode ser chamado ou instanciado, 
+  mas pode ser utilizado para testar se um objecto é um exemplo de strou unicode. 
+  É equivalente a .isinstance(obj, basestring)isinstance(obj, (str, unicode))
+  """
   if isinstance(n, basestring):
+    """
+    getattr( Objeto , nome [ , padrão ] ) ¶
+    Devolver o valor do atributo com o nome do objeto . 
+    Nome deve ser uma cadeia. Se a string é o nome de um dos atributos do objeto, 
+    o resultado é o valor desse atributo.
+    """
     return getattr(of, n, None)
   return n
 
@@ -55,24 +77,28 @@ def _fix_proto (n):
 
 from pox.lib.addresses import parse_cidr, EthAddr
 
+"fixa o ethernet"
 def _fix_eth (n):
   if n is None: return None
   return EthAddr(n)
 
+"fixa o ip"
 def _fix_ip (n):
   if n is None: return n
   return parse_cidr(n, infer = False)
 
 import socket
 
+"fixa a porta"
 def _fix_port (n):
   if isinstance(n, basestring):
     return socket.getservbyname(n)
   return n
 
 def dict_to_match (jm):
+  "ofp_match: O cabeçalho de jogo de fluxo é descrito pela estrutura ofp_match"
   m = of.ofp_match()
-  m.in_port = _fix_of_int(jm.get('in_port'))
+  m.in_port = _fix_of_int(jm.get('in_port')) "in_port: Alternar porta de entrada"
   m.dl_src = _fix_eth(jm.get('dl_src'))
   m.dl_dst = _fix_eth(jm.get('dl_dst'))
   if 'dl_vlan'     in jm: m.dl_vlan     = jm['dl_vlan']
@@ -89,8 +115,10 @@ def dict_to_match (jm):
 
 def _unfix_null (v):
   return v
+  "libera porta"
 def _unfix_port (v):
   return of.ofp_port_map.get(v, v)
+  "libera ip"
 def _unfix_ip (v):
   v = v()
   if v[1] == 0:
@@ -104,6 +132,10 @@ def _unfix_ethertype (v):
     return v
   #NOTE: This may just result in a hex string.  In that case, we might
   #      want to just use a number.
+  """
+  Este pode apenas resultar em uma string hexadecimal . Nesse caso , poderíamos
+  Quer usar apenas um número.
+  """
   return ethtype_to_str(v)
 
 _unfix_map = {k:_unfix_null for k in of.ofp_match_data.keys()}
@@ -129,6 +161,7 @@ def match_to_dict (m):
 
 def action_to_dict (a):
   d = {}
+  "ofp_action_type: A máscara de bits usa os valores de ofp_action_type como o número de bits a deslocar esquerda para uma ação associada ."
   d['type'] = of.ofp_action_type_map.get(a.type, a.type)
   for k,v in fields_of(a).iteritems():
     if k in ['type','length']: continue
@@ -151,7 +184,7 @@ def dict_to_action (d):
   a = cls(**d)
   return a
 
-
+"Recebe uma lista de estatísticas de fluxo"
 def flow_stats_to_list (flowstats):
   """
   Takes a list of flow stats
@@ -159,6 +192,7 @@ def flow_stats_to_list (flowstats):
   stats = []
   for stat in flowstats:
     s = {}
+    "O método append () anexa um passado obj na lista existente."
     stats.append(s)
     for k,v in fields_of(stat).iteritems():
       if k == 'length': continue
@@ -169,12 +203,19 @@ def flow_stats_to_list (flowstats):
       s[k] = v
   return stats
 
-
+"Toma ofp_desc_stats resposta"
 def switch_desc_to_dict (desc):
   """
   Takes ofp_desc_stats response
   """
   r = {}
+  """
+  mfr_desc: descrição do fabricante
+  hw_desc: Descrição do hardware 
+  sw_desc: Descrição do Software 
+  serial_num: número de série
+  dp_desc: descrição legível de caminho de dados
+  """
   for k in ['mfr_desc','hw_desc','sw_desc','serial_num','dp_desc']:
     r[k] = getattr(desc, k)
   return r
@@ -183,6 +224,7 @@ def switch_desc_to_dict (desc):
 def dict_to_flow_mod (flow):
   match = flow.get('match')
   if match is None:
+    "ofp_match: Campos para corresponder. tamanho variável"
     match = of.ofp_match()
   else:
     match = dict_to_match(match)
@@ -196,7 +238,12 @@ def dict_to_flow_mod (flow):
 
   fm = of.ofp_flow_mod(match = match)
   fm.actions = actions
-
+  """
+  cookie: identificador emitido pelo controlador opaco
+  idle_timeout: tempo inativo de modificação fluxo de originais
+  hard_timeout: tempo limite rígido de modificação fluxo inicial
+  priority: nível de prioridade de entrada de fluxo
+  """
   for k in ['cookie','idle_timeout','hard_timeout','priority']:
     if k in flow:
       setattr(fm, k, flow[k])
@@ -207,30 +254,47 @@ def dict_to_flow_mod (flow):
 import pox.lib.packet as packetlib
 valid_packet_types = {}
 def _init ():
+  "dir: Sem argumentos, voltar a lista de nomes no âmbito local atual. Com um argumento, tentar devolver uma lista de atributos válidos para esse objeto."
   candidates = [x for x in dir(packetlib) if x.isalpha()]
   good = set()
   for c in candidates:
+    "lower: mais baixo; upper: mais alto"
     if c.lower() not in candidates: continue
     if c.upper() not in candidates: continue
+    "getattr: Devolver o valor do atributo com o nome do objeto . "
     valid_packet_types[c.lower()] = getattr(packetlib, c.lower())
 _init()
 
+"dict: atribui a função arbitrária namespace de apoio."
 def dict_to_packet (d, parent=None):
   if isinstance(d, list):
+    "chr: Retorna uma string de um personagem cujo código ASCII é o inteiro "
     d = b''.join(chr(x) for x in data)
+    "isinstance: Retorna verdadeiro se o objeto argumento é uma instância da ClassInfo argumento, ou de um (direta, indireta ou virtual subclasse) da mesma"
+    "Este tipo abstrato é a superclasse para stre unicode. Ele não pode ser chamado ou instanciado, "
+    "mas pode ser utilizado para testar se um objecto é um exemplo de strou unicode."
+    "É equivalente a .isinstance(obj, basestring)isinstance(obj, (str, unicode))"
   if isinstance(d, basestring):
     return d
 
   payload = d.get('payload')
   d = d.copy()
 
+  "assert: o programa testa essa condição e desencadea um erro se a condição for falsa."
   assert d['class'] in valid_packet_types
   cls = valid_packet_types[d['class']]
   example = cls()
+
+  "del: Chamado quando a instância está prestes a ser destruído. "
   del d['class']
 
   for k,v in d.iteritems():
     assert not k.startswith('_')
+    """
+    hasattr(objeto, nome): Os argumentos são um objeto e uma string. 
+    O resultado é True se a string é o nome de um dos atributos do objeto, 
+    False se não. (Isso é implementado pelo telefone e ver se ele gera uma exceção ou não.)getattr(object, name)
+    """
     assert hasattr(example, k)
     assert k not in ['prev','next','raw','parsed']
 
@@ -244,6 +308,7 @@ def dict_to_packet (d, parent=None):
 
 from pox.lib.packet.packet_base import packet_base
 
+"fix-parsed: Traduzir de pacote de dados analisado para dicts e outras coisas"
 def fix_parsed (m):
   """
   Translate parsed packet data to dicts and stuff
@@ -251,6 +316,12 @@ def fix_parsed (m):
   if m is None:
     return {"type":"raw","data":[]}
   if isinstance(m, basestring):
+    """
+    Dada uma cadeia de comprimento um, 
+    retornar um inteiro representando o ponto de código 
+    Unicode do caractere quando o argumento é um objeto unicode, 
+    ou o valor do byte quando o argumento é uma string de 8 bits. 
+    """
     return {"type":"raw","data":[ord(b) for b in m]}
   assert isinstance(m, packet_base)
   if not m.parsed:
@@ -272,13 +343,19 @@ def fix_parsed (m):
   r['type'] = m.__class__.__name__
   return r
 
-
+"Converte dict para packet_out. Além disso, especial " output" chave é uma porta de saída ."
 def dict_to_packet_out (d):
   """
   Converts dict to packet_out
   Also, special key "output" is an output port.
   """
   po = of.ofp_packet_out()
+  """
+  Struct do pacote de saída:
+  buffer_id: ID atribuída pelo caminho de dados (-1 se não houver) .
+  in_port: porta de entrada do pacote ( OFPP_NONE se não houver).
+  actions: ações
+  """
   po.buffer_id = d.get('buffer_id', -1)
   po.in_port = _fix_of_int(d.get('in_port', of.OFPP_NONE))
   actions = d.get('actions', [])
@@ -308,8 +385,8 @@ def list_switches (ofnexus = None):
     for p in con.ports.values():
       pdict = {
         'port_no':p.port_no,
-        'hw_addr':str(p.hw_addr),
-        'name':p.name}
+        'hw_addr':str(p.hw_addr), "endereço MAC"
+        'name':p.name} "O campo de nome é um null- rescindido string contendo um nome legível para a interface."
       for bit,name in of.ofp_port_config_map.items():
         if p.config & bit:
           pdict[name.split('OFPPC_', 1)[-1].lower()] = True
@@ -321,7 +398,7 @@ def list_switches (ofnexus = None):
 
     rr = {
           'dpid':dpidToStr(dpid),
-          'n_tables':con.features.n_tables,
+          'n_tables':con.features.n_tables, "Número de tabelas suportado pelo caminho de dados"
           'ports':ports}
     r.append(rr)
 

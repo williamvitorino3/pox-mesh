@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """
+openflow.spanning_tree: Esse componente utiliza o discovery para contruir 
+uma visão da topologia da rede e constrói uma spanning tree para desabilitar 
+a inundação (flooding) nas portas dos switches que não estão na árvore;
+
 Creates a spanning tree.
 
 This component uses the discovery component to build a view of the network
@@ -39,11 +43,23 @@ from pox.lib.util import dpidToStr
 from pox.lib.recoco import Timer
 import time
 
+"""
+
+Pode ser bom se nós fizemos este acessível no núcleo ...
+_adj = defaultdict (lambda : defaultdict (lambda : []) )
+"""
 log = core.getLogger()
 
 # Might be nice if we made this accessible on core...
 #_adj = defaultdict(lambda:defaultdict(lambda:[]))
 
+"""
+Calcula a árvore de expansão real
+
+Retorna como dicionário onde estão as chaves DPID1 , eo
+valores são tuplas de ( DPID2 , porta -num ) , onde porta -num
+é a porta na DPID1 conectar a DPID2
+"""
 def _calc_spanning_tree ():
   """
   Calculates the actual spanning tree
@@ -55,7 +71,10 @@ def _calc_spanning_tree ():
   def flip (link):
     return Discovery.Link(link[2],link[3], link[0],link[1])
 
+  "O tipo de funções e funções criadas pela definidos pelo usuário expressões.lambda"
   adj = defaultdict(lambda:defaultdict(lambda:[]))
+
+  "Adicione todas as ligações e switches"
   switches = set()
   # Add all links and switches
   for l in core.openflow_discovery.adjacency:
@@ -64,6 +83,7 @@ def _calc_spanning_tree ():
     switches.add(l.dpid2)
 
   # Cull links -- we want a single symmetric link connecting nodes
+  "ligações de reforma - nós queremos um único link simétrica ligação dos nós"
   for s1 in switches:
     for s2 in switches:
       if s2 not in adj[s1]:
@@ -93,6 +113,7 @@ def _calc_spanning_tree ():
   tree = defaultdict(set)
 
   while True:
+    "Retornar um novo ordenados lista dos itens em iterable ."
     q = sorted(list(more)) + q
     more.clear()
     if len(q) == 0: break
@@ -121,9 +142,21 @@ def _calc_spanning_tree ():
 # If other things mess with port states, these may not be correct.  We
 # could also refer to Connection.ports, but those are not guaranteed to
 # be up to date.
+"""
+Mantenha uma lista de Estados do porto anteriores , para que possamos ignorar alguns mods portuárias
+# Se outras coisas mexer com os Estados do porto , estas não podem estar corretas . Nós
+# Poderia também se referem a Connection.ports , mas aqueles que não são garantidos para
+# Ser atualizado .
+"""
+
+"Se for verdade, vamos definir portas para baixo quando um interruptor liga"
 _prev = defaultdict(lambda : defaultdict(lambda : None))
 
 # If True, we set ports down when a switch connects
+"""
+Se for verdade, não permitem a desactivação pedaços de inundação até que uma descoberta completa
+# Ciclo deve ter concluído (a maioria faz sentido com _noflood_by_default ) .
+"""
 _noflood_by_default = False
 
 # If True, don't allow turning off flood bits until a complete discovery
@@ -131,6 +164,7 @@ _noflood_by_default = False
 _hold_down = False
 
 
+"Quando um switch conecta , esquecer-se sobre os Estados do porto anteriores"
 def _handle_ConnectionUp (event):
   # When a switch connects, forget about previous port states
   _prev[event.dpid].clear()
@@ -143,7 +177,7 @@ def _handle_ConnectionUp (event):
       _prev[con.dpid][p.port_no] = False
       pm = of.ofp_port_mod(port_no=p.port_no,
                           hw_addr=p.hw_addr,
-                          config = of.OFPPC_NO_FLOOD,
+                          config = of.OFPPC_NO_FLOOD, "OFPPC_NO_FLOOD: Não inclua essa porta ao inundando"
                           mask = of.OFPPC_NO_FLOOD)
       con.send(pm)
     _invalidate_ports(con.dpid)
@@ -152,7 +186,7 @@ def _handle_ConnectionUp (event):
     t = Timer(core.openflow_discovery.send_cycle_time + 1, _update_tree,
               kw={'force_dpid':event.dpid})
 
-
+"Quando os links alterar, atualizar Spanning Tree"
 def _handle_LinkEvent (event):
   # When links change, update spanning tree
 
@@ -165,7 +199,12 @@ def _handle_LinkEvent (event):
 
   _update_tree()
 
+"""
+árvore estendida atualização
 
+  force_dpid especifica um interruptor que deseja atualizar mesmo que é suposto
+  estar mantendo mudanças .
+"""
 def _update_tree (force_dpid = None):
   """
   Update spanning tree
@@ -175,27 +214,34 @@ def _update_tree (force_dpid = None):
   """
 
   # Get a spanning tree
+  "Obter uma árvore geradora"
   tree = _calc_spanning_tree()
+
+  """
+  Conexões nascidos antes desta vez são velhos o suficiente para que uma completa
+  # Ciclo de descoberta deve ter completado ( e , assim , todas as suas
+  # links deveria ter sido descoberto ) .
+  """
   log.debug("Spanning tree updated")
 
   # Connections born before this time are old enough that a complete
   # discovery cycle should have completed (and, thus, all of their
   # links should have been discovered).
+  "Agora modificar as portas conforme necessário"
   enable_time = time.time() - core.openflow_discovery.send_cycle_time - 1
 
-  # Now modify ports as needed
   try:
     change_count = 0
     for sw, ports in tree.iteritems():
       con = core.openflow.getConnection(sw)
-      if con is None: continue # Must have disconnected
-      if con.connect_time is None: continue # Not fully connected
+      if con is None: continue "Deve ter desligado"
+      if con.connect_time is None: continue "Não está completamente conectado"
 
       if _hold_down:
+        "Muito jovem - devemos mantenha mudanças ."
         if con.connect_time > enable_time:
-          # Too young -- we should hold down changes.
+          "mas nós vamos permitir que isso de qualquer maneira"
           if force_dpid is not None and sw == force_dpid:
-            # .. but we'll allow it anyway
             pass
           else:
             continue
@@ -228,10 +274,24 @@ def _update_tree (force_dpid = None):
     _prev.clear()
     log.exception("Couldn't push spanning tree")
 
+"Um mapa dpid_with_dirty_ports- > Contador"
+_dirty_switches = {}
+"Segundos de espera entre pedidos de recursos"
+_coalesce_period = 2 
 
-_dirty_switches = {} # A map dpid_with_dirty_ports->Timer
-_coalesce_period = 2 # Seconds to wait between features requests
+"""
+Registra o fato de que informações porta para DPID pode estar fora de data
 
+  Quando a árvore de expansão ajusta as bandeiras de porta , os bits de porta de configuração
+  mantemos a conexão se tornar desatualizados. Nós não queremos apenas
+  configurá-los localmente , porque uma mensagem de status de porta em voo poderia
+  substituí-los . Nós também pode não querer assumir que eles se definir o
+  maneira que queremos que eles. SO , fazemos enviar um pedido de recursos, mas vamos esperar um
+  momento antes de enviá-lo para que possamos potencialmente aglutinar vários.
+
+  TLDR : informações Porto para este parâmetro pode estar desatualizado por cerca de
+        segundos _coalesce_period .
+"""
 def _invalidate_ports (dpid):
   """
   Registers the fact that port info for dpid may be out of date
@@ -249,21 +309,30 @@ def _invalidate_ports (dpid):
   if dpid in _dirty_switches:
     # We're already planning to check
     return
-  t = Timer(_coalesce_period, _check_ports, args=(dpid,))
+  t = Timer(_coalesce_period, _check_ports, args=(dpid,)) "coalesce: aderir"
   _dirty_switches[dpid] = t
 
+"Envia um pedido de recursos para o DPID dadas"
 def _check_ports (dpid):
-  """
-  Sends a features request to the given dpid
-  """
+
   _dirty_switches.pop(dpid,None)
   con = core.openflow.getConnection(dpid)
   if con is None: return
+  """
+  Barrier (Barreira) : Barreira de solicitação / resposta mensagens 
+  são utilizados pelo controlador para garantir dependências de mensagens
+ foram cumpridos ou para receber notificações de operações concluídas .
+  """
   con.send(of.ofp_barrier_request())
+  """
+  Features (Características): O controlador pode solicitar a identidade e as capacidades básicas de um switch através do envio
+  um pedido de recursos ; o interruptor deve responder com uma características responder que especifica a identidade e básico
+  capacidades da chave. Isto é comumente realizada mediante estabelecimento do canal OpenFlow .
+  """
   con.send(of.ofp_features_request())
   log.debug("Requested switch features for %s", str(con))
 
-
+"Função para iniciar(lançar)"
 def launch (no_flood = False, hold_down = False):
   global _noflood_by_default, _hold_down
   if no_flood is True:
@@ -271,8 +340,9 @@ def launch (no_flood = False, hold_down = False):
   if hold_down is True:
     _hold_down = True
 
+  "começar a árvore de expansão"
   def start_spanning_tree ():
     core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp)
     core.openflow_discovery.addListenerByName("LinkEvent", _handle_LinkEvent)
-    log.debug("Spanning tree component ready")
-  core.call_when_ready(start_spanning_tree, "openflow_discovery")
+    log.debug("Spanning tree component ready") "Os componentes da árvore de expansão estão prontos"
+  core.call_when_ready(start_spanning_tree, "openflow_discovery") "openflow descoberto"

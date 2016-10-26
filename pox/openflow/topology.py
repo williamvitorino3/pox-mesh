@@ -13,13 +13,13 @@
 # limitations under the License.
 
 """
-OpenFlow doesn't know anything about Topology, and Topology doesn't
-know anything about OpenFlow.  This module knows something about both,
-and hooks the two of them together.
+O OpenFlow não sabe nada sobre topologia , e Topologia não
+sabe nada sobre OpenFlow . Este módulo sabe algo sobre ambos,
+e conecta os dois juntos.
 
-Specifically, this module is somewhat like an adapter that listens to
-events from other parts of the openflow substem (such as discovery), and
-uses them to populate and manipulate Topology.
+Especificamente , este módulo é um pouco como um adaptador que escuta
+eventos de outras partes do substem openflow (tais como a descoberta ) , e
+usa -los para preencher e manipular Topologia.
 """
 
 import itertools
@@ -38,28 +38,30 @@ from pox.lib.addresses import *
 import pickle
 import itertools
 
-# After a switch disconnects, it has this many seconds to reconnect in
-# order to reactivate the same OpenFlowSwitch object.  After this, if
-# it reconnects, it will be a new switch object.
+"""
+Depois de interruptor desliga , tem esta quantidade de segundos para se reconectar no
+Fim de reativar o mesmo objeto OpenFlowSwitch . Depois disso, se
+Ele se reconecta , será um novo objeto de switch.
+"""
 RECONNECT_TIMEOUT = 30
 
 log = core.getLogger()
 
 class OpenFlowTopology (object):
-  """
-  Listens to various OpenFlow-specific events and uses those to manipulate
-  Topology accordingly.
-  """
+
+ "Ouve vários eventos específicos do OpenFlow e usa aqueles para manipular"
+  "Topologia em conformidade."
 
   def __init__ (self):
     core.listen_to_dependencies(self, ['topology'], short_attrs=True)
 
-  def _handle_openflow_discovery_LinkEvent (self, event):
-    """
-    The discovery module simply sends out LLDP packets, and triggers
-    LinkEvents for discovered switches. It's our job to take these
-    LinkEvents and update pox.topology.
-    """
+
+ "O módulo de descoberta simplesmente envia pacotes LLDP e gatilhos"
+    "LinkEvents para interruptores descobertos . É o nosso trabalho para tirar esses"
+    "LinkEvents e atualização pox.topology ."
+
+     def _handle_openflow_discovery_LinkEvent (self, event):
+
     link = event.link
     sw1 = self.topology.getEntityByID(link.dpid1)
     sw2 = self.topology.getEntityByID(link.dpid2)
@@ -72,6 +74,7 @@ class OpenFlowTopology (object):
       sw1.ports[link.port1].entities.discard(sw2)
       sw2.ports[link.port2].entities.discard(sw1)
 
+"Lida com a conexão 'de cima' do openflow"
   def _handle_openflow_ConnectionUp (self, event):
     sw = self.topology.getEntityByID(event.dpid)
     add = False
@@ -88,6 +91,7 @@ class OpenFlowTopology (object):
       self.topology.addEntity(sw)
       sw.raiseEvent(SwitchJoin, sw)
 
+  "Lida com a conexão 'de baixo' do openflow"
   def _handle_openflow_ConnectionDown (self, event):
     sw = self.topology.getEntityByID(event.dpid)
     if sw is None:
@@ -100,33 +104,36 @@ class OpenFlowTopology (object):
       sw._connection = None
       log.info("Switch " + str(event.dpid) + " disconnected")
 
+  """
+  Uma subclasse de topology.Port para portas de switch OpenFlow .
 
+  Acrescenta a noção de " entidades ligadas " , que o padrão
+  classe ofp_phy_port não tem .
+
+  Nota: Não usado atualmente .
+  """
 class OpenFlowPort (Port):
-  """
-  A subclass of topology.Port for OpenFlow switch ports.
-
-  Adds the notion of "connected entities", which the default
-  ofp_phy_port class does not have.
-
-  Note: Not presently used.
-  """
+  
   def __init__ (self, ofp):
     # Passed an ofp_phy_port
     Port.__init__(self, ofp.port_no, ofp.hw_addr, ofp.name)
-    self.isController = self.number == of.OFPP_CONTROLLER
+    self.isController = self.number == of.OFPP_CONTROLLER "OFPP_CONTROLLER: Enviar para o controlador."
     self._update(ofp)
     self.exists = True
     self.entities = set()
 
+ "atualiza"
   def _update (self, ofp):
+    "Campos da struct ofp_port: name, port_no, hw_addr, config, state"
     assert self.name == ofp.name
     assert self.number == ofp.port_no
     self.hwAddr = EthAddr(ofp.hw_addr)
     self._config = ofp.config
     self._state = ofp.state
 
+  "contains: Chamado para implementar operadores de teste de adesão"
   def __contains__ (self, item):
-    """ True if this port connects to the specified entity """
+    "Verdadeiro se essa porta se conecta à entidade especificada."
     return item in self.entities
 
   def addEntity (self, entity, single = False):
@@ -137,31 +144,38 @@ class OpenFlowPort (Port):
     else:
       self.entities.add(entity)
 
+  """
+  A ofp_phy_port fornecido
+  estrutura descreve o comportamento do interruptor através do seu campo de bandeiras . No entanto, é possível que o
+  controlador deseja mudar uma bandeira especial e pode não saber o status atual de todas as bandeiras . 
+  """
   def to_ofp_phy_port(self):
     return of.ofp_phy_port(port_no = self.number, hw_addr = self.hwAddr,
                            name = self.name, config = self._config,
                            state = self._state)
 
+"Retorna uma string contendo uma representação de impressão de um objeto. "
   def __repr__ (self):
     return "<Port #" + str(self.number) + ">"
 
 
+"""
+  OpenFlowSwitches são entidades topologia ( herdam topology.Switch )
+
+  OpenFlowSwitches são persistentes ; isto é, se um interruptor reconecta , o
+  campo de conexão do objeto OpenFlowSwitch inicial será simplesmente
+  repor para referir a nova ligação .
+
+  Por enquanto, OpenFlowSwitch é essencialmente um proxy para sua conexão subjacente
+  objeto. Mais tarde , vamos , possivelmente, adicionar operações mais explícitos o cliente pode
+  realizar .
+
+  Observe que, para efeitos do depurador , podemos interpor em
+  uma entidade interruptor enumerando todos os ouvintes para os eventos listados
+  abaixo , e desencadeando eventos simulados para os ouvintes.
+"""
 class OpenFlowSwitch (EventMixin, Switch):
-  """
-  OpenFlowSwitches are Topology entities (inheriting from topology.Switch)
-
-  OpenFlowSwitches are persistent; that is, if a switch reconnects, the
-  Connection field of the original OpenFlowSwitch object will simply be
-  reset to refer to the new connection.
-
-  For now, OpenFlowSwitch is primarily a proxy to its underlying connection
-  object. Later, we'll possibly add more explicit operations the client can
-  perform.
-
-  Note that for the purposes of the debugger, we can interpose on
-  a switch entity by enumerating all listeners for the events listed
-  below, and triggering mock events for those listeners.
-  """
+  
   _eventMixin_events = set([
     SwitchJoin, # Defined in pox.topology
     SwitchLeave,
@@ -189,6 +203,7 @@ class OpenFlowSwitch (EventMixin, Switch):
     self._reconnectTimeout = None # Timer for reconnection
     self._xid_generator = xid_generator( ((dpid & 0x7FFF) << 16) + 1)
 
+  "estabelece a conexão"
   def _setConnection (self, connection, ofp=None):
     ''' ofp - a FeaturesReply message '''
     if self._connection: self._connection.removeListeners(self._listeners)
@@ -221,44 +236,48 @@ class OpenFlowSwitch (EventMixin, Switch):
     else:
       self.raiseEvent(SwitchConnectionDown(self))
 
-
+  "Chamado se tivéssemos sido desligada por alguns segundos RECONNECT_TIMEOUT "
   def _timer_ReconnectTimeout (self):
-    """ Called if we've been disconnected for RECONNECT_TIMEOUT seconds """
     self._reconnectTimeout = None
     core.topology.removeEntity(self)
     self.raiseEvent(SwitchLeave, self)
 
   def _handle_con_PortStatus (self, event):
     p = event.ofp.desc
-    if event.ofp.reason == of.OFPPR_DELETE:
+    if event.ofp.reason == of.OFPPR_DELETE: "O valor indica a razão OFPPR_DELETE uma porta que tenha sido removido a partir do caminho de dados , e não mais existe."
       if p.port_no in self.ports:
         self.ports[p.port_no].exists = False
         del self.ports[p.port_no]
-    elif event.ofp.reason == of.OFPPR_MODIFY:
+    elif event.ofp.reason == of.OFPPR_MODIFY: "O valor razão OFPPR_MODIFY denota um porto que estado ou configuração mudou"
       self.ports[p.port_no]._update(p)
     else:
-      assert event.ofp.reason == of.OFPPR_ADD
+      assert event.ofp.reason == of.OFPPR_ADD "O valor razão OFPPR_ADD denota uma porta que não existia no caminho de dados e foi adicionado. "
       assert p.port_no not in self.ports
       self.ports[p.port_no] = OpenFlowPort(p)
     self.raiseEvent(event)
     event.halt = False
 
+  "Controla a conexão 'baixa'"
   def _handle_con_ConnectionDown (self, event):
     self._setConnection(None)
 
+  "Controla o pacote de 'dentro'"
   def _handle_con_PacketIn (self, event):
     self.raiseEvent(event)
     event.halt = False
 
+  "Controla a barreira de dentro"
   def _handle_con_BarrierIn (self, event):
     self.raiseEvent(event)
     event.halt = False
 
+  "Controla o fluxo removido"
   def _handle_con_FlowRemoved (self, event):
     self.raiseEvent(event)
     self.flowTable.removeFlow(event)
     event.halt = False
 
+  "Encontra a porta de entidade"
   def findPortForEntity (self, entity):
     for p in self.ports.itervalues():
       if entity in p:
@@ -269,18 +288,20 @@ class OpenFlowSwitch (EventMixin, Switch):
   def connected(self):
     return self._connection != None
 
+  "fluxo de instalação na tabela local e a chave associada"
   def installFlow(self, **kw):
-    """ install flow in the local table and the associated switch """
     self.flow_table.install(TableEntry(**kw))
 
+  "Avanço sobre dados não- serializado , por exemplo, soquetes"
   def serialize (self):
-    # Skip over non-serializable data, e.g. sockets
     serializable = OpenFlowSwitch(self.dpid)
     return pickle.dumps(serializable, protocol = 0)
 
+  "Envia"
   def send(self, *args, **kw):
     return self._connection.send(*args, **kw)
 
+  "Lê"
   def read(self, *args, **kw):
    return self._connection.read(*args, **kw)
 
@@ -291,11 +312,14 @@ class OpenFlowSwitch (EventMixin, Switch):
   def name(self):
     return repr(self)
 
-
+"A tabela de fluxo que mantém em sincronia com um interruptor"
 class OFSyncFlowTable (EventMixin):
   _eventMixin_events = set([FlowTableModification])
   """
-  A flow table that keeps in sync with a switch
+  Openflow flow modification: ofp_flow_mod_command
+  OFPFC_ADD: Novo fluxo 
+  OFPFC_DELETE: Excluir todos os fluxos correspondentes .
+  OFPFC_DELETE_STRICT: Excluir entrada estritamente wildcards correspondentes e prioridade.
   """
   ADD = of.OFPFC_ADD
   REMOVE = of.OFPFC_DELETE
@@ -307,43 +331,46 @@ class OFSyncFlowTable (EventMixin):
     self.flow_table = FlowTable()
     self.switch = switch
 
-    # a list of pending flow table entries : tuples (ADD|REMOVE, entry)
+    "uma lista de pendentes entradas de tabela de fluxo : tuplas (ADD | REMOVER , a entrada )"
     self._pending = []
 
-    # a map of pending barriers barrier_xid-> ([entry1,entry2])
+    "um mapa das barreiras pendentes barrier_xid- > ( [ entry1 , entry2 ] )"
     self._pending_barrier_to_ops = {}
-    # a map of pending barriers per request entry -> (barrier_xid, time)
+
     self._pending_op_to_barrier = {}
 
     self.listenTo(switch)
 
-  def install (self, entries=[]):
-    """
-    asynchronously install entries in the flow table
+  """
+  de forma assíncrona instalar entradas na tabela de fluxo
 
-    will raise a FlowTableModification event when the change has been
-    processed by the switch
-    """
+  levantará um evento FlowTableModification quando a mudança foi
+  processados ​​pelo comutador
+  """
+  def install (self, entries=[]):
+    
     self._mod(entries, OFSyncFlowTable.ADD)
 
-  def remove_with_wildcards (self, entries=[]):
-    """
-    asynchronously remove entries in the flow table
+  """
+    de forma assíncrona remover entradas na tabela de fluxo
 
-    will raise a FlowTableModification event when the change has been
-    processed by the switch
-    """
+    levantará um evento FlowTableModification quando a mudança foi
+    processados ​​pelo comutador
+  """
+  def remove_with_wildcards (self, entries=[]):
+  
     self._mod(entries, OFSyncFlowTable.REMOVE)
 
-  def remove_strict (self, entries=[]):
-    """
-    asynchronously remove entries in the flow table.
+  """
+    assincronamente remover entradas na tabela de fluxo .
 
-    will raise a FlowTableModification event when the change has been
-    processed by the switch
-    """
+    levantará um evento FlowTableModification quando a mudança foi
+    processados ​​pelo comutador
+  """
+  def remove_strict (self, entries=[]):
     self._mod(entries, OFSyncFlowTable.REMOVE_STRICT)
 
+  "property: retornar uma propriedade de atributo para novo estilo de classe es (classes que derivam object)."
   @property
   def entries (self):
     return self.flow_table.entries
@@ -352,10 +379,12 @@ class OFSyncFlowTable (EventMixin):
   def num_pending (self):
     return len(self._pending)
 
+  "Len: Retorna o tamanho (número de itens) de um objeto (flow_table). "
   def __len__ (self):
     return len(self.flow_table)
 
   def _mod (self, entries, command):
+    "isinstance: Retorna verdadeiro se o objeto argumento é uma instância da ClassInfo argumento, ou de um (direta, indireta ou virtual subclasse) da mesma."
     if isinstance(entries, TableEntry):
       entries = [ entries ]
 
@@ -400,6 +429,7 @@ class OFSyncFlowTable (EventMixin):
       fmod_xid = self.switch._xid_generator()
       flow_mod = op[1].to_flow_mod(xid=fmod_xid, command=op[0],
                                    flags=op[1].flags | of.OFPFF_SEND_FLOW_REM)
+      "OFPFF_SEND_FLOW_REM: Enviar mensagem removido fluxo quando o fluxo. Expira ou é excluído."
       self.switch.send(flow_mod)
 
     barrier_xid = self.switch._xid_generator()
@@ -414,13 +444,13 @@ class OFSyncFlowTable (EventMixin):
     # sync all_flows
     self._sync_pending(clear=True)
 
+  "CONEXÃO para baixo. muito ruim para nossos entradas não confirmados"
   def _handle_SwitchConnectionDown (self, event):
-    # connection down. too bad for our unconfirmed entries
     self._pending_barrier_to_ops = {}
     self._pending_op_to_barrier = {}
 
+  "tempo para sincronizar alguns destes fluxos"
   def _handle_BarrierIn (self, barrier):
-    # yeah. barrier in. time to sync some of these flows
     if barrier.xid in self._pending_barrier_to_ops:
       added = []
       removed = []
@@ -443,10 +473,8 @@ class OFSyncFlowTable (EventMixin):
     else:
       return EventContinue
 
+  "processar um evento removido fluxo - remover o fluxo correspondente a partir da tabela ."
   def _handle_FlowRemoved (self, event):
-    """
-    process a flow removed event -- remove the matching flow from the table.
-    """
     flow_removed = event.ofp
     for entry in self.flow_table.entries:
       if (flow_removed.match == entry.match
@@ -456,7 +484,7 @@ class OFSyncFlowTable (EventMixin):
         return EventHalt
     return EventContinue
 
-
+"iniciar"
 def launch ():
   if not core.hasComponent("openflow_topology"):
     core.register("openflow_topology", OpenFlowTopology())

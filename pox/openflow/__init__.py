@@ -33,89 +33,128 @@ care of this for you and are only fired when all data is available.
 NOTE: This module is usually automatically loaded by pox.py
 """
 
+"""
+
+Este é o módulo OpenFlow principal .
+
+Juntamente com libopenflow , esta é a maior parte da API OpenFlow em POX .
+Há uma série de eventos , que são geralmente criados em core.openflow
+bem como sobre Conexões de switch individuais. Muitos destes acontecimentos têm pelo
+pelo menos alguns dos seguintes propriedades :
+ .connection - uma referência para a conexão do comutador que causou o evento
+ .dpid - o DPID do interruptor que causou o evento
+ .ofp - a mensagem OpenFlow que causou o evento ( da libopenflow )
+
+Um dos aspectos mais complicados de OpenFlow é lidar com estatísticas
+respostas, que podem entrar em várias partes ( não deve ser aquela que
+difícil, realmente, mas que não impediu de beind tratadas errado
+errado mais de uma vez ) . Em POX , os eventos brutos estão disponíveis , mas você vai
+geralmente só quer ouvir o agregado Status de eventos que levam
+cuidado deste para você e somente são acionados quando todos os dados está disponível .
+
+NOTA: Este módulo é normalmente carregado automaticamente pelo pox.py
+"""
+
 from pox.lib.revent import *
 from pox.lib.util import dpidToStr
 import libopenflow_01 as of
 from pox.lib.packet.ethernet import ethernet
 
+"Evento disparado quando a conexão com um switch OpenFlow tem sido estabelecida ."
 class ConnectionUp (Event):
-  """
-  Event raised when the connection to an OpenFlow switch has been
-  established.
-  """
+
+"Chamado após a instância foi criada (por __new__()), "
+"mas antes de ser retornado para o chamador. "
+"Os argumentos são aqueles passados ​​para a expressão construtor da classe. "
+"Se uma classe base tem um __init__()método, o da classe derivada __init__()método, "
+"se houver, deve chamá-lo explicitamente para garantir a inicialização adequada "
+"da parte da classe base da instância; por exemplo: .BaseClass.__init__(self, [args...])"
+
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
     self.dpid = connection.dpid
     self.ofp = ofp
 
+"""
+Levantadas após o recebimento de uma mensagem de ofp_switch_features
+
+  Isso geralmente acontece como parte de uma conexão automaticamente .
+"""
 class FeaturesReceived (Event):
-  """
-  Raised upon receipt of an ofp_switch_features message
 
-  This generally happens as part of a connection automatically.
-  """
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
     self.dpid = connection.dpid
     self.ofp = ofp
 
+"Evento disparado quando a conexão com um switch OpenFlow tem sido perdido."
 class ConnectionDown (Event):
-  """
-  Event raised when the connection to an OpenFlow switch has been
-  lost.
-  """
+
   def __init__ (self, connection):
     Event.__init__(self)
     self.connection = connection
     self.dpid = connection.dpid
 
+"""
+Demitido em resposta às mudanças de estado das portas .
+  acrescentado ( bool) - Verdadeiro se demitido porque uma porta foi adicionada
+  suprimido (bool ) - True se demitido porque uma porta foi excluída
+  modificada (bool ) - True se demitido porque uma porta foi modificado
+  port (int) - número de porto em questão
+
+PortStatus: 
+Informar o controlador de uma mudança em uma porta . O interruptor é esperado para enviar porta -status
+mensagens para os controladores como configuração da porta ou alterações Estado do porto. Estes eventos incluem mudança de
+eventos de configuração de porta , por exemplo, se ele foi trazido para baixo diretamente por um usuário , e mudança de estado da porta
+eventos , por exemplo, se a ligação caiu.
+"""
 class PortStatus (Event):
-  """
-  Fired in response to port status changes.
-  added (bool) - True if fired because a port was added
-  deleted (bool) - True if fired because a port was deleted
-  modified (bool) - True if fired because a port was modified
-  port (int) - number of port in question
-  """
+
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
-    self.dpid = connection.dpid
-    self.ofp = ofp
-    self.modified = ofp.reason == of.OFPPR_MODIFY
-    self.added = ofp.reason == of.OFPPR_ADD
-    self.deleted = ofp.reason == of.OFPPR_DELETE
+    self.dpid = connection.dpid "o DPID do interruptor que causou o evento"
+    self.ofp = ofp "a mensagem OpenFlow que causou o evento ( da libopenflow )"
+    self.modified = ofp.reason == of.OFPPR_MODIFY "Algum atributo da porta mudou"
+    self.added = ofp.reason == of.OFPPR_ADD "A porta foi adicionada"
+    self.deleted = ofp.reason == of.OFPPR_DELETE "A porta foi removida"
     self.port = ofp.desc.port_no
 
+"""
+Ocorre quando uma entrada de fluxo foi removido a partir de uma mesa de fluxo .
+  Isto pode ser quer devido a um tempo de espera ou porque foi removido
+  explicitamente.
+  propriedades:
+  idleTimeout (bool ) - True se expirou por causa da ociosidade
+  hardTimeout (bool ) - True se expirou por causa do tempo limite de disco
+  timeout ( bool ) - True se qualquer um dos acima é verdadeiro
+  suprimido (bool ) - True se excluídos explicitamente
+
+Fluxo - Removido : informar o controlador sobre a remoção de uma entrada de fluxo de uma tabela de fluxo. Fluxo-
+mensagens removidas são enviados apenas para as entradas de fluxo com a flag OFPFF_SEND_FLOW_REM . Eles são
+gerados como resultado de um fluxo controlador excluir pedido ou o fluxo de processo de termo interruptor quando um de
+o tempo limite de fluxo for excedido
+"""
 class FlowRemoved (Event):
-  """
-  Raised when a flow entry has been removed from a flow table.
-  This may either be because of a timeout or because it was removed
-  explicitly.
-  Properties:
-  idleTimeout (bool) - True if expired because of idleness
-  hardTimeout (bool) - True if expired because of hard timeout
-  timeout (bool) - True if either of the above is true
-  deleted (bool) - True if deleted explicitly
-  """
+  
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
     self.dpid = connection.dpid
     self.ofp = ofp
-    self.idleTimeout = False
-    self.hardTimeout = False
+    self.idleTimeout = False "idleTimeout: idle timeout de modificação fluxo inicial."
+    self.hardTimeout = False "hardTimeout: tempo limite rígido de modificação fluxo de originais"
     self.deleted = False
     self.timeout = False
-    if ofp.reason == of.OFPRR_IDLE_TIMEOUT:
+    if ofp.reason == of.OFPRR_IDLE_TIMEOUT: "OFPRR_IDLE_TIMEOUT: Fluxo tempo ocioso excedeu idle_timeout "
       self.timeout = True
       self.idleTimeout = True
-    elif ofp.reason == of.OFPRR_HARD_TIMEOUT:
+    elif ofp.reason == of.OFPRR_HARD_TIMEOUT: "OFPRR_HARD_TIMEOUT: Tempo excedido hard_timeout"
       self.timeout = True
       self.hardTimeout = True
-    elif ofp.reason == of.OFPRR_DELETE:
+    elif ofp.reason == of.OFPRR_DELETE: "OFPRR_DELETE: Despejados por um mod fluxo DELETE."
       self.deleted = True
 
 class RawStatsReply (Event):
@@ -128,8 +167,8 @@ class RawStatsReply (Event):
   def dpid (self):
     return self.connection.dpid
 
+"superclasse abstrata para todas as estatísticas respostas"
 class StatsReply (Event):
-  """ Abstract superclass for all stats replies """
   def __init__ (self, connection, ofp, stats):
     Event.__init__(self)
     self.connection = connection
@@ -158,13 +197,19 @@ class PortStatsReceived (StatsReply):
 class QueueStatsReceived (StatsReply):
   pass
 
+"""
+Packet -in : transferir o controlador de um pacote para o controlador . Para todos os pacotes enviados para o controlador
+porta reservada usando uma entrada de fluxo ou a entrada de fluxo de mesa -miss , um evento pacote -in é sempre
+enviado aos controladores. Outros processamento , tais como a verificação de TTL , também pode gerar pacotes -in eventos
+para enviar pacotes para o controlador.
+
+Demitido em resposta a eventos PacketIn
+  port (int) - número de porta que o pacote está vindo
+  dados (bytes) - de pacote de dados em bruto
+  analisados ​​( subclasses de pacotes ) - versão analisada do pox.lib.packet
+"""
 class PacketIn (Event):
-  """
-  Fired in response to PacketIn events
-  port (int) - number of port the packet came in on
-  data (bytes) - raw packet data
-  parsed (packet subclasses) - pox.lib.packet's parsed version
-  """
+
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
@@ -179,11 +224,9 @@ class PacketIn (Event):
       self._parsed = ethernet(self.data)
     return self._parsed
 
+"O pacote como analisado pelo pox.lib.packet"
   @property
   def parsed (self):
-    """
-    The packet as parsed by pox.lib.packet
-    """
     return self.parse()
 
 class ErrorIn (Event):
@@ -211,12 +254,12 @@ class ErrorIn (Event):
 #    s += ' Code: '
 #
 #    responses = {
-#      of.OFPET_HELLO_FAILED    : of.ofp_hello_failed_code,
-#      of.OFPET_BAD_REQUEST     : of.ofp_bad_request_code,
-#      of.OFPET_BAD_ACTION      : of.ofp_bad_action_code,
-#      of.OFPET_FLOW_MOD_FAILED : of.ofp_flow_mod_failed_code,
-#      of.OFPET_PORT_MOD_FAILED : of.ofp_port_mod_failed_code,
-#      of.OFPET_QUEUE_OP_FAILED : of.ofp_queue_op_failed_code,
+#      of.OFPET_HELLO_FAILED    : of.ofp_hello_failed_code, #Olá protocolo falhou
+#      of.OFPET_BAD_REQUEST     : of.ofp_bad_request_code, #Pedido não foi compreendido
+#      of.OFPET_BAD_ACTION      : of.ofp_bad_action_code, #Erro na descrição da ação
+#      of.OFPET_FLOW_MOD_FAILED : of.ofp_flow_mod_failed_code, #Problema modificando a entrada de fluxo.
+#      of.OFPET_PORT_MOD_FAILED : of.ofp_port_mod_failed_code, #Pedido da porta mod falhou
+#      of.OFPET_QUEUE_OP_FAILED : of.ofp_queue_op_failed_code, #operação fila falhou.
 #    }
 #
 #    if self.ofp.type in responses:
@@ -228,17 +271,24 @@ class ErrorIn (Event):
 #
 #    return s
 
+"""
+Disparados em resposta a uma resposta barreira
+  XID ( int) - XID de solicitação de barreira
+"""
 class BarrierIn (Event):
-  """
-  Fired in response to a barrier reply
-  xid (int) - XID of barrier request
-  """
+
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
     self.ofp = ofp
     self.dpid = connection.dpid
-    self.xid = ofp.xid
+    """
+    xid: 
+    ID da transação associado a este pacote.
+    Respostas usar o mesmo ID como era no pedido
+    para facilitar o emparelhamento
+    """
+    self.xid = ofp.xid 
 
 class ConnectionIn (Event):
   def __init__ (self, connection):
@@ -247,13 +297,12 @@ class ConnectionIn (Event):
     self.dpid = connection.dpid
     self.nexus = None
 
-
-
+"""
+Determina que OpenFlowNexus fica o interruptor .
+  implementação padrão sempre apenas dá a core.openflow
+"""
 class OpenFlowConnectionArbiter (EventMixin):
-  """
-  Determines which OpenFlowNexus gets the switch.
-  Default implementation always just gives it to core.openflow
-  """
+  
   _eventMixin_events = set([
     ConnectionIn,
   ])
@@ -279,10 +328,29 @@ class OpenFlowConnectionArbiter (EventMixin):
 
 
 class ConnectionDict (dict):
+  
+  "iter: Este método é chamado quando uma iteração é necessário para um recipiente. "
+  "Este método deve retornar um novo objeto iterador que pode iterar sobre todos os objetos no recipiente. "
+  "Para mapeamentos, deve iterar sobre as chaves do recipiente, e também deve ser disponibilizado como o método iterkeys()."
+  "Objetos Iterator também precisa implementar este método; eles são obrigados a voltar-se."
+  
   def __iter__ (self):
     return self.itervalues()
 
+    """
+    Chamado para implementar operadores de teste de adesão. 
+    Deve retornar true se item de está em auto , caso contrário false. 
+    Para objetos de mapeamento, este deve considerar as chaves do mapeamento, 
+    em vez de os valores ou os pares chave-item.
+
+    Para objetos que não definem __contains__(), 
+    o teste de associação tenta primeiro iteração via __iter__(), 
+    em seguida, o antigo protocolo sequência iteração via __getitem__(). 
+    """
+
   def __contains__ (self, item):
+    
+    "dict: Retornar um novo dict ionary inicializada a partir de um argumento opcional e um conjunto possivelmente vazio de argumentos."
     v = dict.__contains__(self, item)
     if v: return v
     return item in self.values()
@@ -294,38 +362,70 @@ class ConnectionDict (dict):
   def iter_dpids (self):
     return self.iterkeys()
 
+"""
+Principal ponto de interação OpenFlow .
 
+  Geralmente, há apenas uma instância dessa classe , registrado como
+  core.openflow . A maioria dos eventos OpenFlow fogo aqui, além de em seu
+  ligações específicas .
+"""
 class OpenFlowNexus (EventMixin):
-  """
-  Main point of OpenFlow interaction.
 
-  There is usually just one instance of this class, registered as
-  core.openflow.  Most OpenFlow events fire here in addition to on their
-  specific connections.
-  """
   _eventMixin_events = set([
     ConnectionUp,
     ConnectionDown,
+    """
+    Features: O controlador pode solicitar a identidade e as capacidades básicas de um switch através do envio
+    um pedido de recursos ; o interruptor deve responder com uma características responder que especifica a identidade e básico
+    capacidades da chave. Isto é comumente realizada mediante estabelecimento do canal OpenFlow .
+        """
     FeaturesReceived,
+    """
+    Port- status: informar o controlador de uma mudança em uma porta . O interruptor é esperado para enviar porta -status
+    mensagens para os controladores como configuração da porta ou alterações Estado do porto. Estes eventos incluem mudança de
+    eventos de configuração de porta , por exemplo, se ele foi trazido para baixo diretamente por um usuário , e mudança de estado da porta
+    eventos , por exemplo, se a ligação caiu.
+    """
     PortStatus,
+    """
+    Fluxo - Removido : informar o controlador sobre a remoção de uma entrada de fluxo de uma tabela de fluxo. Fluxo-
+    mensagens removidas são enviados apenas para as entradas de fluxo com a flag OFPFF_SEND_FLOW_REM . Eles são
+    gerados como resultado de um fluxo controlador excluir pedido ou o fluxo de processo de termo interruptor quando um de
+    o tempo limite de fluxo for excedido
+    """
     FlowRemoved,
+    """
+    Packet -in : transferir o controlo de um pacote para o controlador . Para todos os pacotes enviados para o controlador
+    porta reservada usando uma entrada de fluxo ou a entrada de fluxo de mesa -miss , um evento pacote -in é sempre
+    enviado aos controladores. Outros processamento , tais como a verificação de TTL , também pode gerar pacotes -in eventos
+    para enviar pacotes para o controlador.
+    """
     PacketIn,
+    """ 
+    Barreira : Barreira de solicitação / resposta mensagens são utilizados pelo controlador para garantir dependências de mensagens
+    foram cumpridos ou para receber notificações de operações concluídas .
+    """
     BarrierIn,
     ErrorIn,
     RawStatsReply,
     SwitchDescReceived,
+    "estatísticas do fluxo recebido"
     FlowStatsReceived,
+    "estatísticas de fluxos agregados"
     AggregateFlowStatsReceived,
+    "estatísticas da tabela recebida"
     TableStatsReceived,
+    "estatísticas da porta recebida"
     PortStatsReceived,
+    "estatísticas da filamrecebida"
     QueueStatsReceived,
     FlowRemoved,
   ])
 
-  # Bytes to send to controller when a packet misses all flows
+  "Bytes para enviar ao controlador quando um pacote perde todos os fluxos"
   miss_send_len = of.OFP_DEFAULT_MISS_SEND_LEN
 
-  # Enable/Disable clearing of flows on switch connect
+  "Activar / Desactivar compensação dos fluxos o interruptor ligar"
   clear_flows_on_connect = True
 
   def __init__ (self):
@@ -339,16 +439,14 @@ class OpenFlowNexus (EventMixin):
   def connections (self):
     return self._connections
 
+  "Obter o objeto de conexão associado a um DPID ."
   def getConnection (self, dpid):
-    """
-    Get the Connection object associated with a DPID.
-    """
+  
     return self._connections.get(dpid, None)
 
+  "Enviar dados para um DPID específico."
   def sendToDPID (self, dpid, data):
-    """
-    Send data to a specific DPID.
-    """
+
     if dpid in self._connections:
       self._connections[dpid].send(data)
       return True
@@ -359,6 +457,7 @@ class OpenFlowNexus (EventMixin):
                (dpidToStr(dpid),))
       return False
 
+"controla o evento de baixo"
   def _handle_DownEvent (self, event):
     for c in self._connections.values():
       try:
@@ -366,14 +465,18 @@ class OpenFlowNexus (EventMixin):
       except:
         pass
 
+  "conectar"
   def _connect (self, con):
     self._connections[con.dpid] = con
+
+  "desconectar"
   def _disconnect (self, dpid):
     if dpid in self._connections:
       del self._connections[dpid]
       return True
     return False
 
+"iniciar (lançar)"
 def launch (default_arbiter=True):
   from pox.core import core
   if core.hasComponent("openflow"):

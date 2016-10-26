@@ -17,6 +17,11 @@ In charge of OpenFlow 1.0 switches.
 
 NOTE: This module is loaded automatically on startup unless POX is run
       with --no-openflow .
+
+Encarregado de OpenFlow 1.0 switches.
+
+NOTA: Este módulo é carregado automaticamente na inicialização , a menos POX é executado
+      com --no- openflow .
 """
 from pox.core import core
 import pox
@@ -38,6 +43,11 @@ import select
 # List where the index is an OpenFlow message type (OFPT_xxx), and
 # the values are unpack functions that unpack the wire format of that
 # type into a message object.
+"""
+Lista onde o índice é um tipo de mensagem OpenFlow ( OFPT_xxx ) e
+Os valores são funções descompactação que desempacotar o formato de fio de que
+Tipo em um objeto de mensagem.
+"""
 unpackers = make_type_to_unpacker_table()
 
 try:
@@ -45,10 +55,12 @@ try:
 except:
   try:
     # Try to get it from where PyPy (sometimes) has it
+    "Tentar obtê-lo a partir de onde PyPy (às vezes) tem"
     import IN
     PIPE_BUF = IN.PIPE_BUF
   except:
     # (Hopefully) reasonable default
+    "(Espera) padrão razoável"
     PIPE_BUF = 512
 
 import pox.openflow.libopenflow_01 as of
@@ -62,14 +74,26 @@ from errno import EAGAIN, ECONNRESET, EADDRINUSE, EADDRNOTAVAIL
 
 import traceback
 
-
+"HELLO: HELLO mensagens são trocadas entre o comutador eo controlador durante a inicialização da conexão."
 def handle_HELLO (con, msg): #S
   #con.msg("HELLO wire protocol " + hex(msg.version))
 
   # Send a features request
+  "Enviar um pedido, recursos"
   msg = of.ofp_features_request()
   con.send(msg)
 
+"""
+O interruptor e controlador pode verificar a conectividade apropriada através do protocolo OpenFlow com o novo
+solicitação de eco ( OFPT_ECHO_REQUEST ) e mensagens de resposta ( OFPT_ECHO_REPLY ) . O corpo da mensagem
+é indefinido e simplesmente contém dados uninterpreted que está a ser ecoado volta para o solicitante . o
+solicitante corresponde à resposta com o ID da transação a partir do cabeçalho OpenFlow .
+"""
+"""
+Eco : Echo pedido / resposta mensagens podem ser enviadas a partir de qualquer switch ou o controlador , devendo
+retornar uma resposta de eco . Eles são usados ​​principalmente para verificar a vivacidade de uma conexão do controlador -switch , e
+pode também ser usado para medir a latência ou largura de banda .
+"""
 def handle_ECHO_REPLY (con, msg):
   #con.msg("Got echo reply")
   pass
@@ -85,6 +109,7 @@ def handle_FLOW_REMOVED (con, msg): #A
   if e is None or e.halt != True:
     con.raiseEventNoErrors(FlowRemoved, con, msg)
 
+"OFP_FEATURES_REPLY: Controller/chave mensagem"
 def handle_FEATURES_REPLY (con, msg):
   connecting = con.connect_time == None
   con.features = msg
@@ -114,6 +139,7 @@ def handle_FEATURES_REPLY (con, msg):
 
   listeners = []
 
+  "Finaliza a conexão"
   def finish_connecting (event):
     if event.xid != barrier.xid:
       con.dpid = None
@@ -133,20 +159,21 @@ def handle_FEATURES_REPLY (con, msg):
 
   def also_finish_connecting (event):
     if event.xid != barrier.xid: return
-    if event.ofp.type != of.OFPET_BAD_REQUEST: return
-    if event.ofp.code != of.OFPBRC_BAD_TYPE: return
+    if event.ofp.type != of.OFPET_BAD_REQUEST: return "OFPET_BAD_REQUEST: Pedido não foi compreendido."
+    if event.ofp.code != of.OFPBRC_BAD_TYPE: return "OFPBRC_BAD_TYPE: ofp_header.type não suportada"
     # Okay, so this is probably an HP switch that doesn't support barriers
     # (ugh).  We'll just assume that things are okay.
     finish_connecting(event)
   listeners.append(con.addListener(ErrorIn, also_finish_connecting))
 
   #TODO: Add a timeout for finish_connecting
+  "Para fazer: Adicionar um tempo limite para finish_connecting"
 
   if con.ofnexus.miss_send_len is not None:
     con.send(of.ofp_set_config(miss_send_len =
                                   con.ofnexus.miss_send_len))
   if con.ofnexus.clear_flows_on_connect:
-    con.send(of.ofp_flow_mod(match=of.ofp_match(),command=of.OFPFC_DELETE))
+    con.send(of.ofp_flow_mod(match=of.ofp_match(),command=of.OFPFC_DELETE)) "OFPFC_DELETE: Excluir todos os fluxos correspondentes ."
 
   con.send(barrier)
 
@@ -156,14 +183,16 @@ def handle_FEATURES_REPLY (con, msg):
     xid = barrier.xid
   finish_connecting(C())
   """
-
+"Define as respostas de estatísticas"
 def handle_STATS_REPLY (con, msg):
   e = con.ofnexus.raiseEventNoErrors(RawStatsReply, con, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(RawStatsReply, con, msg)
   con._incoming_stats_reply(msg)
 
+"Define as estatisticas da porta"
 def handle_PORT_STATUS (con, msg): #A
+"OFPPR_DELETE: A porta foi removida"
   if msg.reason == of.OFPPR_DELETE:
     con.ports._forget(msg.desc)
   else:
@@ -171,12 +200,12 @@ def handle_PORT_STATUS (con, msg): #A
   e = con.ofnexus.raiseEventNoErrors(PortStatus, con, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(PortStatus, con, msg)
-
+"PACKET_IN: Define a mensagem assincrona"
 def handle_PACKET_IN (con, msg): #A
   e = con.ofnexus.raiseEventNoErrors(PacketIn, con, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(PacketIn, con, msg)
-
+"ERROR_MSG: define a mensagem de erro"
 def handle_ERROR_MSG (con, msg): #A
   err = ErrorIn(con, msg)
   e = con.ofnexus.raiseEventNoErrors(err)
@@ -185,19 +214,28 @@ def handle_ERROR_MSG (con, msg): #A
   if err.should_log:
     log.error(str(con) + " OpenFlow Error:\n" +
               msg.show(str(con) + " Error: ").strip())
-
+"""
+Barrier Command: 
+O Comando de barreira é um mecanismo para ser notificado quando uma mensagem de OpenFlow terminar a execução
+no interruptor. Quando um switch recebe uma mensagem de barreira deve primeiro concluir todos os comandos enviados antes
+a mensagem de barreira antes de executar qualquer comando após ele. Quando todos os comandos antes da barreira
+mensagem ter concluído, ele deve enviar uma mensagem Barreira resposta de volta para o controlador.
+"""
 def handle_BARRIER (con, msg):
   e = con.ofnexus.raiseEventNoErrors(BarrierIn, con, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(BarrierIn, con, msg)
 
 # handlers for stats replies
+"""
+OFPST_DESC: O número OFPST_DESC foi adicionado para descrever o hardware e software em execução no switch
+"""
 def handle_OFPST_DESC (con, parts):
   msg = parts[0].body
   e = con.ofnexus.raiseEventNoErrors(SwitchDescReceived,con,parts[0],msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(SwitchDescReceived, con, parts[0], msg)
-
+"OFPST_FLOW: descreve o fluxo do switch"
 def handle_OFPST_FLOW (con, parts):
   msg = []
   for part in parts:
@@ -205,14 +243,19 @@ def handle_OFPST_FLOW (con, parts):
   e = con.ofnexus.raiseEventNoErrors(FlowStatsReceived, con, parts, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(FlowStatsReceived, con, parts, msg)
-
+"OFPST_AGGREGATE: descreve estatísticas de fluxos agregados"
 def handle_OFPST_AGGREGATE (con, parts):
   msg = parts[0].body
   e = con.ofnexus.raiseEventNoErrors(AggregateFlowStatsReceived, con,
                                      parts[0], msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(AggregateFlowStatsReceived, con, parts[0], msg)
-
+"""
+OFPST_TABLE: 
+Quando o controlador e o interruptor primeiro comunicar, o controlador irá descobrir quantos quadros, as
+switch suporta a partir do Features Reply. Se quiser compreender o tamanho, tipos e ordem em que
+mesas são consultados, o controlador envia uma solicitação de estatísticas OFPST_TABLE.
+"""
 def handle_OFPST_TABLE (con, parts):
   msg = []
   for part in parts:
@@ -220,7 +263,11 @@ def handle_OFPST_TABLE (con, parts):
   e = con.ofnexus.raiseEventNoErrors(TableStatsReceived, con, parts, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(TableStatsReceived, con, parts, msg)
-
+"""
+OFPST_PORT: A mensagem ofp_port_stats foi expandido para retornar mais informações. Se uma opção não faz
+apoiar um campo particular, deve definir o valor de ter todos os bits habilitado (isto é, um "-1" se o valor fosse
+tratada como assinado).
+"""
 def handle_OFPST_PORT (con, parts):
   msg = []
   for part in parts:
@@ -228,7 +275,7 @@ def handle_OFPST_PORT (con, parts):
   e = con.ofnexus.raiseEventNoErrors(PortStatsReceived, con, parts, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(PortStatsReceived, con, parts, msg)
-
+"OFPST_QUEUE: define uma fila"
 def handle_OFPST_QUEUE (con, parts):
   msg = []
   for part in parts:
@@ -236,7 +283,11 @@ def handle_OFPST_QUEUE (con, parts):
   e = con.ofnexus.raiseEventNoErrors(QueueStatsReceived, con, parts, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(QueueStatsReceived, con, parts, msg)
-
+"""
+VENDOR: 
+Os vendedores são agora capazes de adicionar suas próprias extensões, enquanto ainda está sendo OpenFlow compatível. O primário
+maneira de fazer isso é com o novo tipo de mensagem OFPT_VENDOR
+"""
 def handle_VENDOR (con, msg):
   log.info("Vendor msg: " + str(msg))
 
@@ -244,38 +295,44 @@ def handle_VENDOR (con, msg):
 # A list, where the index is an OFPT, and the value is a function to
 # call for that type
 # This is generated automatically based on handlerMap
+"""
+
+Uma lista, onde o índice é um OFPT, eo valor é uma função para
+Chamada para esse tipo
+Este é gerada automaticamente com base em handlerMap
+"""
 handlers = []
 
 # Message handlers
 handlerMap = {
-  of.OFPT_HELLO : handle_HELLO,
-  of.OFPT_ECHO_REQUEST : handle_ECHO_REQUEST,
-  of.OFPT_ECHO_REPLY : handle_ECHO_REPLY,
-  of.OFPT_PACKET_IN : handle_PACKET_IN,
-  of.OFPT_FEATURES_REPLY : handle_FEATURES_REPLY,
-  of.OFPT_PORT_STATUS : handle_PORT_STATUS,
-  of.OFPT_ERROR : handle_ERROR_MSG,
-  of.OFPT_BARRIER_REPLY : handle_BARRIER,
-  of.OFPT_STATS_REPLY : handle_STATS_REPLY,
-  of.OFPT_FLOW_REMOVED : handle_FLOW_REMOVED,
-  of.OFPT_VENDOR : handle_VENDOR,
+  of.OFPT_HELLO : handle_HELLO, "mensagem simetrica"
+  of.OFPT_ECHO_REQUEST : handle_ECHO_REQUEST, "mensagem simetrica"
+  of.OFPT_ECHO_REPLY : handle_ECHO_REPLY, "mensagem simetrica"
+  of.OFPT_PACKET_IN : handle_PACKET_IN, "mensagem assíncrona"
+  of.OFPT_FEATURES_REPLY : handle_FEATURES_REPLY, "Controller / mensagem chave"
+  of.OFPT_PORT_STATUS : handle_PORT_STATUS, "mensagem assíncrona"
+  of.OFPT_ERROR : handle_ERROR_MSG, "mensagem simetrica"
+  of.OFPT_BARRIER_REPLY : handle_BARRIER, "Controller / mensagem chave"
+  of.OFPT_STATS_REPLY : handle_STATS_REPLY, 
+  of.OFPT_FLOW_REMOVED : handle_FLOW_REMOVED, "mensagem assíncrona"
+  of.OFPT_VENDOR : handle_VENDOR, 
 }
 
 statsHandlerMap = {
-  of.OFPST_DESC : handle_OFPST_DESC,
-  of.OFPST_FLOW : handle_OFPST_FLOW,
+  of.OFPST_DESC : handle_OFPST_DESC, "A resposta OFPST DESC (descrição switch) agora inclui um campo de descrição do caminho de dados."
+  of.OFPST_FLOW : handle_OFPST_FLOW, 
   of.OFPST_AGGREGATE : handle_OFPST_AGGREGATE,
-  of.OFPST_TABLE : handle_OFPST_TABLE,
+  of.OFPST_TABLE : handle_OFPST_TABLE, "Se quiser compreender o tamanho, tipos e ordem em que mesas são consultados, o controlador envia uma solicitação de estatísticas OFPST_TABLE."
   of.OFPST_PORT : handle_OFPST_PORT,
   of.OFPST_QUEUE : handle_OFPST_QUEUE,
 }
 
 # Deferred sending should be unusual, so don't worry too much about
 # efficiency
+"Diferidos de envio deve ser incomum, por isso não se preocupar muito com eficiência"
+
+"Classe que lida com o envio quando uma gravação de soquete não foi concluída"
 class DeferredSender (threading.Thread):
-  """
-  Class that handles sending when a socket write didn't complete
-  """
   def __init__ (self):
     threading.Thread.__init__(self)
     core.addListeners(self)
@@ -289,6 +346,7 @@ class DeferredSender (threading.Thread):
   def _handle_GoingDownEvent (self, event):
     self._waker.ping()
 
+  "Toma uma matriz de bytes de dados, e em elementos de fatias PIPE_BUF bytes cada"
   def _sliceup (self, data):
     """
     Takes an array of data bytes, and slices into elements of
@@ -376,7 +434,7 @@ class DeferredSender (threading.Thread):
               del self._dataForConnection[con]
             except:
               pass
-
+"Modelo de nexo"
 class DummyOFNexus (object):
   def raiseEventNoErrors (self, event, *args, **kw):
     log.warning("%s raised on dummy OpenFlow nexus" % event)
@@ -409,7 +467,7 @@ class FileCloser (object):
 _itemcloser = FileCloser()
 """
 
-
+"Captura dados OpenFlow para um arquivo pcap"
 class OFCaptureSocket (CaptureSocket):
   """
   Captures OpenFlow data to a pcap file
@@ -459,7 +517,13 @@ class OFCaptureSocket (CaptureSocket):
       self._sbuf = self._sbuf[packet_length:]
       l = len(self._sbuf)
 
+"""
+Mantém o controle de listas de portas e fornece boa indexação.
 
+  NOTA: É possível que este poderia ser mais simples por herança de UserDict,
+        mas eu não podia jurar sem olhar para UserDict com algum detalhe,
+        então eu só implementou um monte de coisas com a mão.
+"""
 class PortCollection (object):
   """
   Keeps track of lists of ports and provides nice indexing.
@@ -494,7 +558,7 @@ class PortCollection (object):
 
   def __len__ (self):
     return len(self.keys())
-
+"getitem: Chamado para implementar avaliação de self[key]. "
   def __getitem__ (self, index):
     if isinstance(index, (int,long)):
       for p in self._ports:
@@ -561,7 +625,11 @@ class PortCollection (object):
     r = PortCollection()
     r._ports = set(self.values())
 
-
+"""
+Um objeto de conexão representa uma única sessão TCP com um
+  interruptor habilitado para OpenFlow.
+  Se o interruptor for reconectado, um novo objeto de conexão é instanciado.
+"""
 class Connection (EventMixin):
   """
   A Connection object represents a single TCP session with an
@@ -625,7 +693,9 @@ class Connection (EventMixin):
 
     #TODO: set a time that makes sure we actually establish a connection by
     #      some timeout
-
+    """
+    definir um tempo que garante que nós realmente estabelecer uma ligação por algum tempo limite
+    """
   @property
   def eth_addr (self):
     dpid = self.dpid
@@ -642,7 +712,7 @@ class Connection (EventMixin):
       self.sock.close()
     except:
       pass
-
+  "desconectar essa conexão (normalmente não chamado manualmente)."    
   def disconnect (self, msg = 'disconnected', defer_event = False):
     """
     disconnect this Connection (usually not invoked manually).
@@ -675,7 +745,12 @@ class Connection (EventMixin):
       #TODO disconnect notification
     except:
       pass
+  """
+  Enviar dados para o switch.
 
+    Dados provavelmente deve ser bytes brutos em formato fio OpenFlow, ou
+    um objeto mensagem OpenFlow controlador para mudar de libopenflow.
+  """
   def send (self, data):
     """
     Send data to the switch.
@@ -687,7 +762,12 @@ class Connection (EventMixin):
     if type(data) is not bytes:
       # There's actually no reason the data has to be an instance of
       # ofp_header, but this check is likely to catch a lot of bugs,
-      # so we check it anyway.
+      # so we check it anywayself.
+      """
+      Há realmente nenhuma razão os dados têm que ser uma instância de
+      Ofp_header, mas essa verificação é provável para pegar um monte de erros,
+      Para que verificá-lo de qualquer maneira.
+      """
       assert isinstance(data, of.ofp_header)
       data = data.pack()
 
@@ -709,7 +789,12 @@ class Connection (EventMixin):
       else:
         self.msg("Socket error: " + strerror)
         self.disconnect(defer_event=True)
+  """
+  Ler dados a partir desta conexão. Geralmente este é apenas chamado pelo
+    loop principal OpenFlow abaixo.
 
+    Nota: Esta função irá bloquear, se os dados não está disponível.
+  """
   def read (self):
     """
     Read data from this connection.  Generally this is just called by the
@@ -728,6 +813,12 @@ class Connection (EventMixin):
 
 
     offset = 0
+    """
+    8 bytes é mínimo de tamanho da mensagem
+    Nós puxar os primeiros quatro bytes do cabeçalho OpenFlow off com a mão
+    (Usando ord) para encontrar a versão / comprimento / tipo para que possamos
+    Chamar corretamente libopenflow para descompactá-lo.
+    """
     while buf_len - offset >= 8: # 8 bytes is minimum OF message size
       # We pull the first four bytes of the OpenFlow header off by hand
       # (using ord) to find the version/length/type so that we can
@@ -765,13 +856,17 @@ class Connection (EventMixin):
       self.buf = self.buf[offset:]
 
     return True
-
+"""
+Isso pressupõe que você não receber várias estatísticas respostas
+    # Para diferentes solicitações fora de ordem / intercaladas.
+"""
   def _incoming_stats_reply (self, ofp):
     # This assumes that you don't receive multiple stats replies
     # to different requests out of order/interspersed.
     if not ofp.is_last_reply:
       if ofp.type not in [of.OFPST_FLOW, of.OFPST_TABLE,
                                 of.OFPST_PORT, of.OFPST_QUEUE]:
+                  "Não sei como agregar Status de mensagem do tipo"
         log.error("Don't know how to aggregate stats message of type " +
                   str(ofp.type))
         self._previous_stats = []
@@ -795,7 +890,8 @@ class Connection (EventMixin):
       handler = statsHandlerMap.get(self._previous_stats[0].type, None)
       s = self._previous_stats
       self._previous_stats = []
-      if handler is None:
+      if handler is None: 
+                 "Nenhum manipulador para estatísticas de tipo"
         log.warn("No handler for stats of type " +
                  str(self._previous_stats[0].type))
         return
@@ -809,7 +905,7 @@ class Connection (EventMixin):
       d = pox.lib.util.dpidToStr(self.dpid)
     return "[%s %i]" % (d, self.ID)
 
-
+"'embrulhar' o socket"
 def wrap_socket (new_sock):
   fname = datetime.datetime.now().strftime("%Y-%m-%d-%I%M%p")
   fname += "_" + new_sock.getpeername()[0].replace(".", "_")
@@ -826,7 +922,7 @@ def wrap_socket (new_sock):
 
 
 from pox.lib.recoco.recoco import *
-
+"O thread principal recoco para ouvir OpenFlow mensagens"
 class OpenFlow_01_Task (Task):
   """
   The main recoco thread for listening to openflow messages
@@ -847,7 +943,7 @@ class OpenFlow_01_Task (Task):
       return
     self.started = True
     return super(OpenFlow_01_Task,self).start()
-
+  "lista de soquetes abertos / conexões para selecionar on"
   def run (self):
     # List of open sockets/connections to select on
     sockets = []
@@ -859,9 +955,11 @@ class OpenFlow_01_Task (Task):
     except socket.error as (errno, strerror):
       log.error("Error %i while binding socket: %s", errno, strerror)
       if errno == EADDRNOTAVAIL:
+        "Você pode estar especificando um endereço local que não é atribuído a qualquer interface"
         log.error(" You may be specifying a local address which is "
                   "not assigned to any interface.")
       elif errno == EADDRINUSE:
+        "Você pode ter outro controlador de execução"
         log.error(" You may have another controller running.")
         log.error(" Use openflow.of_01 --port=<port> to run POX on "
                   "another port.")
@@ -935,12 +1033,12 @@ class OpenFlow_01_Task (Task):
           sockets.remove(con)
         except:
           pass
-
+    "Já não atendendo as conexões"
     log.debug("No longer listening for connections")
 
     #pox.core.quit()
 
-
+"define manipuladores"
 def _set_handlers ():
   handlers.extend([None] * (1 + sorted(handlerMap.keys(),reverse=True)[0]))
   for h in handlerMap:

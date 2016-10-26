@@ -24,6 +24,13 @@ It supports the following commandline options:
  --interval=X  Send an echo request every X seconds (default 20)
  --timeout=X   Expect response from switch within X seconds (default 3)
 """
+"Este módulo envia pedidos de eco periódicas aos switches."
+
+"No momento, ele só funciona no primário do nexo."
+
+"Ele suporta as seguintes opções de linha de comando :"
+" --interval = X Enviar uma solicitação de eco a cada X segundos (padrão 20)"
+" --timeout = X Esperar resposta do interruptor dentro de X segundos (default 3)"
 
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
@@ -63,4 +70,5 @@ def launch (interval = 20, timeout = 3):
       return
     _running = True
     Timer(_interval, _handle_timer, recurring=True, args=(core.openflow,))
+    "análise de eventos recorrentes linguagem natural"
   core.call_when_ready(start, "openflow", __name__)

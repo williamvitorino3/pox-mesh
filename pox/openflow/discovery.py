@@ -15,6 +15,18 @@
 # This file is loosely based on the discovery component in NOX.
 
 """
+openflow.discovery: Utiliza mensagens LLDP (Link Layer Discovery Protocol) 
+para descobrir a conectividade entre os switches com o objetivo de mapear 
+a topologia da rede. O mesmo cria eventos (os quais podem ser “escutados”) 
+quando um link fica up ou down. Esse componente foi essencial para a aplicação desenvolvida;
+
+Este módulo descobre a conectividade entre switches OpenFlow enviando
+fora pacotes LLDP . Para ser notificado desta informação , ouvir LinkEvents
+em core.openflow_discovery .
+
+É possível que alguns dos isso deve ser abstraída para fora em um genérico
+módulo de descoberta , ou uma superclasse Discovery.
+
 This module discovers the connectivity between OpenFlow switches by sending
 out LLDP packets. To be notified of this information, listen to LinkEvents
 on core.openflow_discovery.
@@ -38,21 +50,35 @@ from random import shuffle, random
 
 log = core.getLogger()
 
-
+"Envia pacotes descobertos"
 class LLDPSender (object):
-  """
-  Sends out discovery packets
-  """
 
   SendItem = namedtuple("LLDPSenderItem", ('dpid','port_num','packet'))
 
+  """
+  sua classe mantém os pacotes para enviar em uma lista simples , o que torna
+  Adicionar / remover -los na chave juntar / licença ou (especialmente) porta
+  Mudanças de status relativamente caro . Poderia ser facilmente melhorado.
+  """
   #NOTE: This class keeps the packets to send in a flat list, which makes
   #      adding/removing them on switch join/leave or (especially) port
   #      status changes relatively expensive. Could easily be improved.
 
   # Maximum times to run the timer per second
+  "tempo máximo para executar o temporizador por segundo"
   _sends_per_sec = 15
 
+"""
+Inicializar um pacote remetente LLDP
+
+send_cycle_time é o tempo ( em segundos) que este remetente vai demorar para
+enviar todos os pacotes de descoberta. Assim , ele deve ser o elo de tempo limite
+intervalo de , no máximo.
+
+TTL é o tempo ( em segundos) para que um agente LLDP recepção deve
+considerar o resto dos dados para ser válido. Nós não usamos isso, mas
+outros agentes LLDP pode. não pode ser 0 (isto significa revogar ) .
+"""
   def __init__ (self, send_cycle_time, ttl = 120):
     """
     Initialize an LLDP packet sender
@@ -66,12 +92,15 @@ class LLDPSender (object):
       other LLDP agents might.  Can't be 0 (this means revoke).
     """
     # Packets remaining to be sent in this cycle
+    "Pacotes restantes a serem enviados neste ciclo"
     self._this_cycle = []
 
     # Packets we've already sent in this cycle
+    "Os pacotes que já enviaram neste ciclo"
     self._next_cycle = []
 
     # Packets to send in a batch
+    "Pacotes para enviar em um lote"
     self._send_chunk_size = 1
 
     self._timer = None
@@ -79,10 +108,8 @@ class LLDPSender (object):
     self._send_cycle_time = send_cycle_time
     core.listen_to_dependencies(self)
 
+  "Acompanhar as mudanças para alternar portas"
   def _handle_openflow_PortStatus (self, event):
-    """
-    Track changes to switch ports
-    """
     if event.added:
       self.add_port(event.dpid, event.port, event.ofp.desc.hw_addr)
     elif event.deleted:
@@ -101,11 +128,13 @@ class LLDPSender (object):
   def _handle_openflow_ConnectionDown (self, event):
     self.del_switch(event.dpid)
 
+  "deleta switch"
   def del_switch (self, dpid, set_timer = True):
     self._this_cycle = [p for p in self._this_cycle if p.dpid != dpid]
     self._next_cycle = [p for p in self._next_cycle if p.dpid != dpid]
     if set_timer: self._set_timer()
 
+  "deleta porta"
   def del_port (self, dpid, port_num, set_timer = True):
     if port_num > of.OFPP_MAX: return
     self._this_cycle = [p for p in self._this_cycle
@@ -114,6 +143,7 @@ class LLDPSender (object):
                         if p.dpid != dpid or p.port_num != port_num]
     if set_timer: self._set_timer()
 
+  "adiciona porta"
   def add_port (self, dpid, port_num, port_addr, set_timer = True):
     if port_num > of.OFPP_MAX: return
     self.del_port(dpid, port_num, set_timer = False)
@@ -121,6 +151,7 @@ class LLDPSender (object):
           self.create_discovery_packet(dpid, port_num, port_addr)))
     if set_timer: self._set_timer()
 
+  "estabelece o temporizador"
   def _set_timer (self):
     if self._timer: self._timer.cancel()
     self._timer = None
@@ -130,6 +161,7 @@ class LLDPSender (object):
 
     self._send_chunk_size = 1 # One at a time
     interval = self._send_cycle_time / float(num_packets)
+    "Exigiria muitos envia por segundo - enviar mais de um ao mesmo tempo"
     if interval < 1.0 / self._sends_per_sec:
       # Would require too many sends per sec -- send more than one at once
       interval = 1.0 / self._sends_per_sec
@@ -139,6 +171,12 @@ class LLDPSender (object):
     self._timer = Timer(interval,
                         self._timer_handler, recurring=True)
 
+  """
+  Chamado por um temporizador para realmente enviar pacotes .
+  Pega o primeiro pacote de fora da lista deste ciclo, envia -lo, 
+  e em seguida, coloca-lo na lista de próxima ciclo. 
+  Quando a lista deste ciclo é vazio, começa o ciclo seguinte .
+  """
   def _timer_handler (self):
     """
     Called by a timer to actually send packets.
@@ -160,6 +198,7 @@ class LLDPSender (object):
       self._next_cycle.append(item)
       core.openflow.sendToDPID(item.dpid, item.packet)
 
+  "Constroir pacote descoberto"
   def create_discovery_packet (self, dpid, port_num, port_addr):
     """
     Build discovery packet
@@ -192,7 +231,7 @@ class LLDPSender (object):
     po.data = eth.pack()
     return po.pack()
 
-
+"Vincular up / down evento"
 class LinkEvent (Event):
   """
   Link up/down event
@@ -213,6 +252,11 @@ class LinkEvent (Event):
 
 class Link (namedtuple("LinkBase",("dpid1","port1","dpid2","port2"))):
   @property
+  """
+  Retorna uma versão " unidirecional " desta ligação
+
+  As versões unidireccionais de chaves simétricas será igual
+  """
   def uni (self):
     """
     Returns a "unidirectional" version of this link
@@ -235,7 +279,11 @@ class Link (namedtuple("LinkBase",("dpid1","port1","dpid2","port2"))):
     return "Link(dpid1=%s,port1=%s, dpid2=%s,port2=%s)" % (self.dpid1,
         self.port1, self.dpid2, self.port2)
 
+"""
+Componente que tenta descobrir da topologia de rede.
 
+Envia pacotes LLDP especialmente criados , e monitora a sua chegada .
+"""
 class Discovery (EventMixin):
   """
   Component that attempts to discover network toplogy.
@@ -243,8 +291,11 @@ class Discovery (EventMixin):
   Sends out specially-crafted LLDP packets, and monitors their arrival.
   """
 
-  _flow_priority = 65000     # Priority of LLDP-catching flow (if any)
+  "Prioridade do fluxo de captura LLDP (se houver)"
+  _flow_priority = 65000     # Priority of LLDP-catching flow (if any) 
+  "Quanto tempo até que nós consideramos um beco sem ligação"
   _link_timeout = 10         # How long until we consider a link dead
+  "Quantas vezes para verificar se há tempos de espera"
   _timeout_check_period = 5  # How often to check for timeouts
 
   _eventMixin_events = set([
@@ -266,6 +317,7 @@ class Discovery (EventMixin):
     self._sender = LLDPSender(self.send_cycle_time)
 
     # Listen with a high priority (mostly so we get PacketIns early)
+    "Ouça com uma alta prioridade (principalmente então temos PacketIns início )"
     core.listen_to_dependencies(self,
         listen_args={'openflow':{'priority':0xffffffff}})
 
@@ -275,6 +327,7 @@ class Discovery (EventMixin):
   def send_cycle_time (self):
     return self._link_timeout / 2.0
 
+  "instala o fluxo"
   def install_flow (self, con_or_dpid, priority = None):
     if priority is None:
       priority = self._flow_priority
@@ -291,22 +344,25 @@ class Discovery (EventMixin):
     msg = of.ofp_flow_mod()
     msg.priority = priority
     msg.match = match
-    msg.actions.append(of.ofp_action_output(port = of.OFPP_CONTROLLER))
+    msg.actions.append(of.ofp_action_output(port = of.OFPP_CONTROLLER)) "OFPP_CONTROLLER: Enviar para o controlador"
     con.send(msg)
     return True
 
   def _handle_openflow_ConnectionUp (self, event):
     if self._install_flow:
       # Make sure we get appropriate traffic
+      "Certifique-se de que obter o tráfego adequado"
       log.debug("Installing flow for %s", dpid_to_str(event.dpid))
       self.install_flow(event.connection)
 
+  "Excluir todos os links nesta interruptor"
   def _handle_openflow_ConnectionDown (self, event):
     # Delete all links on this switch
     self._delete_links([link for link in self.adjacency
                         if link.dpid1 == event.dpid
                         or link.dpid2 == event.dpid])
 
+  "remover links aparentemente mortos"
   def _expire_links (self):
     """
     Remove apparently dead links
@@ -321,6 +377,7 @@ class Discovery (EventMixin):
 
       self._delete_links(expired)
 
+  "Receber e processar pacotes LLDP"
   def _handle_openflow_PacketIn (self, event):
     """
     Receive and process LLDP packets
@@ -347,10 +404,10 @@ class Discovery (EventMixin):
 
     lldph = packet.find(pkt.lldp)
     if lldph is None or not lldph.parsed:
-      log.error("LLDP packet could not be parsed")
+      log.error("LLDP packet could not be parsed") "LLDP pacote não pôde ser analisada"
       return EventHalt
     if len(lldph.tlvs) < 3:
-      log.error("LLDP packet without required three TLVs")
+      log.error("LLDP packet without required three TLVs") "pacote LLDP sem necessárias três TLVs"
       return EventHalt
     if lldph.tlvs[0].tlv_type != pkt.lldp.CHASSIS_ID_TLV:
       log.error("LLDP packet TLV 1 not CHASSIS_ID")
@@ -389,6 +446,7 @@ class Discovery (EventMixin):
       if lldph.tlvs[0].subtype == pkt.chassis_id.SUB_LOCAL:
         if lldph.tlvs[0].id.startswith('dpid:'):
           # This is how NOX does it at the time of writing
+          "Isto é como NOX faz isso no momento da escrita"
           try:
             originatorDPID = int(lldph.tlvs[0].id[5:], 16)
           except:
@@ -397,6 +455,10 @@ class Discovery (EventMixin):
         if lldph.tlvs[0].subtype == pkt.chassis_id.SUB_MAC:
           # Last ditch effort -- we'll hope the DPID was small enough
           # to fit into an ethernet address
+          """
+          Último esforço - vamos esperar que o DPID era pequeno o suficiente
+          # Para caber em um endereço ethernet
+          """
           if len(lldph.tlvs[0].id) == 6:
             try:
               s = lldph.tlvs[0].id
@@ -405,23 +467,26 @@ class Discovery (EventMixin):
               pass
 
     if originatorDPID == None:
-      log.warning("Couldn't find a DPID in the LLDP packet")
+      log.warning("Couldn't find a DPID in the LLDP packet") "Não foi possível encontrar um DPID no pacote LLDP"
       return EventHalt
 
     if originatorDPID not in core.openflow.connections:
-      log.info('Received LLDP packet from unknown switch')
+      log.info('Received LLDP packet from unknown switch') "Pacote recebido LLDP do interruptor desconhecido"
       return EventHalt
 
     # Get port number from port TLV
+    "Obter número da porta de TLV porta"
     if lldph.tlvs[1].subtype != pkt.port_id.SUB_PORT:
-      log.warning("Thought we found a DPID, but packet didn't have a port")
+      log.warning("Thought we found a DPID, but packet didn't have a port") "Pensado que encontramos um DPID , mas pacotes não têm uma porta"
       return EventHalt
     originatorPort = None
     if lldph.tlvs[1].id.isdigit():
       # We expect it to be a decimal value
+      "Esperamos que ele seja um valor decimal"
       originatorPort = int(lldph.tlvs[1].id)
     elif len(lldph.tlvs[1].id) == 2:
       # Maybe it's a 16 bit port number...
+      "Talvez seja um número de porta de 16 bits "
       try:
         originatorPort  =  struct.unpack("!H", lldph.tlvs[1].id)[0]
       except:
@@ -432,7 +497,7 @@ class Discovery (EventMixin):
       return EventHalt
 
     if (event.dpid, event.port) == (originatorDPID, originatorPort):
-      log.warning("Port received its own LLDP packet; ignoring")
+      log.warning("Port received its own LLDP packet; ignoring") "Porta recebeu o seu próprio pacote LLDP ; ignorando "
       return EventHalt
 
     link = Discovery.Link(originatorDPID, originatorPort, event.dpid,
@@ -444,8 +509,10 @@ class Discovery (EventMixin):
       self.raiseEventNoErrors(LinkEvent, True, link)
     else:
       # Just update timestamp
+      "Apenas atualização timestamp"
       self.adjacency[link] = time.time()
 
+    "Provavelmente, ninguém mais precisa neste evento"
     return EventHalt # Probably nobody else needs this event
 
   def _delete_links (self, links):
@@ -454,7 +521,8 @@ class Discovery (EventMixin):
     for link in links:
       self.adjacency.pop(link, None)
 
-  def is_edge_port (self, dpid, port):
+ "Retornar true se determinada porta não se conectar a outro switch"
+ def is_edge_port (self, dpid, port):
     """
     Return True if given port does not connect to another switch
     """
@@ -465,7 +533,7 @@ class Discovery (EventMixin):
         return False
     return True
 
-
+"inicializa"
 def launch (no_flow = False, explicit_drop = True, link_timeout = None,
             eat_early_packets = False):
   explicit_drop = str_to_bool(explicit_drop)

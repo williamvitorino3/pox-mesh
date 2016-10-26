@@ -14,7 +14,6 @@
 
 """
 A simple JSON-RPC-ish web service for interacting with OpenFlow.
-
 This is not incredibly robust or performant or anything.  It's a demo.
 It's derived from the of_service messenger service, so see it for some
 more details.  Also, if you add features to this, please think about
@@ -43,6 +42,33 @@ curl -i -X POST -d '{"method":"set_table","params":{"dpid":
  "port":"OFPP_ALL"}],"match":{}}]}}' http://127.0.0.1:8000/OF/
 """
 
+"""
+Um simples serviço web em JSON -RPC ish para interagir com OpenFlow .
+
+Este não é incrivelmente robusto ou performance ou qualquer coisa. É uma demonstração.
+É derivado do serviço of_service messenger , então vê-lo por algum
+mais detalhes. Além disso, se você adicionar recursos para isso, por favor, pense
+adicioná-los ao serviço de mensagens também.
+
+comandos atuais incluem:
+  set_table
+    Define a tabela de fluxo em um switch .
+    DPID - um DPID cadeia
+    flui - uma lista de entradas de fluxo
+  get_switch_desc
+    Obtém mudar detalhes .
+    DPID - um DPID cadeia
+  get_flow_stats
+    Obter lista de fluxos sobre a mesa .
+    DPID - um DPID cadeia
+    jogo - estrutura de jogo ( opcional, padrão para coincidir com todos)
+    table_id - mesa para fluxos ( padrão para todos)
+    out_port - filtro por porta de saída (padrão para todos)
+  get_switches
+    Obter lista de opções e suas informações básicas .
+"""
+
+"sys: Um dicionário agindo como um cache para localizador de objectos."
 import sys
 from pox.lib.util import dpidToStr, strToDPID, fields_of
 from pox.core import core
@@ -53,7 +79,10 @@ import threading
 
 log = core.getLogger()
 
-
+"""
+Superclasse para solicitações que enviam comandos para uma conexão e
+  esperar por respostas .
+"""
 class OFConRequest (object):
   """
   Superclass for requests that send commands to a connection and
@@ -76,6 +105,7 @@ class OFConRequest (object):
     #log.warn("UNIMPLEMENTED REQUEST INIT")
     pass
 
+  "obtem resposta"
   def get_response (self):
     if not self._sync.wait(5):
       # Whoops; timeout!
@@ -84,16 +114,18 @@ class OFConRequest (object):
       raise RuntimeError("Operation timed out")
     return self._response
 
+  "finaliza"
   def _finish (self, value = None):
     if self._response is None:
       self._response = value
     self._sync.set()
     self._con.removeListeners(self._listeners)
 
+  "resultado"
   def _result (self, key, value):
     self._finish({'result':{key:value,'dpid':dpidToStr(self._con.dpid)}})
 
-
+"Lida com o switch recebido. Obtém mudar detalhes . DPID - um DPID string"
 class OFSwitchDescRequest (OFConRequest):
   def _init (self):
     sr = of.ofp_stats_request()
@@ -101,16 +133,26 @@ class OFSwitchDescRequest (OFConRequest):
     self._con.send(sr)
     self.xid = sr.xid
 
+  "Lida com o switch recebido. Obtém mudar detalhes . DPID - um DPID string"
   def _handle_SwitchDescReceived (self, event):
     if event.ofp.xid != self.xid: return
     r = switch_desc_to_dict(event.stats)
     self._result('switchdesc', r)
 
+  "Lida com erro"
   def _handle_ErrorIn (self, event):
     if event.ofp.xid != self.xid: return
     self._finish(make_error("OpenFlow Error", data=event.asString()))
 
-
+"Lida com o switch recebido. Obtém mudar detalhes . DPID - um DPID string"
+"""
+get_flow_stats
+    Obter lista de fluxos sobre a mesa .
+    DPID - um DPID cadeia
+    jogo - estrutura de jogo ( opcional, padrão para coincidir com todos)
+    table_id - mesa para fluxos ( padrão para todos)
+    out_port - filtro por porta de saída (padrão para todos)
+"""
 class OFFlowStatsRequest (OFConRequest):
   def _init (self, match=None, table_id=0xff, out_port=of.OFPP_NONE):
     sr = of.ofp_stats_request()
@@ -125,22 +167,34 @@ class OFFlowStatsRequest (OFConRequest):
     self._con.send(sr)
     self.xid = sr.xid
 
+  "Lida com o estado de fluxo recebido. Lida lista de fluxos sobre a mesa ."
   def _handle_FlowStatsReceived (self, event):
     if event.ofp[0].xid != self.xid: return
     stats = flow_stats_to_list(event.stats)
 
     self._result('flowstats', stats)
 
+  "Lida com erro"
   def _handle_ErrorIn (self, event):
     if event.ofp.xid != self.xid: return
     self._finish(make_error("OpenFlow Error", data=event.asString()))
 
-
+"""
+set_table
+    Define a tabela de fluxo em um switch .
+    DPID - um DPID cadeia
+    flui - uma lista de entradas de fluxo
+"""
+"Classe para a resposta da tabela"
 class OFSetTableRequest (OFConRequest):
 
+  "limpa a tabela"
   def clear_table (self, xid = None):
+
+    "As modificações em um tabela de fluxo do controlador é feito com a mensagem OFPT_FLOW_MOD"
     fm = of.ofp_flow_mod()
     fm.xid = xid
+    "OFPFC_DELETE: Exclui todos os fluxos correspondentes .."
     fm.command = of.OFPFC_DELETE
     self._con.send(fm)
     bar = of.ofp_barrier_request()
@@ -164,6 +218,7 @@ class OFSetTableRequest (OFConRequest):
       self._con.send(fm)
       self._con.send(of.ofp_barrier_request(xid=xid))
 
+ "Lida com a 'barreira'"
   def _handle_BarrierIn (self, event):
     if event.ofp.xid != self.xid: return
     if self.done: return
@@ -172,6 +227,7 @@ class OFSetTableRequest (OFConRequest):
       self._result('flowmod', True)
       self.done = True
 
+  "Lida com erro"
   def _handle_ErrorIn (self, event):
     if event.ofp.xid != self.xid: return
     if self.done: return
@@ -179,9 +235,13 @@ class OFSetTableRequest (OFConRequest):
     self.done = True
     self._finish(make_error("OpenFlow Error", data=event.asString()))
 
-
+"Lida com a resposta"
 class OFRequestHandler (JSONRPCHandler):
 
+" executa o set_table"
+    "Define a tabela de fluxo em um switch ."
+    "DPID - um DPID cadeia"
+    "flui - uma lista de entradas de fluxo"
   def _exec_set_table (self, dpid, flows):
     dpid = strToDPID(dpid)
     con = core.openflow.getConnection(dpid)
@@ -190,6 +250,7 @@ class OFRequestHandler (JSONRPCHandler):
 
     return OFSetTableRequest(con, flows).get_response()
 
+  "Executa o switch recebido. Obtém mudar detalhes . DPID - um DPID string"
   def _exec_get_switch_desc (self, dpid):
     dpid = strToDPID(dpid)
     con = core.openflow.getConnection(dpid)
@@ -198,6 +259,7 @@ class OFRequestHandler (JSONRPCHandler):
 
     return OFSwitchDescRequest(con).get_response()
 
+  "Executa lista de fluxos sobre a mesa ."
   def _exec_get_flow_stats (self, dpid, *args, **kw):
     dpid = strToDPID(dpid)
     con = core.openflow.getConnection(dpid)
