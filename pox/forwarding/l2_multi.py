@@ -55,7 +55,11 @@ mac_map = {}
 path_map = defaultdict(lambda:defaultdict(lambda:(None,None)))
 
 
-def _calc_paths ():
+def _calc_paths():
+  """
+  Implemantação do algoritimo Floyd-Warshall no mapa de switches.
+  :return: Sem retorno.
+  """
   """
   Essentially Floyd-Warshall algorithm
   """
@@ -98,6 +102,13 @@ def _calc_paths ():
 
 
 def _get_raw_path (src, dst):
+  """
+  Pega uma linha de caminhos.
+  :param src: Pasta origem.
+  :param dst: Pasta destino.
+  :return: Retorna uma lista com o caminho da origem até o destino
+  passando pelo meio, se houver, caso comtrário retorna uma lista vázia.
+  """
   if len(path_map) == 0: _calc_paths()
   if src is dst:
     # We're here!
@@ -113,6 +124,11 @@ def _get_raw_path (src, dst):
 
 
 def _check_path (p):
+  """
+  Verifica a adjacência da matriz 'p'.
+  :param p: Uma matriz para comparação.
+  :return: Verdadeiro se for ajacente, ou falso se houver alguma falha na matriz 'p'.
+  """
   for i in range(len(p) - 1):
     if adjacency[p[i][0]][p[i+1][0]] != p[i][1]:
       return False
@@ -120,6 +136,13 @@ def _check_path (p):
 
 
 def _get_path (src, dst, final_port):
+  """
+  Pega o caminho que o capote vai percorrer.
+  :param src: Local de origem.
+  :param dst: Local de destino.
+  :param final_port: Porta final.
+  :return:  Lista de tuplas com os caminhos.
+  """
   #print "path from",src,"to",dst
   if src == dst:
     path = [src]
@@ -142,6 +165,9 @@ def _get_path (src, dst, final_port):
 
 class PathInstalled (Event):
   """
+  Salva o path de alguma instalação.
+  """
+  """
   Fired when a path is installed
   """
   def __init__ (self, path):
@@ -150,6 +176,9 @@ class PathInstalled (Event):
 
 
 class Switch (EventMixin):
+  """
+  Clesse que representa um switch.
+  """
   def __init__ (self):
     self.connection = None
     self.ports = None
