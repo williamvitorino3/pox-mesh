@@ -68,17 +68,17 @@ class LLDPSender (object):
   "tempo máximo para executar o temporizador por segundo"
   _sends_per_sec = 15
 
-"""
-Inicializar um pacote remetente LLDP
+  """
+  Inicializar um pacote remetente LLDP
 
-send_cycle_time é o tempo ( em segundos) que este remetente vai demorar para
-enviar todos os pacotes de descoberta. Assim , ele deve ser o elo de tempo limite
-intervalo de , no máximo.
+  send_cycle_time é o tempo ( em segundos) que este remetente vai demorar para
+  enviar todos os pacotes de descoberta. Assim , ele deve ser o elo de tempo limite
+  intervalo de , no máximo.
 
-TTL é o tempo ( em segundos) para que um agente LLDP recepção deve
-considerar o resto dos dados para ser válido. Nós não usamos isso, mas
-outros agentes LLDP pode. não pode ser 0 (isto significa revogar ) .
-"""
+  TTL é o tempo ( em segundos) para que um agente LLDP recepção deve
+  considerar o resto dos dados para ser válido. Nós não usamos isso, mas
+  outros agentes LLDP pode. não pode ser 0 (isto significa revogar ) .
+  """
   def __init__ (self, send_cycle_time, ttl = 120):
     """
     Initialize an LLDP packet sender
@@ -249,12 +249,13 @@ class LinkEvent (Event):
       return self.link.port2
     return None
 
-"""
+
+class Link (namedtuple("LinkBase",("dpid1","port1","dpid2","port2"))):
+  """
   Retorna uma versão " unidirecional " desta ligação
 
   As versões unidireccionais de chaves simétricas será igual
   """
-class Link (namedtuple("LinkBase",("dpid1","port1","dpid2","port2"))):
   @property
   def uni (self):
     """
@@ -403,10 +404,10 @@ class Discovery (EventMixin):
 
     lldph = packet.find(pkt.lldp)
     if lldph is None or not lldph.parsed:
-      log.error("LLDP packet could not be parsed") #LLDP pacote não pôde ser analisada"
+      log.error("LLDP packet could not be parsed") "LLDP pacote não pôde ser analisada"
       return EventHalt
     if len(lldph.tlvs) < 3:
-      log.error("LLDP packet without required three TLVs") #pacote LLDP sem necessárias três TLVs"
+      log.error("LLDP packet without required three TLVs") "pacote LLDP sem necessárias três TLVs"
       return EventHalt
     if lldph.tlvs[0].tlv_type != pkt.lldp.CHASSIS_ID_TLV:
       log.error("LLDP packet TLV 1 not CHASSIS_ID")
@@ -476,7 +477,7 @@ class Discovery (EventMixin):
     # Get port number from port TLV
     "Obter número da porta de TLV porta"
     if lldph.tlvs[1].subtype != pkt.port_id.SUB_PORT:
-      log.warning("Thought we found a DPID, but packet didn't have a port") #Pensado que encontramos um DPID , mas pacotes não têm uma porta"
+      log.warning("Thought we found a DPID, but packet didn't have a port") "Pensado que encontramos um DPID , mas pacotes não têm uma porta"
       return EventHalt
     originatorPort = None
     if lldph.tlvs[1].id.isdigit():
@@ -496,7 +497,7 @@ class Discovery (EventMixin):
       return EventHalt
 
     if (event.dpid, event.port) == (originatorDPID, originatorPort):
-      log.warning("Port received its own LLDP packet; ignoring") #Porta recebeu o seu próprio pacote LLDP ; ignorando "
+      log.warning("Port received its own LLDP packet; ignoring") "Porta recebeu o seu próprio pacote LLDP ; ignorando "
       return EventHalt
 
     link = Discovery.Link(originatorDPID, originatorPort, event.dpid,

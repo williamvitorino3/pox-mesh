@@ -210,8 +210,8 @@ class ofp_base (object):
 
   def __ne__ (self, other):
     return not self.__eq__(other)
- 
- """
+
+  """
   Descompacta formato de fio no objeto de mensagem apropriada.
 
   Retorna newoffset, objeto
@@ -378,22 +378,22 @@ def openflow_stats_reply (stats_type, type_val=None, is_list=None,
 # ----------------------------------------------------------------------
 
 ofp_error_type_rev_map = {
-  'OFPET_HELLO_FAILED'    : 0, #Olá protocolo falhou
-  'OFPET_BAD_REQUEST'     : 1, #Pedido não foi compreendido
-  'OFPET_BAD_ACTION'      : 2, #Erro na descrição da ação
-  'OFPET_FLOW_MOD_FAILED' : 3, #Problema na modificação da entrada de fluxo
-  'OFPET_PORT_MOD_FAILED' : 4, #Pedido da porta mod falhou
-  'OFPET_QUEUE_OP_FAILED' : 5, #Falha na operação da fila
+  'OFPET_HELLO_FAILED'    : 0, "Olá protocolo falhou"
+  'OFPET_BAD_REQUEST'     : 1, "Pedido não foi compreendido"
+  'OFPET_BAD_ACTION'      : 2, "Erro na descrição da ação"
+  'OFPET_FLOW_MOD_FAILED' : 3, "Problema na modificação da entrada de fluxo"
+  'OFPET_PORT_MOD_FAILED' : 4, "Pedido da porta mod falhou"
+  'OFPET_QUEUE_OP_FAILED' : 5, "Falha na operação da fila"
 }
 
 ofp_hello_failed_code_rev_map = {
-  'OFPHFC_INCOMPATIBLE' : 0, #Nenhuma versão compatível
-  'OFPHFC_EPERM'        : 1, #Erro de permissões
+  'OFPHFC_INCOMPATIBLE' : 0, "Nenhuma versão compatível"
+  'OFPHFC_EPERM'        : 1, "Erro de permissões"
 }
 
 ofp_bad_request_code_rev_map = {
-  'OFPBRC_BAD_VERSION'    : 0, #ofp_header.version não suportada
-  'OFPBRC_BAD_TYPE'       : 1, #ofp_header.type não suportada
+  'OFPBRC_BAD_VERSION'    : 0, "ofp_header.version não suportada"
+  'OFPBRC_BAD_TYPE'       : 1, "ofp_header.type não suportada"
   'OFPBRC_BAD_STAT'       : 2, 
 
   "Para indicar que um switch não compreende uma extensão de fornecedor, um código de erro OFPBRC_BAD_VENDOR"
@@ -401,22 +401,22 @@ ofp_bad_request_code_rev_map = {
   'OFPBRC_BAD_VENDOR'     : 3,
 
   'OFPBRC_BAD_SUBTYPE'    : 4, 
-  'OFPBRC_EPERM'          : 5, #Erro de permissões
-  'OFPBRC_BAD_LEN'        : 6, #Comprimento pedido errado para comprimento do pedido de tipo typeWrong
-  'OFPBRC_BUFFER_EMPTY'   : 7, #Buffer especificado já foi utilizado
-  'OFPBRC_BUFFER_UNKNOWN' : 8, #Buffer especificado não existe
+  'OFPBRC_EPERM'          : 5, "Erro de permissões"
+  'OFPBRC_BAD_LEN'        : 6, "Comprimento pedido errado para comprimento do pedido de tipo typeWrong"
+  'OFPBRC_BUFFER_EMPTY'   : 7, "Buffer especificado já foi utilizado"
+  'OFPBRC_BUFFER_UNKNOWN' : 8, "Buffer especificado não existe"
 }
 
 ofp_bad_action_code_rev_map = {
-  'OFPBAC_BAD_TYPE'        : 0, #Tipo de acção desconhecida ou sem suporte"
-  'OFPBAC_BAD_LEN'         : 1, #Problema no comprimento em ações"
+  'OFPBAC_BAD_TYPE'        : 0, "Tipo de acção desconhecida ou sem suporte"
+  'OFPBAC_BAD_LEN'         : 1, "Problema no comprimento em ações"
   'OFPBAC_BAD_VENDOR'      : 2, 
   'OFPBAC_BAD_VENDOR_TYPE' : 3,
-  'OFPBAC_BAD_OUT_PORT'    : 4, #Problema na validação da porta de saída."
-  'OFPBAC_BAD_ARGUMENT'    : 5, #Má argumento de ação"
-  'OFPBAC_EPERM'           : 6, #Erro de permissões"
-  'OFPBAC_TOO_MANY'        : 7, #Não pode lidar com isso com muitas ações"
-  'OFPBAC_BAD_QUEUE'       : 8, #Problema na validação da fila de saída."
+  'OFPBAC_BAD_OUT_PORT'    : 4, "Problema na validação da porta de saída."
+  'OFPBAC_BAD_ARGUMENT'    : 5, "Má argumento de ação"
+  'OFPBAC_EPERM'           : 6, "Erro de permissões"
+  'OFPBAC_TOO_MANY'        : 7, "Não pode lidar com isso com muitas ações"
+  'OFPBAC_BAD_QUEUE'       : 8, "Problema na validação da fila de saída."
 }
 
 ofp_flow_mod_failed_code_rev_map = {
@@ -433,56 +433,56 @@ ofp_flow_mod_failed_code_rev_map = {
   em seguida, ele deve usar um Packet-out diretamente.
   """
   'OFPFMFC_ALL_TABLES_FULL'   : 0, 
-  'OFPFMFC_OVERLAP'           : 1, #Tentou adicionar fluxo de sobreposição com CHECK_OVERLAP jogo da bandeira"
-  'OFPFMFC_EPERM'             : 2, #Erro de permissões"
-  'OFPFMFC_BAD_EMERG_TIMEOUT' : 3, #Fluxo não acrescentado por causa do tempo limite não suportado"
-  'OFPFMFC_BAD_COMMAND'       : 4, #Comando não suportado ou desconhecido"
-  'OFPFMFC_UNSUPPORTED'       : 5, #Comando não suportado"
+  'OFPFMFC_OVERLAP'           : 1, "Tentou adicionar fluxo de sobreposição com CHECK_OVERLAP jogo da bandeira"
+  'OFPFMFC_EPERM'             : 2, "Erro de permissões"
+  'OFPFMFC_BAD_EMERG_TIMEOUT' : 3, "Fluxo não acrescentado por causa do tempo limite não suportado"
+  'OFPFMFC_BAD_COMMAND'       : 4, "Comando não suportado ou desconhecido"
+  'OFPFMFC_UNSUPPORTED'       : 5, "Comando não suportado"
 }
 
 ofp_port_mod_failed_code_rev_map = {
-  'OFPPMFC_BAD_PORT'    : 0, #Número da porta especificado não existe"
-  'OFPPMFC_BAD_HW_ADDR' : 1, #Endereço de hardware especificado não corresponde ao número da porta"
+  'OFPPMFC_BAD_PORT'    : 0, "Número da porta especificado não existe"
+  'OFPPMFC_BAD_HW_ADDR' : 1, "Endereço de hardware especificado não corresponde ao número da porta"
 }
 
 ofp_queue_op_failed_code_rev_map = {
-  'OFPQOFC_BAD_PORT'  : 0, #Porta inválida (ou a porta não existe)"
-  'OFPQOFC_BAD_QUEUE' : 1, #Fila não existe."
-  'OFPQOFC_EPERM'     : 2, #Erro de permissões"
+  'OFPQOFC_BAD_PORT'  : 0, "Porta inválida (ou a porta não existe)"
+  'OFPQOFC_BAD_QUEUE' : 1, "Fila não existe."
+  'OFPQOFC_EPERM'     : 2, "Erro de permissões"
 }
 
 ofp_port_config_rev_map = {
-  'OFPPC_PORT_DOWN'    : 1, #Porta é administrativamente para baixo"
-  'OFPPC_NO_STP'       : 2, #Desativar Spanning Tree na porta 802.1D  "
-  'OFPPC_NO_RECV'      : 4, #Soltar mais pacotes recebidos na porta"
-  'OFPPC_NO_RECV_STP'  : 8, #Soltar pacotes 802.1D STP recebidos"
-  'OFPPC_NO_FLOOD'     : 16, #Não inclua essa porta a inundação"
-  'OFPPC_NO_FWD'       : 32, #Descartar pacotes enviados para a porta"
-  'OFPPC_NO_PACKET_IN' : 64, #Não enviar msgs de pacotes-in para porta"
+  'OFPPC_PORT_DOWN'    : 1, "Porta é administrativamente para baixo"
+  'OFPPC_NO_STP'       : 2, "Desativar Spanning Tree na porta 802.1D  "
+  'OFPPC_NO_RECV'      : 4, "Soltar mais pacotes recebidos na porta"
+  'OFPPC_NO_RECV_STP'  : 8, "Soltar pacotes 802.1D STP recebidos"
+  'OFPPC_NO_FLOOD'     : 16, "Não inclua essa porta a inundação"
+  'OFPPC_NO_FWD'       : 32, "Descartar pacotes enviados para a porta"
+  'OFPPC_NO_PACKET_IN' : 64, "Não enviar msgs de pacotes-in para porta"
 }
 
 ofp_port_state_rev_map = {
-  'OFPPS_STP_LISTEN'  : 0, #Ouvir a Spanning Tree"
-  'OFPPS_LINK_DOWN'   : 1, #Sem ligação física presente"
-  'OFPPS_STP_LEARN'   : 256, #Informar a Spanning Tree"
-  'OFPPS_STP_FORWARD' : 512, #Enviar Spanning Tree"
-  'OFPPS_STP_BLOCK'   : 768, #Bloquear Spanning Tree"
+  'OFPPS_STP_LISTEN'  : 0, "Ouvir a Spanning Tree"
+  'OFPPS_LINK_DOWN'   : 1, "Sem ligação física presente"
+  'OFPPS_STP_LEARN'   : 256, "Informar a Spanning Tree"
+  'OFPPS_STP_FORWARD' : 512, "Enviar Spanning Tree"
+  'OFPPS_STP_BLOCK'   : 768, "Bloquear Spanning Tree"
 }
 OFPPS_STP_MASK        = 768
 
 ofp_port_features_rev_map = {
-  'OFPPF_10MB_HD'    : 1, #10 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
-  'OFPPF_10MB_FD'    : 2, #10 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_100MB_HD'   : 4, #100 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
-  'OFPPF_100MB_FD'   : 8, #100 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_1GB_HD'     : 16, #1 Gb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
-  'OFPPF_1GB_FD'     : 32, #1 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_10GB_FD'    : 64, #10 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_COPPER'     : 128, #Médio de cobre"
-  'OFPPF_FIBER'      : 256, #Médio do filamento"
-  'OFPPF_AUTONEG'    : 512, #Auto-negociação"
-  'OFPPF_PAUSE'      : 1024, #Pausa"
-  'OFPPF_PAUSE_ASYM' : 2048, #Pausa assimétrica"
+  'OFPPF_10MB_HD'    : 1, "10 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
+  'OFPPF_10MB_FD'    : 2, "10 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_100MB_HD'   : 4, "100 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
+  'OFPPF_100MB_FD'   : 8, "100 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_1GB_HD'     : 16, "1 Gb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
+  'OFPPF_1GB_FD'     : 32, "1 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_10GB_FD'    : 64, "10 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_COPPER'     : 128, "Médio de cobre"
+  'OFPPF_FIBER'      : 256, "Médio do filamento"
+  'OFPPF_AUTONEG'    : 512, "Auto-negociação"
+  'OFPPF_PAUSE'      : 1024, "Pausa"
+  'OFPPF_PAUSE_ASYM' : 2048, "Pausa assimétrica"
 }
 
 ofp_queue_properties_rev_map = {
@@ -491,60 +491,60 @@ ofp_queue_properties_rev_map = {
 OFPQT_NONE         = 0
 
 ofp_capabilities_rev_map = {
-  'OFPC_FLOW_STATS'   : 1, #Estatísticas de fluxos"
-  'OFPC_TABLE_STATS'  : 2, #Estatísticas da tabela"
-  'OFPC_PORT_STATS'   : 4, #Estatísticas da porta"
-  'OFPC_STP'          : 8, #Spanning Tree"
-  'OFPC_RESERVED'     : 16, #Reservado"
-  'OFPC_IP_REASM'     : 32, #Pode remontar os fragmentos IP"
-  'OFPC_QUEUE_STATS'  : 64, #Estatísticas da fila"
-  'OFPC_ARP_MATCH_IP' : 128, #ARP de combinação do Ip"
+  'OFPC_FLOW_STATS'   : 1, "Estatísticas de fluxos"
+  'OFPC_TABLE_STATS'  : 2, "Estatísticas da tabela"
+  'OFPC_PORT_STATS'   : 4, "Estatísticas da porta"
+  'OFPC_STP'          : 8, "Spanning Tree"
+  'OFPC_RESERVED'     : 16, "Reservado"
+  'OFPC_IP_REASM'     : 32, "Pode remontar os fragmentos IP"
+  'OFPC_QUEUE_STATS'  : 64, "Estatísticas da fila"
+  'OFPC_ARP_MATCH_IP' : 128, "ARP de combinação do Ip"
   }
 
 ofp_config_flags_rev_map = {
-  'OFPC_FRAG_NORMAL' : 0, #Nenhum tratamento especial para fragmentos"
-  'OFPC_FRAG_DROP'   : 1, #Exclusão de fragmentos"
-  'OFPC_FRAG_REASM'  : 2, #Remontar (apenas se OFPC_IP_REASM definido)."
-  'OFPC_FRAG_MASK'   : 3, #Fragmento da máscara"
+  'OFPC_FRAG_NORMAL' : 0, "Nenhum tratamento especial para fragmentos"
+  'OFPC_FRAG_DROP'   : 1, "Exclusão de fragmentos"
+  'OFPC_FRAG_REASM'  : 2, "Remontar (apenas se OFPC_IP_REASM definido)."
+  'OFPC_FRAG_MASK'   : 3, "Fragmento da máscara"
   }
 
 ofp_flow_mod_command_rev_map = {
-  'OFPFC_ADD'           : 0, #Novo fluxo"
-  'OFPFC_MODIFY'        : 1, #Modificar todos os fluxos correspondentes"
-  'OFPFC_MODIFY_STRICT' : 2, #Alterar inscrição estritamente wildcards correspondentes e prioridade"
-  'OFPFC_DELETE'        : 3, #Excluir todos os fluxos correspondentes"
-  'OFPFC_DELETE_STRICT' : 4, #Excluir entrada estritamente wildcards correspondentes e prioridade"
+  'OFPFC_ADD'           : 0, "Novo fluxo"
+  'OFPFC_MODIFY'        : 1, "Modificar todos os fluxos correspondentes"
+  'OFPFC_MODIFY_STRICT' : 2, "Alterar inscrição estritamente wildcards correspondentes e prioridade"
+  'OFPFC_DELETE'        : 3, "Excluir todos os fluxos correspondentes"
+  'OFPFC_DELETE_STRICT' : 4, "Excluir entrada estritamente wildcards correspondentes e prioridade"
 }
 
 ofp_flow_mod_flags_rev_map = {
-  'OFPFF_SEND_FLOW_REM' : 1, #Enviar fluxo de mensagens removidas quando o fluxo expirar ou for deletado"
-  'OFPFF_CHECK_OVERLAP' : 2, #Verifique se há sobreposição nas primeiras entradas"
+  'OFPFF_SEND_FLOW_REM' : 1, "Enviar fluxo de mensagens removidas quando o fluxo expirar ou for deletado"
+  'OFPFF_CHECK_OVERLAP' : 2, "Verifique se há sobreposição nas primeiras entradas"
   'OFPFF_EMERG'         : 4, 
 }
 
 ofp_stats_reply_flags_rev_map = {
-  'OFPSF_REPLY_MORE' : 1, #Em vez de usar pacote vazio, utilizar a flag OFPSF_REPLY_MORE para mudar a estratégia de fragmentação de respostas estatísticas"
+  'OFPSF_REPLY_MORE' : 1, "Em vez de usar pacote vazio, utilizar a flag OFPSF_REPLY_MORE para mudar a estratégia de fragmentação de respostas estatísticas"
 }
 
 ofp_packet_in_reason_rev_map = {
   'OFPR_NO_MATCH' : 0, 
-  'OFPR_ACTION'   : 1, #Saída para o controlador no conjunto de ações"
+  'OFPR_ACTION'   : 1, "Saída para o controlador no conjunto de ações"
 }
 
 ofp_flow_removed_reason_rev_map = {
-  'OFPRR_IDLE_TIMEOUT' : 0, #Fluxo tempo ocioso excedeu idle_timeout."
-  'OFPRR_HARD_TIMEOUT' : 1, #Tempo excedido hard_timeout"
-  'OFPRR_DELETE'       : 2, #Despejados por um APAGAR no mod fluxo "
+  'OFPRR_IDLE_TIMEOUT' : 0, "Fluxo tempo ocioso excedeu idle_timeout."
+  'OFPRR_HARD_TIMEOUT' : 1, "Tempo excedido hard_timeout"
+  'OFPRR_DELETE'       : 2, "Despejados por um APAGAR no mod fluxo "
 }
 
 ofp_port_reason_rev_map = {
-  'OFPPR_ADD'    : 0, #A porta foi adicionada"
-  'OFPPR_DELETE' : 1, #A porta foi removida"
-  'OFPPR_MODIFY' : 2, #Algum atributo da porta mudou"
+  'OFPPR_ADD'    : 0, "A porta foi adicionada"
+  'OFPPR_DELETE' : 1, "A porta foi removida"
+  'OFPPR_MODIFY' : 2, "Algum atributo da porta mudou"
 }
 
 ofp_port_rev_map = {
-  'OFPP_MAX'        : 65280, #O número máximo de portas de switch físicos e lógicos"
+  'OFPP_MAX'        : 65280, "O número máximo de portas de switch físicos e lógicos"
   
   """
   OFPP_IN_PORT: Enviar o pacote para a porta de entrada. Esta
@@ -560,23 +560,23 @@ ofp_port_rev_map = {
   """
   'OFPP_TABLE'      : 65529, 
 
-  'OFPP_NORMAL'     : 65530, #Enviar usando o non-OpenFlow pipeline."
-  'OFPP_FLOOD'      : 65531, #Fluxo usando o non-OpenFlow pipeline."
-  'OFPP_ALL'        : 65532, #Todas as portas padrão, exceto a porta de entrada"
-  'OFPP_CONTROLLER' : 65533, #Enviar para o controlador"
-  'OFPP_LOCAL'      : 65534, #'Porta' local do Openflow"
-  'OFPP_NONE'       : 65535, #Valor especial usado em algumas solicitações quando nenhuma porta for especificado (ou seja wildcarded)."
+  'OFPP_NORMAL'     : 65530, "Enviar usando o non-OpenFlow pipeline."
+  'OFPP_FLOOD'      : 65531, "Fluxo usando o non-OpenFlow pipeline."
+  'OFPP_ALL'        : 65532, "Todas as portas padrão, exceto a porta de entrada"
+  'OFPP_CONTROLLER' : 65533, "Enviar para o controlador"
+  'OFPP_LOCAL'      : 65534, "'Porta' local do Openflow"
+  'OFPP_NONE'       : 65535, "Valor especial usado em algumas solicitações quando nenhuma porta for especificado (ou seja wildcarded)."
 }
 
 ofp_flow_wildcards_rev_map = {
-  'OFPFW_IN_PORT'      : 1, #Alternar porta de entrada"
-  'OFPFW_DL_VLAN'      : 2, #VLAN"
-  'OFPFW_DL_SRC'       : 4, #Endereço de origem Ethernet"
-  'OFPFW_DL_DST'       : 8, #Endereço de destino Ethernet"
-  'OFPFW_DL_TYPE'      : 16, #Tipo de quadro Ethernet"
-  'OFPFW_NW_PROTO'     : 32, #Protocolo IP"
-  'OFPFW_TP_SRC'       : 64, #Porta de origem TCP / UDP"
-  'OFPFW_TP_DST'       : 128, #Porta de destino TCP / UDP"
+  'OFPFW_IN_PORT'      : 1, "Alternar porta de entrada"
+  'OFPFW_DL_VLAN'      : 2, "VLAN"
+  'OFPFW_DL_SRC'       : 4, "Endereço de origem Ethernet"
+  'OFPFW_DL_DST'       : 8, "Endereço de destino Ethernet"
+  'OFPFW_DL_TYPE'      : 16, "Tipo de quadro Ethernet"
+  'OFPFW_NW_PROTO'     : 32, "Protocolo IP"
+  'OFPFW_TP_SRC'       : 64, "Porta de origem TCP / UDP"
+  'OFPFW_TP_DST'       : 128, "Porta de destino TCP / UDP"
   'OFPFW_DL_VLAN_PCP'  : 1048576,
   'OFPFW_NW_TOS'       : 1<<21,
 }
@@ -616,7 +616,7 @@ class ofp_header (ofp_base):
     if 'header_type' in kw:
       self.header_type = kw.pop('header_type')
     initHelper(self, kw)
-  
+
   """
   XID: ID da transação associado a este pacote.
       Respostas usar o mesmo ID como era no pedido
@@ -658,7 +658,7 @@ class ofp_header (ofp_base):
     offset,(self.version, self.header_type, length, self.xid) = \
         _unpack("!BBHL", raw, offset)
     return offset,length
-.
+
   "Retorna verdadeiro se igual. Verifica os campos do cabeçalho do pacote Openflow: type/version/length/xid"
   def __eq__ (self, other):
     if type(self) != type(other): return False
@@ -978,10 +978,10 @@ class ofp_queue_prop_generic (ofp_queue_prop_base):
     offset,self.data = _read(raw, offset, length-4)
     assert offset - _offset == len(self)
     return offset
-  
+
   "Retorna o tamanho"
   @staticmethod
-  def __len__ ():
+  def __len__ (self):
     return 4 + len(self.data)
 
   "Retorna verdadeiro se igual"
@@ -999,6 +999,7 @@ class ofp_queue_prop_generic (ofp_queue_prop_base):
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
     return outstr
 
+
 "Classe para nenhuma propriedade da fila"
 @openflow_queue_prop('OFPQT_NONE', 0)
 class ofp_queue_prop_none (ofp_queue_prop_generic):
@@ -1006,11 +1007,11 @@ class ofp_queue_prop_none (ofp_queue_prop_generic):
 
 "Classe para as propriedades mínimas de variação (taxa) da fila"
 @openflow_queue_prop('OFPQT_MIN_RATE', 1)
-class ofp_queue_prop_min_rate (ofp_base):
-  def __init__ (self, **kw):
-    self.rate = 0
+def __init__ (self, **kw):
+  self.rate = 0
 
-    initHelper(self, kw)
+  initHelper(self, kw)
+class ofp_queue_prop_min_rate (ofp_base):
 
   "Define o pacote"
   def pack (self):
@@ -1027,15 +1028,15 @@ class ofp_queue_prop_min_rate (ofp_base):
   def unpack (self, raw, offset=0):
     _offset = offset
     offset,(self.property, length, pad) = \
-        _unpack("!HHL", raw, offset)
+      _unpack("!HHL", raw, offset)
     offset,(self.rate,) = _unpack("!H", raw, offset)
     offset = _skip(raw, offset, 6)
     assert offset - _offset == len(self)
     return offset
-  
+
   "Retorna o tamanho"
   @staticmethod
-  def __len__ ():
+  def __len__():
     return 16
 
   "Retorna verdadeiro se igual. Compara os campos len/property/rate"
@@ -1059,7 +1060,7 @@ class ofp_queue_prop_min_rate (ofp_base):
 "Classe de estruturas da combinação de fluxo"
 class ofp_match (ofp_base):
   adjust_wildcards = True # Set to true to "fix" outgoing wildcards
-  
+
   """
   Constrói uma correspondência exata para o pacote de dados
 
@@ -1538,13 +1539,14 @@ class ofp_match (ofp_base):
                              | OFPFW_NW_SRC_MASK | OFPFW_NW_DST_MASK
                              | OFPFW_TP_SRC | OFPFW_TP_DST)
 
-  "É caracter universal"
+
   @property
+  "É caracter universal"
   def is_wildcarded (self):
     return self.wildcards & OFPFW_ALL != 0
-  
-  "É exato"
+
   @property
+  "É exato"
   def is_exact (self):
     return not self.is_wildcarded
 
@@ -1570,9 +1572,9 @@ class ofp_match (ofp_base):
 
     assert offset - _offset == len(self)
     return offset
-  
-  "Define o tamanho"
+
   @staticmethod
+  "Define o tamanho"
   def __len__ ():
     return 40
 
@@ -1802,9 +1804,10 @@ class ofp_action_generic (ofp_action_base):
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
     return outstr
 
+
+@openflow_action('OFPAT_OUTPUT', 0)
 "OFPAT_OUTPUT: Saída para porta do switch."
 "CLasse para ação de saída"
-@openflow_action('OFPAT_OUTPUT', 0)
 class ofp_action_output (ofp_action_base):
   def __init__ (self, **kw):
     self.port = None # Purposely bad -- require specification
@@ -1831,9 +1834,9 @@ class ofp_action_output (ofp_action_base):
         _unpack("!HHHH", raw, offset)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamaho"
+
   @staticmethod
+  "Retorna o tamaho"
   def __len__ ():
     return 8
 
@@ -1855,8 +1858,9 @@ class ofp_action_output (ofp_action_base):
     outstr += prefix + 'max_len: ' + str(self.max_len) + '\n'
     return outstr
 
-"Classe para ações enfileiradas"
+
 @openflow_action('OFPAT_ENQUEUE', 11)
+"Classe para ações enfileiradas"
 class ofp_action_enqueue (ofp_action_base):
   def __init__ (self, **kw):
     self.port = None # Require user to set
@@ -1882,9 +1886,9 @@ class ofp_action_enqueue (ofp_action_base):
     offset,(self.queue_id,) = _unpack("!L", raw, offset)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamaho"
+
   @staticmethod
+  "Retorna o tamaho"
   def __len__ ():
     return 16
 
@@ -1906,9 +1910,10 @@ class ofp_action_enqueue (ofp_action_base):
     outstr += prefix + 'queue_id: ' + str(self.queue_id) + '\n'
     return outstr
 
+
+@openflow_action('OFPAT_STRIP_VLAN', 3)
 "OFPAT_STRIP_VLAN: Tira o cabeçalho 802.1q"
 "Classe para ação de retirada da VLAN"
-@openflow_action('OFPAT_STRIP_VLAN', 3)
 class ofp_action_strip_vlan (ofp_action_base):
   def __init__ (self):
     pass
@@ -1925,9 +1930,9 @@ class ofp_action_strip_vlan (ofp_action_base):
     offset = _skip(raw, offset, 4)
     assert offset - _offset == len(self)
     return offset
- 
- "Retorna o tamaho"
+
   @staticmethod
+ "Retorna o tamaho"
   def __len__ ():
     return 8
 
@@ -1945,9 +1950,10 @@ class ofp_action_strip_vlan (ofp_action_base):
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
     return outstr
 
+
+@openflow_action('OFPAT_SET_VLAN_VID', 1)
 "OFPAT_SET_VLAN_VID: Defina o id 802.1q VLAN."
 "Classe para ação do ID da VLAN"
-@openflow_action('OFPAT_SET_VLAN_VID', 1)
 class ofp_action_vlan_vid (ofp_action_base):
   def __init__ (self, **kw):
     self.vlan_vid = 0
@@ -1973,8 +1979,8 @@ class ofp_action_vlan_vid (ofp_action_base):
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamaho"
   @staticmethod
+  "Retorna o tamaho"
   def __len__ ():
     return 8
 
@@ -1995,9 +2001,10 @@ class ofp_action_vlan_vid (ofp_action_base):
     return outstr
 ofp_action_set_vlan_vid = ofp_action_vlan_vid
 
+
+@openflow_action('OFPAT_SET_VLAN_PCP', 2)
 "OFPAT_SET_VLAN_PCP: Definir a prioridade 802.1q."
 "Classe para ação de prioridade da VLAN"
-@openflow_action('OFPAT_SET_VLAN_PCP', 2)
 class ofp_action_vlan_pcp (ofp_action_base):
   def __init__ (self, **kw):
     self.vlan_pcp = 0
@@ -2021,9 +2028,9 @@ class ofp_action_vlan_pcp (ofp_action_base):
     offset = _skip(raw, offset, 3)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamaho"
+
   @staticmethod
+  "Retorna o tamaho"
   def __len__ ():
     return 8
 
@@ -2045,19 +2052,17 @@ class ofp_action_vlan_pcp (ofp_action_base):
 ofp_action_set_vlan_pcp = ofp_action_vlan_pcp
 
 "OFPAT_SET_DL_DST: Endereço Ethernet de destino"
-"OFPAT_SET_DL_SRC: Endereço Ethernet de origem"
-"Classe para ação de endereço Ethernet"
 @openflow_action('OFPAT_SET_DL_DST', 5)
+"OFPAT_SET_DL_SRC: Endereço Ethernet de origem"
 @openflow_action('OFPAT_SET_DL_SRC', 4)
-
+"Classe para ação de endereço Ethernet"
 class ofp_action_dl_addr (ofp_action_base):
-    "Define o destino"
-    @classmethod
+  @classmethod
+  "Define o destino"
   def set_dst (cls, dl_addr = None):
     return cls(OFPAT_SET_DL_DST, dl_addr)
- 
-  "Define a origem"
   @classmethod
+  "Define a origem"
   def set_src (cls, dl_addr = None):
     return cls(OFPAT_SET_DL_SRC, dl_addr)
 
@@ -2101,9 +2106,9 @@ class ofp_action_dl_addr (ofp_action_base):
     offset = _skip(raw, offset, 6)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamanho"
+
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 16
 
@@ -2124,19 +2129,17 @@ class ofp_action_dl_addr (ofp_action_base):
     return outstr
 
 "OFPAT_SET_NW_DST: endereço IP de destino"
-"OFPAT_SET_NW_SRC: endereço IP de origem"
-"CLasse de ação do endereço IP"
 @openflow_action('OFPAT_SET_NW_DST', 7)
+"OFPAT_SET_NW_SRC: endereço IP de origem"
 @openflow_action('OFPAT_SET_NW_SRC', 6)
-
+"CLasse de ação do endereço IP"
 class ofp_action_nw_addr (ofp_action_base):
-  "Define o destino"
   @classmethod
+  "Define o destino"
   def set_dst (cls, nw_addr = None):
     return cls(OFPAT_SET_NW_DST, nw_addr)
-  
-  "Define a origem"
   @classmethod
+  "Define a origem"
   def set_src (cls, nw_addr = None):
     return cls(OFPAT_SET_NW_SRC, nw_addr)
 
@@ -2167,9 +2170,9 @@ class ofp_action_nw_addr (ofp_action_base):
     offset,self.nw_addr = _readip(raw, offset)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamanho"
+
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -2191,8 +2194,8 @@ class ofp_action_nw_addr (ofp_action_base):
 
 "TOS (Type Of Service: é utilizado para diferenciar o tipo do pacote a ser transportado,"
 "classificando-o para que possa ter prioridade em sua transmissão. No cabeçalho IP, 8 bits são reservados para o Identificar ToS "
-"Classe para ação do TOS"
 @openflow_action('OFPAT_SET_NW_TOS', 8)
+"Classe para ação do TOS"
 class ofp_action_nw_tos (ofp_action_base):
   def __init__ (self, nw_tos = 0):
     self.nw_tos = nw_tos
@@ -2214,9 +2217,8 @@ class ofp_action_nw_tos (ofp_action_base):
     assert offset - _offset == len(self)
     return offset
 
- "Retorna o tamanho"
- @staticmethod
-  
+  @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -2237,19 +2239,17 @@ class ofp_action_nw_tos (ofp_action_base):
     return outstr
 
 "OFPAT_SET_TP_DST: Porta de destino TCP/UDP"
-"OFPAT_SET_TP_SRC: Porta de origem TCP/UDP"
-"Classe para ação da porta TCP/UDP"
 @openflow_action('OFPAT_SET_TP_DST', 10)
+"OFPAT_SET_TP_SRC: Porta de origem TCP/UDP"
 @openflow_action('OFPAT_SET_TP_SRC', 9)
-
+"Classe para ação da porta TCP/UDP"
 class ofp_action_tp_port (ofp_action_base):
-  "Define o destino"
   @classmethod
+  "Define o destino"
   def set_dst (cls, tp_port = None):
     return cls(OFPAT_SET_TP_DST, tp_port)
-  
-  "Define a origem"
   @classmethod
+  "Define a origem"
   def set_src (cls, tp_port = None):
     return cls(OFPAT_SET_TP_SRC, tp_port)
 
@@ -2278,8 +2278,8 @@ class ofp_action_tp_port (ofp_action_base):
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -2400,8 +2400,9 @@ class ofp_action_vendor_base (ofp_action_base):
     outstr += self._show(prefix)
     return outstr
 
-"Classe para ação do vendedor generico"
+
 @openflow_action('OFPAT_VENDOR', 65535)
+"Classe para ação do vendedor generico"
 class ofp_action_vendor_generic (ofp_action_base):
   def __init__ (self, **kw):
     self.vendor = 0
@@ -2460,9 +2461,9 @@ class ofp_action_vendor_generic (ofp_action_base):
 
 ##3.1 Handshake
 "Mensagens do controlador para switch"
-"Classe das caracaterísticas de resposta"
 @openflow_s_message("OFPT_FEATURES_REPLY", 6,
     reply_to="ofp_features_request")
+"Classe das caracaterísticas de resposta"
 class ofp_features_reply (ofp_header):
   _MIN_LENGTH = 32
   def __init__ (self, **kw):
@@ -2541,8 +2542,8 @@ ofp_switch_features = ofp_features_reply
 
 ##3.2 Switch Configuration
 "Configuração do switch"
-"Classe para definição das configurações"
 @openflow_c_message("OFPT_SET_CONFIG", 9)
+"Classe para definição das configurações"
 class ofp_set_config (ofp_header): # uses ofp_switch_config
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -2566,8 +2567,9 @@ class ofp_set_config (ofp_header): # uses ofp_switch_config
     offset,(self.flags, self.miss_send_len) = _unpack("!HH", raw, offset)
     assert length == len(self)
     return offset,length
-  "Retorna o tamanho"
+
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 12
 
@@ -2592,13 +2594,13 @@ class ofp_set_config (ofp_header): # uses ofp_switch_config
 ##3.3 Modify State Messages
 "Modifica as mensagens do Estado"
 "OFPT_FLOW_MOD: As modificações em um tabela de fluxo do controlador é feito com a mensagem OFPT_FLOW_MOD"
-"Classe ofp_flow_mod: configuração de fluxo e desmontagem"
 @openflow_c_message("OFPT_FLOW_MOD", 14)
+"Classe ofp_flow_mod: configuração de fluxo e desmontagem"
 class ofp_flow_mod (ofp_header):
   _MIN_LENGTH = 72
   def __init__ (self, **kw):
     ofp_header.__init__(self)
-    #Campos da Flow Table"
+    "Campos da Flow Table"
     if 'match' in kw:
       self.match = None
     else:
@@ -2626,9 +2628,9 @@ class ofp_flow_mod (ofp_header):
     # Allow use of actions=<a single action> for kw args.
     if not hasattr(self.actions, '__getitem__'):
       self.actions = [self.actions]
-  
-  "Define o ID do buffer"
+
   @property
+  "Define o ID do buffer"
   def buffer_id (self):
     if self._buffer_id == NO_BUFFER: return None
     return self._buffer_id
@@ -2747,8 +2749,8 @@ class ofp_flow_mod (ofp_header):
     return outstr
 
 "OFPT_PORT_MOD: O controlador utiliza a mensagem OFPT_PORT_MOD para modificar o comportamento da porta:"
-"Classe de modificação da porta"
 @openflow_c_message("OFPT_PORT_MOD", 15)
+"Classe de modificação da porta"
 class ofp_port_mod (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -2795,8 +2797,8 @@ class ofp_port_mod (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 32
 
@@ -2826,8 +2828,8 @@ class ofp_port_mod (ofp_header):
 
 ##3.4 Queue Configuration Messages
 "Messagens de configuração da fila"
-"Classe para obtenção da requisição de configuração da fila"
 @openflow_c_message("OFPT_QUEUE_GET_CONFIG_REQUEST", 20)
+"Classe para obtenção da requisição de configuração da fila"
 class ofp_queue_get_config_request (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -2851,9 +2853,9 @@ class ofp_queue_get_config_request (ofp_header):
     offset = _skip(raw, offset, 2)
     assert length == len(self)
     return offset,length
-  
-  "Retorna o tamanho"
+
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 12
 
@@ -2872,8 +2874,9 @@ class ofp_queue_get_config_request (ofp_header):
     outstr += prefix + 'port: ' + str(self.port) + '\n'
     return outstr
 
-"Classe para obtenção da resposta de configuração da fila"
+
 @openflow_s_message("OFPT_QUEUE_GET_CONFIG_REPLY", 21)
+"Classe para obtenção da resposta de configuração da fila"
 class ofp_queue_get_config_reply (ofp_header):
   _MIN_LENGTH = 16
   def __init__ (self, **kw):
@@ -2943,8 +2946,9 @@ class ofp_queue_get_config_reply (ofp_header):
       outstr += obj.show(prefix + '  ')
     return outstr
 
-"Classe para estatísticas de requisições"
+
 @openflow_c_message("OFPT_STATS_REQUEST", 16)
+"Classe para estatísticas de requisições"
 class ofp_stats_request (ofp_header):
   _MIN_LENGTH = 12
   def __init__ (self, **kw):
@@ -2981,14 +2985,13 @@ class ofp_stats_request (ofp_header):
       else:
         self._body_packed = self._body
     return self._body_packed
-  
-  "Define o corpo"
+
   @property
+  "Define o corpo"
   def body (self):
     return self._body
- 
- "Define a composição do corpo" 
- @body.setter 
+  @body.setter
+  "Define a composição do corpo"
   def body (self, data):
     self._body = data
     self._body_packed_cache = None
@@ -3036,9 +3039,10 @@ class ofp_stats_request (ofp_header):
     outstr += _format_body(self.body, prefix + '  ') + '\n'
     return outstr
 
-"Classe para estatísticas da resposta"
+
 @openflow_s_message("OFPT_STATS_REPLY", 17,
     reply_to="ofp_stats_request")
+"Classe para estatísticas da resposta"
 class ofp_stats_reply (ofp_header):
   _MIN_LENGTH = 12
   def __init__ (self, **kw):
@@ -3049,21 +3053,20 @@ class ofp_stats_reply (ofp_header):
     self._body_data = (None, None)
 
     initHelper(self, kw)
-  
-  "É última resposta"
+
   @property
+  "É última resposta"
   def is_last_reply (self):
     return (self.flags & 1) == 0
-  
-  "É última mensagem montada"
   @is_last_reply.setter
+  "É última mensagem montada"
   def is_last_reply (self, value):
     self.flags = self.flags & 0xfffe
     if not value:
       self.flags |= 1
-  
-  "Define o corpo dos dados"
+
   @property
+  "Define o corpo dos dados"
   def body_data (self):
     if self._body_data[0] is not self.body:
       "Define o pacote"
@@ -3165,8 +3168,8 @@ class ofp_stats_reply (ofp_header):
     return outstr
 
 "OFPST_DESC: O número OFPST_DESC foi adicionada para descrever o hardware e software em execução no switch:"
-"Classe para descrever as estatísticas de hardware e software"
 @openflow_stats_reply("OFPST_DESC", 0)
+"Classe para descrever as estatísticas de hardware e software"
 class ofp_desc_stats (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.mfr_desc   = "" #mfr_desc: descrição do fabricante
@@ -3223,9 +3226,9 @@ class ofp_desc_stats (ofp_stats_body_base):
     offset,self.dp_desc    = _readzs(raw, offset, DESC_STR_LEN)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamanho"
+
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 1056
 
@@ -3279,9 +3282,9 @@ class _empty_stats_request_body (ofp_stats_body_base):
     if avail != 0:
       raise RuntimeError("Expected empty body")
     return offset
-  
-  "Define o tamanho"
+
   @staticmethod
+  "Define o tamanho"
   def __len__ ():
     return 0
 
@@ -3294,16 +3297,16 @@ class _empty_stats_request_body (ofp_stats_body_base):
   def show (self, prefix=''):
     return "<empty>"
 
-"Classe para descrever as estatísticas da requisição"
 @openflow_stats_request('OFPST_DESC', 0)
+"Classe para descrever as estatísticas da requisição"
 class ofp_desc_stats_request (_empty_stats_request_body):
   """
   See _empty_stats_request_body superclass documentation
   """
   pass
 
-"Classe para a tabela de estatísticas da requisição"
 @openflow_stats_request('OFPST_TABLE', 3)
+"Classe para a tabela de estatísticas da requisição"
 class ofp_table_stats_request (_empty_stats_request_body):
   """
   See _empty_stats_request_body superclass documentation
@@ -3311,8 +3314,8 @@ class ofp_table_stats_request (_empty_stats_request_body):
   pass
 
 "Estatísticas de requisição"
-"Classe para o fluxo de estatísticas da requisição"
 @openflow_stats_request('OFPST_FLOW', 1)
+"Classe para o fluxo de estatísticas da requisição"
 class ofp_flow_stats_request (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.match = ofp_match()
@@ -3345,8 +3348,8 @@ class ofp_flow_stats_request (ofp_stats_body_base):
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 4 + len(ofp_match)
 
@@ -3368,12 +3371,12 @@ class ofp_flow_stats_request (ofp_stats_body_base):
     return outstr
 
 "Estatísticas de resposta"
-"Classe para o fluxo de estatísticas da resposta"
 @openflow_stats_reply('OFPST_FLOW', is_list = True)
+"Classe para o fluxo de estatísticas da resposta"
 class ofp_flow_stats (ofp_stats_body_base):
   _MIN_LENGTH = 88
   def __init__ (self, **kw):
-    #Campos da Flow Table"
+    "Campos da Flow Table"
     self.table_id = 0
     self.match = ofp_match()
     self.duration_sec = 0
@@ -3477,8 +3480,8 @@ class ofp_flow_stats (ofp_stats_body_base):
 ofp_flow_stats_reply = ofp_flow_stats
 
 "Estatísticas de requisição"
-"Classe para o conjunto de estatísticas da requisição"
 @openflow_stats_request('OFPST_AGGREGATE', 2)
+"Classe para o conjunto de estatísticas da requisição"
 class ofp_aggregate_stats_request (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.match = ofp_match()
@@ -3512,8 +3515,8 @@ class ofp_aggregate_stats_request (ofp_stats_body_base):
     assert offset - _offset == len(self)
     return offset
 
- "Retorna o tamanho"
-  @staticmethod 
+  @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 44
 
@@ -3535,8 +3538,8 @@ class ofp_aggregate_stats_request (ofp_stats_body_base):
     return outstr
 
 "Estatísticas de resposta"
-"Classe para o conjunto de estatísticas da requisição"
 @openflow_stats_reply('OFPST_AGGREGATE')
+"Classe para o conjunto de estatísticas da requisição"
 class ofp_aggregate_stats (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.packet_count = 0
@@ -3563,9 +3566,9 @@ class ofp_aggregate_stats (ofp_stats_body_base):
     offset = _skip(raw, offset, 4)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamanho"
+
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 24
 
@@ -3587,8 +3590,8 @@ class ofp_aggregate_stats (ofp_stats_body_base):
 ofp_aggregate_stats_reply = ofp_aggregate_stats
 
 "Estatísticas de resposta"
-"Classe para a tabela de estatísticas"
 @openflow_stats_reply('OFPST_TABLE', 3, is_list = True)
+"Classe para a tabela de estatísticas"
 class ofp_table_stats (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.table_id = 0
@@ -3634,8 +3637,8 @@ class ofp_table_stats (ofp_stats_body_base):
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 64
 
@@ -3665,8 +3668,8 @@ class ofp_table_stats (ofp_stats_body_base):
 ofp_table_stats_reply = ofp_table_stats
 
 "Estatísticas de requisição"
-"Classe de estatísticas de requisição da porta "
 @openflow_stats_request("OFPST_PORT", 4)
+"Classe de estatísticas de requisição da porta "
 class ofp_port_stats_request (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.port_no = OFPP_NONE
@@ -3689,8 +3692,8 @@ class ofp_port_stats_request (ofp_stats_body_base):
     assert offset - _offset == len(self)
     return offset
 
+  @staticmethod
   "Retorna o tamanho"
-  @staticmethod 
   def __len__ ():
     return 8
 
@@ -3707,11 +3710,11 @@ class ofp_port_stats_request (ofp_stats_body_base):
     return outstr
 
 "Estatísticas de resposta"
-"Classe de estatísticas de resposta da porta "
 @openflow_stats_reply("OFPST_PORT", is_list = True)
+"Classe de estatísticas de resposta da porta "
 class ofp_port_stats (ofp_stats_body_base):
   def __init__ (self, **kw):
-    #Campos do ofp_port_stats"
+    "Campos do ofp_port_stats"
     self.port_no = OFPP_NONE
     self.rx_packets = 0
     self.tx_packets = 0
@@ -3756,8 +3759,8 @@ class ofp_port_stats (ofp_stats_body_base):
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 104
 
@@ -3824,8 +3827,8 @@ class ofp_port_stats (ofp_stats_body_base):
 ofp_port_stats_reply = ofp_port_stats
 
 "Estatísticas de requisição"
-"Estatísticas de requisição da fila"
 @openflow_stats_request("OFPST_QUEUE", 5)
+"Estatísticas de requisição da fila"
 class ofp_queue_stats_request (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.port_no = OFPP_ALL
@@ -3851,8 +3854,8 @@ class ofp_queue_stats_request (ofp_stats_body_base):
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -3871,8 +3874,8 @@ class ofp_queue_stats_request (ofp_stats_body_base):
     return outstr
 
 "Estatísticas de resposta"
-"Classe de estatísticas da fila"
 @openflow_stats_reply("OFPST_QUEUE", is_list = True)
+"Classe de estatísticas da fila"
 class ofp_queue_stats (ofp_stats_body_base):
   def __init__ (self, **kw):
     self.port_no = 0 #Porta a fila está ligado a
@@ -3903,8 +3906,8 @@ class ofp_queue_stats (ofp_stats_body_base):
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 32
 
@@ -3930,10 +3933,10 @@ class ofp_queue_stats (ofp_stats_body_base):
 ofp_queue_stats_reply = ofp_queue_stats
 
 "Estatísticas de requisição"
-"Estatísticas de resposta"
-"Classe de estatísticas do vendedor generico"
 @openflow_stats_request("OFPST_VENDOR", 65535, is_list = False)
+"Estatísticas de resposta"
 @openflow_stats_reply("OFPST_VENDOR", 65535, is_list = False)
+"Classe de estatísticas do vendedor generico"
 class ofp_vendor_stats_generic (ofp_stats_body_base):
   _MIN_LENGTH = 4
   def __init__ (self, **kw):
@@ -3965,8 +3968,8 @@ class ofp_vendor_stats_generic (ofp_stats_body_base):
     offset,self.data = _read(raw, offset, avail-4)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 4+len(self._pack_body())
 
@@ -4013,8 +4016,8 @@ class ofp_generic_stats_body (ofp_stats_body_base):
     offset,self.data = _read(raw, offset, avail)
     return offset
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return len(self._pack_body())
 
@@ -4056,25 +4059,23 @@ class ofp_packet_out (ofp_header):
     if not hasattr(self.actions, '__getitem__'):
       self.actions = [self.actions]
 
-  "Define o id do buffer"
   @property
+  "Define o id do buffer"
   def buffer_id (self):
     if self._buffer_id == NO_BUFFER: return None
     return self._buffer_id
-  
-  "Define o id do buffer montador"
   @buffer_id.setter
+  "Define o id do buffer montador"
   def buffer_id (self, val):
     if val is None: val = NO_BUFFER
     self._buffer_id = val
 
- "Define dados"
- @property
+  @property
+  "Define dados"
   def data (self):
     return self._data
-  
-  "Define o dados montados"
   @data.setter
+  "Define o dados montados"
   def data (self, data):
     if data is None:
       self._data = b''
@@ -4167,9 +4168,9 @@ class ofp_packet_out (ofp_header):
 
 ##3.7 Barrier Message
 "Mensagem de resposta da barreira"
-"Classe de resposta da barreira"
 @openflow_s_message("OFPT_BARRIER_REPLY", 19,
     reply_to="ofp_barrier_request")
+"Classe de resposta da barreira"
 class ofp_barrier_reply (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4188,8 +4189,8 @@ class ofp_barrier_reply (ofp_header):
   #  assert length == len(self)
   #  return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -4207,9 +4208,9 @@ class ofp_barrier_reply (ofp_header):
     return outstr
 
 "Mensagem de requisição da barreira"
-"Classe de requisição da barreira"
 @openflow_c_message("OFPT_BARRIER_REQUEST", 18,
     request_for="ofp_barrier_reply")
+"Classe de requisição da barreira"
 class ofp_barrier_request (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4229,8 +4230,8 @@ class ofp_barrier_request (ofp_header):
   #  assert length == len(self)
   #  return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -4254,8 +4255,8 @@ class ofp_barrier_request (ofp_header):
 Quando os pacotes são recebidos pelo caminho de dados 
 e enviadas para o controlador utilizam a mensagem OFPT_PACKET_IN
 """
-"Classe do packet_in"
 @openflow_s_message("OFPT_PACKET_IN", 10)
+"Classe do packet_in"
 class ofp_packet_in (ofp_header):
   _MIN_LENGTH = 18
   def __init__ (self, **kw):
@@ -4278,37 +4279,35 @@ class ofp_packet_in (ofp_header):
     if self.data and (self.total_len < len(self.data)):
       return "total len less than data len"
 
-  "Define o tamanho total"
   @property
+  "Define o tamanho total"
   def total_len (self):
     if self._total_len is None:
       return len(self.data) if self.data else 0
     return self._total_len
 
-  "Define o montador do tamanho total"
   @total_len.setter
+  "Define o montador do tamanho total"
   def total_len (self, value):
     self._total_len = value
 
-  "Define o id do buffer"
   @property
+  "Define o id do buffer"
   def buffer_id (self):
     if self._buffer_id == NO_BUFFER: return None
     return self._buffer_id
- 
-  "Define o id do montador do buffer"
   @buffer_id.setter
+  "Define o id do montador do buffer"
   def buffer_id (self, val):
     if val is None: val = NO_BUFFER
     self._buffer_id = val
 
-  "Define dados"
   @property
+  "Define dados"
   def data (self):
     return self._data
-  
-  "Define o montador dos dados"
   @data.setter
+  "Define o montador dos dados"
   def data (self, data):
     assert assert_type("data", data, (packet_base, str))
     if data is None:
@@ -4330,8 +4329,8 @@ class ofp_packet_in (ofp_header):
     #TODO: Padding?  See __len__
     return packed
 
-  "Está completo"
   @property
+  "Está completo"
   def is_complete (self):
     if self.buffer_id is not None: return True
     return len(self.data) == self.total_len
@@ -4381,8 +4380,8 @@ OFPT_FLOW_REMOVED: Se o controlador pediu para ser notificado
 quando o fluxo de entradas de tempo fora ou são apagados das tabelas, 
 o caminho de dados faz isso com a mensagem OFPT_FLOW_REMOVED
 """
-"Classe do fluxo removido"
 @openflow_s_message("OFPT_FLOW_REMOVED", 11)
+"Classe do fluxo removido"
 class ofp_flow_removed (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4434,8 +4433,8 @@ class ofp_flow_removed (ofp_header):
     assert length == len(self)
     return offset,length
 
+  @staticmethod
   "Retorna o tamanho"
-  @staticmethod 
   def __len__ ():
     return 48 + len(ofp_match)
 
@@ -4480,8 +4479,8 @@ OFPT_PORT_STATUS: Como portas são adicionadas, modificadas e removidas
 do caminho de dados, o controlador precisa ser informado com
 a mensagem OFPT_PORT_STATUS
 """
-"Classe para o status da porta"
 @openflow_s_message("OFPT_PORT_STATUS", 12)
+"Classe para o status da porta"
 class ofp_port_status (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4516,8 +4515,8 @@ class ofp_port_status (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 64
 
@@ -4545,8 +4544,8 @@ para notificar problemas para o outro lado da conexão.
 Eles são usados ​​principalmente por o interruptor 
 para indicar uma falha de uma solicitação iniciada pelo controlador.
 """
-"Classe para erro"
 @openflow_s_message("OFPT_ERROR", 1)
+"Classe para erro"
 class ofp_error (ofp_header):
   _MIN_LENGTH = 12
   def __init__ (self, **kw):
@@ -4617,8 +4616,8 @@ OFPT_HELLO: Quando uma conexão OpenFlow é
 estabelecido, cada lado da conexão deve enviar 
 imediatamente uma mensagem OFPT_HELLO como sua primeira mensagem OpenFlow
 """
-"Classe ofp_hello. Fazer hanshake"
 @openflow_sc_message("OFPT_HELLO", 0)
+"Classe ofp_hello. Fazer hanshake"
 class ofp_hello (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4637,8 +4636,8 @@ class ofp_hello (ofp_header):
   #  assert length == len(self)
   #  return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -4659,9 +4658,9 @@ class ofp_hello (ofp_header):
 O interruptor e controlador pode verificar a conectividade apropriada através do protocolo OpenFlow com o novo
 solicitação de eco (OFPT_ECHO_REQUEST) e mensagens de resposta (OFPT_ECHO_REPLY)
 """
-"Classe de requisição de eco"
 @openflow_sc_message("OFPT_ECHO_REQUEST", 2,
     request_for="ofp_echo_reply")
+"Classe de requisição de eco"
 class ofp_echo_request (ofp_header):
   _MIN_LENGTH = 8
   def __init__ (self, **kw):
@@ -4705,9 +4704,10 @@ class ofp_echo_request (ofp_header):
     outstr += _format_body(self.body, prefix + '  ') + '\n'
     return outstr
 
-"Classe de resposta de eco"
+
 @openflow_sc_message("OFPT_ECHO_REPLY", 3,
     reply_to="ofp_echo_request")
+"Classe de resposta de eco"
 class ofp_echo_reply (ofp_header):
   _MIN_LENGTH = 8
   def __init__ (self, **kw):
@@ -4847,8 +4847,8 @@ class ofp_features_request (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -4869,9 +4869,9 @@ class ofp_features_request (ofp_header):
 O controlador é capaz de definir e consultar parâmetros de configuração no interruptor com as mensagens OFPT_SET_CONFIG
 e OFPT_GET_CONFIG_REQUEST, respectivamente.
 """
-"Classe para consulta de parâmetros de configuração de requisição"
 @openflow_c_message("OFPT_GET_CONFIG_REQUEST", 7,
     request_for="ofp_get_config_reply")
+"Classe para consulta de parâmetros de configuração de requisição"
 class ofp_get_config_request (ofp_header):
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4892,8 +4892,8 @@ class ofp_get_config_request (ofp_header):
   #  assert length == len(self)
   #  return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 8
 
@@ -4910,9 +4910,10 @@ class ofp_get_config_request (ofp_header):
     outstr += ofp_header.show(self, prefix + '  ')
     return outstr
 
-"Classe para consulta de parâmetros de configuração de resposta"
+
 @openflow_s_message("OFPT_GET_CONFIG_REPLY", 8,
     reply_to="ofp_get_config_request")
+"Classe para consulta de parâmetros de configuração de resposta"
 class ofp_get_config_reply (ofp_header): # uses ofp_switch_config
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4938,8 +4939,8 @@ class ofp_get_config_reply (ofp_header): # uses ofp_switch_config
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   @staticmethod
+  "Retorna o tamanho"
   def __len__ ():
     return 12
 
@@ -5089,35 +5090,35 @@ _init()
 
 # Values from macro definitions
 "Valores de definições de macro"
-OFP_FLOW_PERMANENT = 0  #Valor utilizado em 'idle_timeout' e 'hard_timeout' para indicar que a entrada é permanente"
-OFP_DL_TYPE_ETH2_CUTOFF = 0x0600 #Interromper o tipo ethernet 2"
-DESC_STR_LEN = 256 #Tamanho da struct"
-OFPFW_ICMP_CODE = OFPFW_TP_DST #Código ICMP é igual ao destino TCP/UDP"
-OFPQ_MIN_RATE_UNCFG = 0xffff  #Se a taxa não for configurada, ela é definida como OFPQ_MIN_RATE_UNCFG, que é 0xffff."
-OFP_VERSION = 0x01 #O bit mais significativo a ser definido no campo versão indica uma Versão experimental OpenFlow"
-OFP_MAX_TABLE_NAME_LEN = 32 #Tamanho máximo do nome da tabela"
-OFP_DL_TYPE_NOT_ETH_TYPE = 0x05ff #Tipo ethernet nao é o tipo link de dados"
-OFP_DEFAULT_MISS_SEND_LEN = 128 #Tamanho enviado perdido"
-OFP_MAX_PORT_NAME_LEN = 16 #Tamanho máximo do nome da porta"
-OFP_SSL_PORT = 6633 #Porta SSL"
-OFPFW_ICMP_TYPE = OFPFW_TP_SRC #Tipo ICMP"
-OFP_TCP_PORT = 6633 #Porta TCP"
-SERIAL_NUM_LEN = 32 #Tamanho do numero de serie"
-OFP_DEFAULT_PRIORITY = 0x8000 #Prioridade padrão"
-OFP_VLAN_NONE = 0xffff #Nenhuma VLAN"
-OFPQ_ALL = 0xffffffff #Tudo"
+OFP_FLOW_PERMANENT = 0  "Valor utilizado em 'idle_timeout' e 'hard_timeout' para indicar que a entrada é permanente"
+OFP_DL_TYPE_ETH2_CUTOFF = 0x0600 "Interromper o tipo ethernet 2"
+DESC_STR_LEN = 256 "Tamanho da struct"
+OFPFW_ICMP_CODE = OFPFW_TP_DST "Código ICMP é igual ao destino TCP/UDP"
+OFPQ_MIN_RATE_UNCFG = 0xffff  "Se a taxa não for configurada, ela é definida como OFPQ_MIN_RATE_UNCFG, que é 0xffff."
+OFP_VERSION = 0x01 "O bit mais significativo a ser definido no campo versão indica uma Versão experimental OpenFlow"
+OFP_MAX_TABLE_NAME_LEN = 32 "Tamanho máximo do nome da tabela"
+OFP_DL_TYPE_NOT_ETH_TYPE = 0x05ff "Tipo ethernet nao é o tipo link de dados"
+OFP_DEFAULT_MISS_SEND_LEN = 128 "Tamanho enviado perdido"
+OFP_MAX_PORT_NAME_LEN = 16 "Tamanho máximo do nome da porta"
+OFP_SSL_PORT = 6633 "Porta SSL"
+OFPFW_ICMP_TYPE = OFPFW_TP_SRC "Tipo ICMP"
+OFP_TCP_PORT = 6633 "Porta TCP"
+SERIAL_NUM_LEN = 32 "Tamanho do numero de serie"
+OFP_DEFAULT_PRIORITY = 0x8000 "Prioridade padrão"
+OFP_VLAN_NONE = 0xffff "Nenhuma VLAN"
+OFPQ_ALL = 0xffffffff "Tudo"
 
 ofp_match_data = {
-  'in_port' : (0, OFPFW_IN_PORT), #OFPFW_IN_PORT: porta de entrada do switch"
-  'dl_src' : (EMPTY_ETH, OFPFW_DL_SRC), #EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de origem Ethernet"
-  'dl_dst' : (EMPTY_ETH, OFPFW_DL_DST), #EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de destino Ethernet"
-  'dl_vlan' : (0, OFPFW_DL_VLAN), #VLAN"
+  'in_port' : (0, OFPFW_IN_PORT), "OFPFW_IN_PORT: porta de entrada do switch"
+  'dl_src' : (EMPTY_ETH, OFPFW_DL_SRC), "EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de origem Ethernet"
+  'dl_dst' : (EMPTY_ETH, OFPFW_DL_DST), "EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de destino Ethernet"
+  'dl_vlan' : (0, OFPFW_DL_VLAN), "VLAN"
   'dl_vlan_pcp' : (0, OFPFW_DL_VLAN_PCP),
-  'dl_type' : (0, OFPFW_DL_TYPE), #Tipo de quadro Ethernet"
+  'dl_type' : (0, OFPFW_DL_TYPE), "Tipo de quadro Ethernet"
   'nw_tos' : (0, OFPFW_NW_TOS),
-  'nw_proto' : (0, OFPFW_NW_PROTO), #Protocolo IP"
+  'nw_proto' : (0, OFPFW_NW_PROTO), "Protocolo IP"
   'nw_src' : (0, OFPFW_NW_SRC_ALL),
   'nw_dst' : (0, OFPFW_NW_DST_ALL),
-  'tp_src' : (0, OFPFW_TP_SRC), #Porta de entrada TCP/UDP"
-  'tp_dst' : (0, OFPFW_TP_DST), #Porta de destino TCP/UDP"
+  'tp_src' : (0, OFPFW_TP_SRC), "Porta de entrada TCP/UDP"
+  'tp_dst' : (0, OFPFW_TP_DST), "Porta de destino TCP/UDP"
 }

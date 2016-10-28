@@ -1,27 +1,24 @@
-# Copyright 2012-2013 James McCauley
+# Copyright 2012 James McCauley
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at:
+# This file is part of POX.
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# POX is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# POX is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with POX.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-A shortest-path forwarding application.
-
-This is a standalone L2 switch that learns ethernet addresses
-across the entire network and picks short paths between them.
-
-You shouldn't really write an application this way -- you should
-keep more state in the controller (that is, your flow tables),
-and/or you should make your topology more static.  However, this
-does (mostly) work. :)
+A messy first shot at a standalone L2 switch that learns ethernet
+addresses across the entire network and picks short paths between
+them.
 
 Depends on openflow.discovery
 Works with openflow.spanning_tree
@@ -39,11 +36,9 @@ Trabalha com openflow.spanning_tree #Arvore de abrabgência...
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
 from pox.lib.revent import *
-from pox.lib.recoco import Timer
 from collections import defaultdict
 from pox.openflow.discovery import Discovery
-from pox.lib.util import dpid_to_str
-import time
+from pox.lib.util import dpidToStr
 
 log = core.getLogger()
 
@@ -59,34 +54,15 @@ mac_map = {}
 # [sw1][sw2] -> (distance, intermediate)
 path_map = defaultdict(lambda:defaultdict(lambda:(None,None)))
 
-# Waiting path.  (dpid,xid)->WaitingPath
-waiting_paths = {}
 
-# Time to not flood in seconds
-FLOOD_HOLDDOWN = 5
-
-# Flow timeouts
-FLOW_IDLE_TIMEOUT = 10
-FLOW_HARD_TIMEOUT = 30
-
-# How long is allowable to set up a path?
-PATH_SETUP_TIME = 4
-
-
-def _calc_paths ():
+def _calc_paths():
+  """
+  Implemantação do algoritimo Floyd-Warshall no mapa de switches.
+  :return: Sem retorno.
+  """
   """
   Essentially Floyd-Warshall algorithm
   """
-
-  def dump ():
-    for i in sws:
-      for j in sws:
-        a = path_map[i][j][0]
-        #a = adjacency[i][j]
-        if a is None: a = "*"
-        print a,
-      print
-
   sws = switches.values()
   path_map.clear()
   for k in sws:
@@ -95,7 +71,15 @@ def _calc_paths ():
       path_map[k][j] = (1,None)
     path_map[k][k] = (0,None) # distance, intermediate
 
-  #dump()
+  """
+  for i in sws:
+    for j in sws:
+      a = path_map[i][j][0]
+      #a = adjacency[i][j]
+      if a is None: a = "*"
+      print a,
+    print
+  """
 
   for k in sws:
     for i in sws:
@@ -108,13 +92,22 @@ def _calc_paths ():
               # i -> k -> j is better than existing
               path_map[i][j] = (ikj_dist, k)
 
-  #print "--------------------"
-  #dump()
+  """
+  print "--------------------"
+  for i in sws:
+    for j in sws:
+      print path_map[i][j][0],
+    print
+  """
 
 
 def _get_raw_path (src, dst):
   """
-  Get a raw path (just a list of nodes to traverse)
+  Pega uma linha de caminhos.
+  :param src: Pasta origem.
+  :param dst: Pasta destino.
+  :return: Retorna uma lista com o caminho da origem até o destino
+  passando pelo meio, se houver, caso comtrário retorna uma lista vázia.
   """
   if len(path_map) == 0: _calc_paths()
   if src is dst:
@@ -132,102 +125,48 @@ def _get_raw_path (src, dst):
 
 def _check_path (p):
   """
-  Make sure that a path is actually a string of nodes with connected ports
-
-  returns True if path is valid
+  Verifica a adjacência da matriz 'p'.
+  :param p: Uma matriz para comparação.
+  :return: Verdadeiro se for ajacente, ou falso se houver alguma falha na matriz 'p'.
   """
-  for a,b in zip(p[:-1],p[1:]):
-    if adjacency[a[0]][b[0]] != a[2]:
-      return False
-    if adjacency[b[0]][a[0]] != b[1]:
+  for i in range(len(p) - 1):
+    if adjacency[p[i][0]][p[i+1][0]] != p[i][1]:
       return False
   return True
 
 
-def _get_path (src, dst, first_port, final_port):
+def _get_path (src, dst, final_port):
   """
-  Gets a cooked path -- a list of (node,in_port,out_port)
+  Pega o caminho que o capote vai percorrer.
+  :param src: Local de origem.
+  :param dst: Local de destino.
+  :param final_port: Porta final.
+  :return:  Lista de tuplas com os caminhos.
   """
-  # Start with a raw path...
+  #print "path from",src,"to",dst
   if src == dst:
     path = [src]
   else:
     path = _get_raw_path(src, dst)
     if path is None: return None
     path = [src] + path + [dst]
-
-  # Now add the ports
+#  print "raw:    ",path
   r = []
-  in_port = first_port
   for s1,s2 in zip(path[:-1],path[1:]):
-    out_port = adjacency[s1][s2]
-    r.append((s1,in_port,out_port))
-    in_port = adjacency[s2][s1]
-  r.append((dst,in_port,final_port))
+    port = adjacency[s1][s2]
+    r.append((s1,port))
+  r.append((dst, final_port))
+#  print "cooked: ",r
 
-  assert _check_path(r), "Illegal path!"
+  assert _check_path(r)
 
   return r
 
 
-class WaitingPath (object):
-  """
-  A path which is waiting for its path to be established
-  """
-  def __init__ (self, path, packet):
-    """
-    xids is a sequence of (dpid,xid)
-    first_switch is the DPID where the packet came from
-    packet is something that can be sent in a packet_out
-    """
-    self.expires_at = time.time() + PATH_SETUP_TIME
-    self.path = path
-    self.first_switch = path[0][0].dpid
-    self.xids = set()
-    self.packet = packet
-
-    if len(waiting_paths) > 1000:
-      WaitingPath.expire_waiting_paths()
-
-  def add_xid (self, dpid, xid):
-    self.xids.add((dpid,xid))
-    waiting_paths[(dpid,xid)] = self
-
-  @property
-  def is_expired (self):
-    return time.time() >= self.expires_at
-
-  def notify (self, event):
-    """
-    Called when a barrier has been received
-    """
-    self.xids.discard((event.dpid,event.xid))
-    if len(self.xids) == 0:
-      # Done!
-      if self.packet:
-        log.debug("Sending delayed packet out %s"
-                  % (dpid_to_str(self.first_switch),))
-        msg = of.ofp_packet_out(data=self.packet,
-            action=of.ofp_action_output(port=of.OFPP_TABLE))
-        core.openflow.sendToDPID(self.first_switch, msg)
-
-      core.l2_multi.raiseEvent(PathInstalled(self.path))
-
-
-  @staticmethod
-  def expire_waiting_paths ():
-    packets = set(waiting_paths.values())
-    killed = 0
-    for p in packets:
-      if p.is_expired:
-        killed += 1
-        for entry in p.xids:
-          waiting_paths.pop(entry, None)
-    if killed:
-      log.error("%i paths failed to install" % (killed,))
-
-
 class PathInstalled (Event):
+  """
+  Salva o path de alguma instalação.
+  """
   """
   Fired when a path is installed
   """
@@ -237,39 +176,53 @@ class PathInstalled (Event):
 
 
 class Switch (EventMixin):
+  """
+  Clesse que representa um switch.
+  """
   def __init__ (self):
     self.connection = None
     self.ports = None
     self.dpid = None
     self._listeners = None
-    self._connected_at = None
 
   def __repr__ (self):
-    return dpid_to_str(self.dpid)
+    return dpidToStr(self.dpid)
 
-  def _install (self, switch, in_port, out_port, match, buf = None):
-    msg = of.ofp_flow_mod()
+  def _install (self, switch, port, match, buf = -1):
+    """
+    Configura e grava a inclusão de um novo switch na rede.
+    :param switch: Instância do Switch à ser conectado.
+    :param port: Porta do Switch.
+    :param match: Mac do Switch
+    :param buf: Tamanho do buffer do Switch.
+    :return: Sem retorno.
+    """
+    msg = of.ofp_flow_mod() # configuração de fluxo e desmontagem
     msg.match = match
-    msg.match.in_port = in_port
-    msg.idle_timeout = FLOW_IDLE_TIMEOUT
-    msg.hard_timeout = FLOW_HARD_TIMEOUT
-    msg.actions.append(of.ofp_action_output(port = out_port))
+    msg.idle_timeout = 10
+    msg.hard_timeout = 30
+    msg.actions.append(of.ofp_action_output(port = port)) # Adiciona uma ação de saida
     msg.buffer_id = buf
     switch.connection.send(msg)
 
-  def _install_path (self, p, match, packet_in=None):
-    wp = WaitingPath(p, packet_in)
-    for sw,in_port,out_port in p:
-      self._install(sw, in_port, out_port, match)
-      msg = of.ofp_barrier_request()
-      sw.connection.send(msg)
-      wp.add_xid(sw.dpid,msg.xid)
+  def _install_path (self, p, match, buffer_id = -1):
+    for sw,port in p[1:]:   # Adiciona todos os switches do segundo ao final(nesta ordem) da lista 'p' na rede.
+      self._install(sw, port, match)
 
-  def install_path (self, dst_sw, last_port, match, event):
+    self._install(p[0][0], p[0][1], match, buffer_id)   # Adiciona todos o primeiro switch da lista 'p' na rede.
+
+    core.l2_multi.raiseEvent(PathInstalled(p))    # Lança o evento de instalação dos Switches na lista 'p'.
+
+  def install_path (self, dst_sw, last_port, match, event):#buffer_id, packet):
     """
-    Attempts to install a path between this switch and some destination
+    Cria uma lista de Switches e os instala.
+    :param dst_sw: Switch de destino.
+    :param last_port: Ultima porta acessada.
+    :param match: Configurações iniciais.
+    :param event: Utiliza o tamanho do seu buffer na instalação..
+    :return: Sem retorno.
     """
-    p = _get_path(self, dst_sw, event.port, last_port)
+    p = _get_path(self, dst_sw, last_port)
     if p is None:
       log.warning("Can't get from %s to %s", match.dl_src, match.dl_dst)
 
@@ -283,7 +236,7 @@ class Switch (EventMixin):
 
         from pox.lib.addresses import EthAddr
         e = pkt.ethernet()
-        e.src = EthAddr(dpid_to_str(self.dpid)) #FIXME: Hmm...
+        e.src = EthAddr(dpidToStr(self.dpid)) #FIXME: Hmm...
         e.dst = match.dl_src
         e.type = e.IP_TYPE
         ipp = pkt.ipv4()
@@ -309,36 +262,39 @@ class Switch (EventMixin):
 
       return
 
-    log.debug("Installing path for %s -> %s %04x (%i hops)",
-        match.dl_src, match.dl_dst, match.dl_type, len(p))
-
-    # We have a path -- install it
-    self._install_path(p, match, event.ofp)
-
-    # Now reverse it and install it backwards
-    # (we'll just assume that will work)
-    p = [(sw,out_port,in_port) for sw,in_port,out_port in p]
-    self._install_path(p, match.flip())
-
+    self._install_path(p, match, event.ofp.buffer_id)
+    log.debug("Installing path for %s -> %s %04x (%i hops)", match.dl_src, match.dl_dst, match.dl_type, len(p))
+    #log.debug("installing path for %s.%i -> %s.%i" %
+    #          (src[0].dpid, src[1], dst[0].dpid, dst[1]))
 
   def _handle_PacketIn (self, event):
+    """
+    Manuseia os pacotes de entrada.
+    :param event: Evento de lançãmento.
+    :return: Sem retorno.
+    """
     def flood ():
+      """
+      Imundação de pacotes.
+      :return: Sem retorno.
+      """
       """ Floods the packet """
-      if self.is_holding_down:
-        log.warning("Not flooding -- holddown active")
       msg = of.ofp_packet_out()
-      # OFPP_FLOOD is optional; some switches may need OFPP_ALL
       msg.actions.append(of.ofp_action_output(port = of.OFPP_FLOOD))
       msg.buffer_id = event.ofp.buffer_id
       msg.in_port = event.port
       self.connection.send(msg)
 
     def drop ():
+      """
+      Discarta os pacotes.
+      :return: Sem retorno.
+      """
       # Kill the buffer
-      if event.ofp.buffer_id is not None:
+      if event.ofp.buffer_id != -1:
         msg = of.ofp_packet_out()
         msg.buffer_id = event.ofp.buffer_id
-        event.ofp.buffer_id = None # Mark is dead
+        event.ofp.buffer_id = -1 # Mark is dead
         msg.in_port = event.port
         self.connection.send(msg)
 
@@ -347,41 +303,38 @@ class Switch (EventMixin):
     loc = (self, event.port) # Place we saw this ethaddr
     oldloc = mac_map.get(packet.src) # Place we last saw this ethaddr
 
-    if packet.effective_ethertype == packet.LLDP_TYPE:
+    if packet.type == packet.LLDP_TYPE:
       drop()
       return
 
+    #print packet.src,"*",loc,oldloc
     if oldloc is None:
-      if packet.src.is_multicast == False:
+      if packet.src.isMulticast() == False:
         mac_map[packet.src] = loc # Learn position for ethaddr
         log.debug("Learned %s at %s.%i", packet.src, loc[0], loc[1])
     elif oldloc != loc:
       # ethaddr seen at different place!
-      if core.openflow_discovery.is_edge_port(loc[0].dpid, loc[1]):
+      if loc[1] not in adjacency[loc[0]].values():
         # New place is another "plain" port (probably)
         log.debug("%s moved from %s.%i to %s.%i?", packet.src,
-                  dpid_to_str(oldloc[0].dpid), oldloc[1],
-                  dpid_to_str(   loc[0].dpid),    loc[1])
-        if packet.src.is_multicast == False:
+                  dpidToStr(oldloc[0].connection.dpid), oldloc[1],
+                  dpidToStr(   loc[0].connection.dpid),    loc[1])
+        if packet.src.isMulticast() == False:
           mac_map[packet.src] = loc # Learn position for ethaddr
           log.debug("Learned %s at %s.%i", packet.src, loc[0], loc[1])
-      elif packet.dst.is_multicast == False:
+      elif packet.dst.isMulticast() == False:
         # New place is a switch-to-switch port!
-        # Hopefully, this is a packet we're flooding because we didn't
-        # know the destination, and not because it's somehow not on a
-        # path that we expect it to be on.
-        # If spanning_tree is running, we might check that this port is
-        # on the spanning tree (it should be).
-        if packet.dst in mac_map:
-          # Unfortunately, we know the destination.  It's possible that
-          # we learned it while it was in flight, but it's also possible
-          # that something has gone wrong.
-          log.warning("Packet from %s to known destination %s arrived "
-                      "at %s.%i without flow", packet.src, packet.dst,
-                      dpid_to_str(self.dpid), event.port)
+        #TODO: This should be a flood.  It'd be nice if we knew.  We could
+        #      check if the port is in the spanning tree if it's available.
+        #      Or maybe we should flood more carefully?
+        log.warning("Packet from %s arrived at %s.%i without flow",# -- dropping",
+                    packet.src, dpidToStr(self.dpid), event.port)
+        #drop()
+        #return
 
 
-    if packet.dst.is_multicast:
+
+    if packet.dst.isMulticast():
       log.debug("Flood multicast from %s", packet.src)
       flood()
     else:
@@ -390,10 +343,15 @@ class Switch (EventMixin):
         flood()
       else:
         dest = mac_map[packet.dst]
+        #print packet.dst, "is on", dest
         match = of.ofp_match.from_packet(packet)
         self.install_path(dest[0], dest[1], match, event)
 
   def disconnect (self):
+    """
+    Desliga as  conexões.
+    :return: Sem retorno.
+    """
     if self.connection is not None:
       log.debug("Disconnect %s" % (self.connection,))
       self.connection.removeListeners(self._listeners)
@@ -401,6 +359,11 @@ class Switch (EventMixin):
       self._listeners = None
 
   def connect (self, connection):
+    """
+    Liga as  conexões.
+    :param connection: Conexão à ser adicionada.
+    :return: Sem retorno.
+    """
     if self.dpid is None:
       self.dpid = connection.dpid
     assert self.dpid == connection.dpid
@@ -410,18 +373,15 @@ class Switch (EventMixin):
     log.debug("Connect %s" % (connection,))
     self.connection = connection
     self._listeners = self.listenTo(connection)
-    self._connected_at = time.time()
-
-  @property
-  def is_holding_down (self):
-    if self._connected_at is None: return True
-    if time.time() - self._connected_at > FLOOD_HOLDDOWN:
-      return False
-    return True
 
   def _handle_ConnectionDown (self, event):
+    """
+    Gerência as paradas de conexão.
+    :param event: Evento de lançamento.
+    :return: Sem retorno.
+    """
     self.disconnect()
-
+    pass
 
 class l2_multi (EventMixin):
 
@@ -430,14 +390,21 @@ class l2_multi (EventMixin):
   ])
 
   def __init__ (self):
-    # Listen to dependencies
-    def startup ():
-      core.openflow.addListeners(self, priority=0)
-      core.openflow_discovery.addListeners(self)
-    core.call_when_ready(startup, ('openflow','openflow_discovery'))
+    self.listenTo(core.openflow, priority=0)
+    self.listenTo(core.openflow_discovery)
 
   def _handle_LinkEvent (self, event):
+    """
+    Manipula os eventos de Link.
+    :param event: Evento de lançamento.
+    :return: Sem retorno.
+    """
     def flip (link):
+      """
+      .
+      :param link: Lista de links
+      :return: Instância de objeto Link.
+      """
       return Discovery.Link(link[2],link[3], link[0],link[1])
 
     l = event.link
@@ -450,9 +417,8 @@ class l2_multi (EventMixin):
     # For link removals, this makes sure that we don't use a
     # path that may have been broken.
     #NOTE: This could be radically improved! (e.g., not *ALL* paths break)
-    clear = of.ofp_flow_mod(command=of.OFPFC_DELETE)
+    clear = of.ofp_flow_mod(match=of.ofp_match(),command=of.OFPFC_DELETE)
     for sw in switches.itervalues():
-      if sw.connection is None: continue
       sw.connection.send(clear)
     path_map.clear()
 
@@ -486,13 +452,24 @@ class l2_multi (EventMixin):
       # be connected to a switch, unlearn it.
       bad_macs = set()
       for mac,(sw,port) in mac_map.iteritems():
-        if sw is sw1 and port == l.port1: bad_macs.add(mac)
-        if sw is sw2 and port == l.port2: bad_macs.add(mac)
+        #print sw,sw1,port,l.port1
+        if sw is sw1 and port == l.port1:
+          if mac not in bad_macs:
+            log.debug("Unlearned %s", mac)
+            bad_macs.add(mac)
+        if sw is sw2 and port == l.port2:
+          if mac not in bad_macs:
+            log.debug("Unlearned %s", mac)
+            bad_macs.add(mac)
       for mac in bad_macs:
-        log.debug("Unlearned %s", mac)
         del mac_map[mac]
 
   def _handle_ConnectionUp (self, event):
+    """
+        Gerência as inicializações de conexão.
+        :param event: Evento de lançamento.
+        :return: Sem retorno.
+        """
     sw = switches.get(event.dpid)
     if sw is None:
       # New switch
@@ -502,17 +479,15 @@ class l2_multi (EventMixin):
     else:
       sw.connect(event.connection)
 
-  def _handle_BarrierIn (self, event):
-    wp = waiting_paths.pop((event.dpid,event.xid), None)
-    if not wp:
-      #log.info("No waiting packet %s,%s", event.dpid, event.xid)
-      return
-    #log.debug("Notify waiting packet %s,%s", event.dpid, event.xid)
-    wp.notify(event)
-
 
 def launch ():
+  """
+  Função que cria uma instância e registra novo switch de aprendizagem.
+  :return: Sem retorno.
+  """
+  if 'openflow_discovery' not in core.components:
+    import pox.openflow.discovery as discovery
+    core.registerNew(discovery.Discovery)
+    
   core.registerNew(l2_multi)
 
-  timeout = min(max(PATH_SETUP_TIME, 5) * 2, 15)
-  Timer(timeout, WaitingPath.expire_waiting_paths, recurring=True)
