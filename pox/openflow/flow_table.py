@@ -64,9 +64,8 @@ class TableEntry (object):
     self.buffer_id = buffer_id
 
  "Retornar um método estático para a função ."
-  @staticmethod
-
-  "Componentes de uma entrada da tabela de fluxo"
+ "Componentes de uma entrada da tabela de fluxo"
+  @staticmethod 
   def from_flow_mod (flow_mod):
     return TableEntry(priority=flow_mod.priority, 
                       cookie=flow_mod.cookie,

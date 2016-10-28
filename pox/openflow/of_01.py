@@ -305,24 +305,24 @@ handlers = []
 
 # Message handlers
 handlerMap = {
-  of.OFPT_HELLO : handle_HELLO, "mensagem simetrica"
-  of.OFPT_ECHO_REQUEST : handle_ECHO_REQUEST, "mensagem simetrica"
-  of.OFPT_ECHO_REPLY : handle_ECHO_REPLY, "mensagem simetrica"
-  of.OFPT_PACKET_IN : handle_PACKET_IN, "mensagem assíncrona"
-  of.OFPT_FEATURES_REPLY : handle_FEATURES_REPLY, "Controller / mensagem chave"
-  of.OFPT_PORT_STATUS : handle_PORT_STATUS, "mensagem assíncrona"
-  of.OFPT_ERROR : handle_ERROR_MSG, "mensagem simetrica"
-  of.OFPT_BARRIER_REPLY : handle_BARRIER, "Controller / mensagem chave"
+  of.OFPT_HELLO : handle_HELLO, #"mensagem simetrica"
+  of.OFPT_ECHO_REQUEST : handle_ECHO_REQUEST, #"mensagem simetrica"
+  of.OFPT_ECHO_REPLY : handle_ECHO_REPLY, #"mensagem simetrica"
+  of.OFPT_PACKET_IN : handle_PACKET_IN, #"mensagem assíncrona"
+  of.OFPT_FEATURES_REPLY : handle_FEATURES_REPLY, #"Controller / mensagem chave"
+  of.OFPT_PORT_STATUS : handle_PORT_STATUS, #"mensagem assíncrona"
+  of.OFPT_ERROR : handle_ERROR_MSG, #"mensagem simetrica"
+  of.OFPT_BARRIER_REPLY : handle_BARRIER, #"Controller / mensagem chave"
   of.OFPT_STATS_REPLY : handle_STATS_REPLY, 
-  of.OFPT_FLOW_REMOVED : handle_FLOW_REMOVED, "mensagem assíncrona"
+  of.OFPT_FLOW_REMOVED : handle_FLOW_REMOVED, #"mensagem assíncrona"
   of.OFPT_VENDOR : handle_VENDOR, 
 }
 
 statsHandlerMap = {
-  of.OFPST_DESC : handle_OFPST_DESC, "A resposta OFPST DESC (descrição switch) agora inclui um campo de descrição do caminho de dados."
+  of.OFPST_DESC : handle_OFPST_DESC, #"A resposta OFPST DESC (descrição switch) agora inclui um campo de descrição do caminho de dados."
   of.OFPST_FLOW : handle_OFPST_FLOW, 
   of.OFPST_AGGREGATE : handle_OFPST_AGGREGATE,
-  of.OFPST_TABLE : handle_OFPST_TABLE, "Se quiser compreender o tamanho, tipos e ordem em que mesas são consultados, o controlador envia uma solicitação de estatísticas OFPST_TABLE."
+  of.OFPST_TABLE : handle_OFPST_TABLE, #"Se quiser compreender o tamanho, tipos e ordem em que mesas são consultados, o controlador envia uma solicitação de estatísticas OFPST_TABLE."
   of.OFPST_PORT : handle_OFPST_PORT,
   of.OFPST_QUEUE : handle_OFPST_QUEUE,
 }

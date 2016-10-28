@@ -1182,8 +1182,8 @@ class nx_action_learn (of.ofp_action_vendor_base):
 
     self.spec = flow_mod_spec_chain()
 
-  @property
   "Sinônimo de table_id"
+  @property
   def table (self):
     """
     Synonym for table_id
@@ -1271,8 +1271,8 @@ class nx_learn_spec (object):
   def pack (self):
     return self.data if self.data else b''
 
-  @classmethod
   "Subclasse para descompactar"
+  @classmethod
   def unpack_subclass (cls, spec, n_bits, raw, offset):
     """
     Returns (new_offset, object)
@@ -1282,8 +1282,8 @@ class nx_learn_spec (object):
     offset,o = c.unpack_new(n_bits, raw, offset)
     return offset, o
 
-  @classmethod
   "Classe para nova descompactação"
+  @classmethod
   def unpack_new (cls, n_bits, raw, offset):
     """
     Returns (new_offset, object)
@@ -1334,8 +1334,8 @@ class _field_and_match (object):
   def ofs (self):
     return struct.unpack_from("!H", self.data, 4)[0]
 
-  @property
   "define o campo"
+  @property
   def field (self):
     t,_,_ = nxm_entry.unpack_header(self.data, 0)
     c = _nxm_type_to_class.get(t)
@@ -1352,8 +1352,8 @@ class _field_and_match (object):
 class nx_learn_src_field (_field_and_match, nx_learn_spec_src):
   value = NX_LEARN_SRC_FIELD
 
-  @property
-  "Define a combinação de destino informado"
+ "Define a combinação de destino informado"
+ @property 
   def matching (self):
     """
     Returns a corresponding nx_learn_dst_match
@@ -1382,18 +1382,18 @@ class nx_learn_src_immediate (nx_learn_spec_src):
     self.n_bits = n_bits
     self.data = data
 
-  @classmethod
   "unit 8"
+  @classmethod
   def u8 (cls, dst, value):
     return cls(struct.pack("!H", value))
 
-  @classmethod
   "unit 16"
+  @classmethod
   def u16 (cls, dst, value):
     return cls(struct.pack("!H", value))
 
-  @classmethod
   "unit 32"
+  @classmethod
   def u32 (cls, dst, value):
     return cls(struct.pack("!L", value))
   """
@@ -1591,8 +1591,8 @@ class flow_mod_spec (object):
     p += self.src.pack() + self.dst.pack()
     return p
 
-  @classmethod
   "Pode retornar objeto nulo se está preenchido"
+  @classmethod
   def unpack_new (cls, raw, offset = 0):
     """
     May return a None object if it's padding
@@ -1781,8 +1781,8 @@ class nxm_entry (object):
 
   #TODO: make mask-omittable a class-level attribute?
 
-  @classmethod
   "Define o número significante de bits"
+  @classmethod
   def _get_size_hint (self):
     """
     Number of significant bits
@@ -1791,17 +1791,18 @@ class nxm_entry (object):
       return self._nxm_length * 8
     return self._size_hint
 
-  @property
   "Define o vendedor do Nicira Extensible Match"
+  @property
   def nxm_vendor (self):
     return self._nxm_type >> 7
-  @property
+  
   "Define o campo do Nicira Extensible Match"
+  @property
   def nxm_field (self):
     return self._nxm_type & 0x7f
 
-  @staticmethod
   "Define o cabeçalho do pacote desempacotado"
+  @staticmethod
   def unpack_header (raw, offset):
     """
     Parses the NXM_HEADER
@@ -1815,8 +1816,8 @@ class nxm_entry (object):
     length = h & 0x7f
     return t,has_mask,length
 
-  @staticmethod
   "Define um novo pacote desempacotado"
+  @staticmethod
   def unpack_new (raw, offset):
     t,has_mask,length = nxm_entry.unpack_header(raw, offset)
     offset += 4
@@ -1896,17 +1897,19 @@ class nxm_entry (object):
   @property
   def is_reg (self):
     return False
-  @property
+  
   "define a permissão da máscara"
+  @property
   def allow_mask (self):
     return False
 
-  @property
   "Retorna o valor do pacote desempacotado"
+  @property
   def value (self):
     return self._unpack_value(self._value)
-  @value.setter
+  
   "Retorna o valor do pacote"
+  @value.setter
   def value (self, value):
     self._value = self._pack_value(value)
 
@@ -1914,8 +1917,9 @@ class nxm_entry (object):
   def mask (self):
     if self._mask is None: return None
     return self._unpack_mask(self._mask)
-  @mask.setter
+  
   "Define a máscara"
+  @mask.setter
   def mask (self, value):
     if self.allow_mask is False:
       if value is not None:
@@ -1992,24 +1996,28 @@ Se nenhum argumento for fornecido, retorna a cadeia vazia, ''.
 "Classe para a entrada numérica do Nicira Extensible Match"
 class _nxm_numeric_entry (_nxm_numeric, nxm_entry):
   pass
+
 "Classe para a máscara capacitada do Nicira Extensible Match"
+"Define a mascara permitida"
 class _nxm_maskable (object):
-  @property
-  "Define a mascara permitida"
+  @property  
   def allow_mask (self):
     return True
+
 "CLasse para a máscara numerica capacitada do Nicira Extensible Match"
 class _nxm_maskable_numeric_entry (_nxm_maskable, _nxm_numeric_entry):
   pass
+
 "Classe para o registro do Nicira Extensible Match"
 class _nxm_reg (_nxm_maskable_numeric_entry):
   @property
   def is_reg (self):
     return True
+
 "Classe para o Nicira Extensible Match generico"
+"Define a mascara permitida"
 class NXM_GENERIC (_nxm_raw, nxm_entry):
-  @property
-  "Define a mascara permitida"
+  @property  
   def allow_mask (self):
     return True
   "Retorna uma string"
@@ -2391,17 +2399,18 @@ class nxt_packet_in (nicira_base, of.ofp_packet_in):
     if self.data and (self.total_len < len(self.packed_data)):
       return "total len less than data len"
 
-  @property
   "Na porta"
+  @property
   def in_port (self):
     return self.match.of_in_port
 
-  @property
   "Combinacao"
+  @property
   def match (self):
     if self._match is None:
       self._match = nx_match()
     return self._match
+  
   @match.setter
   def match (self, v):
     self._match = v
@@ -2425,8 +2434,8 @@ class nxt_packet_in (nicira_base, of.ofp_packet_in):
     packed += self.packed_data
     return packed
 
-  @property
   "Funcao para os dados do pacote"
+  @property
   def packed_data (self):
     if self.data is None:
       return b''
@@ -2442,6 +2451,7 @@ class nxt_packet_in (nicira_base, of.ofp_packet_in):
       return self.data.pack()
     else:
       return self.data
+  
   "Funcao para desempacotar"
   def unpack (self, raw, offset=0):
     _offset = offset
@@ -2481,6 +2491,7 @@ class nxt_packet_in (nicira_base, of.ofp_packet_in):
     if self.cookie != other.cookie: return False
     if self.match != other.match: return False
     return True
+  
   "Define-se o metodo _ne_ para o caso de ser falso"
   def __ne__ (self, other): return not self.__eq__(other)
 
@@ -2499,6 +2510,7 @@ class nxt_packet_in (nicira_base, of.ofp_packet_in):
     #outstr += prefix + 'data: ' + hexdump(self.data) + '\n'
     outstr += prefix + 'datalen: ' + str(len(self.data)) + '\n'
     return outstr
+  
   "Define o campo"
   def field (self, t):
     for i in self.match:
@@ -2631,8 +2643,8 @@ class nx_match (object):
   def show (self, prefix = ''):
     return prefix + str(self)
 
-  @property
   "Define o mapa"
+   @property
   def _map (self):
     if self._cache is None:
       self._cache = {}
@@ -2721,8 +2733,8 @@ class nx_match (object):
   def __iadd__ (self, other):
     self.append(other)
 
-  @staticmethod
   "Correção de nome"
+  @staticmethod
   def _fixname (name):
     name = name.upper()
 
