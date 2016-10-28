@@ -189,23 +189,39 @@ class Switch (EventMixin):
     return dpidToStr(self.dpid)
 
   def _install (self, switch, port, match, buf = -1):
-    msg = of.ofp_flow_mod()
+    """
+    Configura e grava a inclusão de um novo switch na rede.
+    :param switch: Instância do Switch à ser conectado.
+    :param port: Porta do Switch.
+    :param match: Mac do Switch
+    :param buf: Tamanho do buffer do Switch.
+    :return: Sem retorno.
+    """
+    msg = of.ofp_flow_mod() # configuração de fluxo e desmontagem
     msg.match = match
     msg.idle_timeout = 10
     msg.hard_timeout = 30
-    msg.actions.append(of.ofp_action_output(port = port))
+    msg.actions.append(of.ofp_action_output(port = port)) # Adiciona uma ação de saida
     msg.buffer_id = buf
     switch.connection.send(msg)
 
   def _install_path (self, p, match, buffer_id = -1):
-    for sw,port in p[1:]:
+    for sw,port in p[1:]:   # Adiciona todos os switches do segundo ao final(nesta ordem) da lista 'p' na rede.
       self._install(sw, port, match)
 
-    self._install(p[0][0], p[0][1], match, buffer_id)
+    self._install(p[0][0], p[0][1], match, buffer_id)   # Adiciona todos o primeiro switch da lista 'p' na rede.
 
-    core.l2_multi.raiseEvent(PathInstalled(p))
+    core.l2_multi.raiseEvent(PathInstalled(p))    # Lança o evento de instalação dos Switches na lista 'p'.
 
   def install_path (self, dst_sw, last_port, match, event):#buffer_id, packet):
+    """
+    Cria uma lista de Switches e os instala.
+    :param dst_sw: Switch de destino.
+    :param last_port: Ultima porta acessada.
+    :param match: Configurações iniciais.
+    :param event: Utiliza o tamanho do seu buffer na instalação..
+    :return: Sem retorno.
+    """
     p = _get_path(self, dst_sw, last_port)
     if p is None:
       log.warning("Can't get from %s to %s", match.dl_src, match.dl_dst)
@@ -252,7 +268,16 @@ class Switch (EventMixin):
     #          (src[0].dpid, src[1], dst[0].dpid, dst[1]))
 
   def _handle_PacketIn (self, event):
+    """
+    Manuseia os pacotes de entrada.
+    :param event: Evento de lançãmento.
+    :return: Sem retorno.
+    """
     def flood ():
+      """
+      Imundação de pacotes.
+      :return: Sem retorno.
+      """
       """ Floods the packet """
       msg = of.ofp_packet_out()
       msg.actions.append(of.ofp_action_output(port = of.OFPP_FLOOD))
@@ -261,6 +286,10 @@ class Switch (EventMixin):
       self.connection.send(msg)
 
     def drop ():
+      """
+      Discarta os pacotes.
+      :return: Sem retorno.
+      """
       # Kill the buffer
       if event.ofp.buffer_id != -1:
         msg = of.ofp_packet_out()
@@ -319,6 +348,10 @@ class Switch (EventMixin):
         self.install_path(dest[0], dest[1], match, event)
 
   def disconnect (self):
+    """
+    Desliga as  conexões.
+    :return: Sem retorno.
+    """
     if self.connection is not None:
       log.debug("Disconnect %s" % (self.connection,))
       self.connection.removeListeners(self._listeners)
@@ -326,6 +359,11 @@ class Switch (EventMixin):
       self._listeners = None
 
   def connect (self, connection):
+    """
+    Liga as  conexões.
+    :param connection: Conexão à ser adicionada.
+    :return: Sem retorno.
+    """
     if self.dpid is None:
       self.dpid = connection.dpid
     assert self.dpid == connection.dpid
@@ -337,10 +375,13 @@ class Switch (EventMixin):
     self._listeners = self.listenTo(connection)
 
   def _handle_ConnectionDown (self, event):
+    """
+    Gerência as paradas de conexão.
+    :param event: Evento de lançamento.
+    :return: Sem retorno.
+    """
     self.disconnect()
     pass
-
-
 
 class l2_multi (EventMixin):
 
@@ -353,7 +394,17 @@ class l2_multi (EventMixin):
     self.listenTo(core.openflow_discovery)
 
   def _handle_LinkEvent (self, event):
+    """
+    Manipula os eventos de Link.
+    :param event: Evento de lançamento.
+    :return: Sem retorno.
+    """
     def flip (link):
+      """
+      .
+      :param link: Lista de links
+      :return: Instância de objeto Link.
+      """
       return Discovery.Link(link[2],link[3], link[0],link[1])
 
     l = event.link
@@ -414,6 +465,11 @@ class l2_multi (EventMixin):
         del mac_map[mac]
 
   def _handle_ConnectionUp (self, event):
+    """
+        Gerência as inicializações de conexão.
+        :param event: Evento de lançamento.
+        :return: Sem retorno.
+        """
     sw = switches.get(event.dpid)
     if sw is None:
       # New switch
@@ -425,6 +481,10 @@ class l2_multi (EventMixin):
 
 
 def launch ():
+  """
+  Função que cria uma instância e registra novo switch de aprendizagem.
+  :return: Sem retorno.
+  """
   if 'openflow_discovery' not in core.components:
     import pox.openflow.discovery as discovery
     core.registerNew(discovery.Discovery)
