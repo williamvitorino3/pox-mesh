@@ -42,8 +42,8 @@ OpenFlow material
 # este ficheiro. Uma vez que não têm 1.1+ apoio ainda, é aqui pelo menos
 # temporariamente.
 """
-OFPR_INVALID_TTL = 2 "Packet tem TTL inválida"
-OFPC_INVALID_TTL_TO_CONTROLLER = 4 "Remover etiqueta config OFPC_INVALID_TTL_TO_CONTROLLER."
+OFPR_INVALID_TTL = 2 #Packet tem TTL inválida
+OFPC_INVALID_TTL_TO_CONTROLLER = 4 #Remover etiqueta config OFPC_INVALID_TTL_TO_CONTROLLER.
 
 
 # -----------------------------------------------------------------------
