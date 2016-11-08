@@ -18,8 +18,13 @@
 
 """
 This is an L2 learning switch  derived originally from NOX's pyswitch
-example.  It is now a demonstration of the ofcommand library for constructing
+example.  It is now a demonstration of the of command library for constructing
 OpenFlow messages.
+"""
+"""
+Este é um interruptor de aprendizagem de L2 derivadas originalmente de exemplo
+interruptor de NOX. Agora é uma demostração do caso biblioteca de comandos
+para a construção de mensagens OpenFlow.
 """
 
 from time import time
@@ -42,6 +47,8 @@ log = core.getLogger()
 
 import pox.openflow.ofcommand as ofcommand
 
+
+
 class dumb_l2_switch (EventMixin):
   def __init__ (self):
     log.info("Starting")
@@ -49,9 +56,20 @@ class dumb_l2_switch (EventMixin):
     self.st = {}
     
   def _handle_GoingUpEvent (self, event):
+    """
+    Grava os eventos ocorridos no core.
+    :param event: Parametro obrigatório para relacionar eventos à métodos.
+    :return: Sem retorno.
+    """
     self.listenTo(core.openflow)
         
   def _handle_PacketIn (self, event):
+    """
+    Método de entrada de pacotes.
+    Descartar pacotes LLDP, tentativa de aprendizagem e encaminhamento.
+    :param event: Evento ocorrido.
+    :return: Sem retorno.
+    """
     """Packet entry method.
     Drop LLDP packets (or we get confused) and attempt learning and forwarding
     """
@@ -79,6 +97,13 @@ class dumb_l2_switch (EventMixin):
     self.forward_l2_packet(con, inport, packet, packet.arr, buffer_id)
       
   def do_l2_learning(self, con, inport, packet):
+    """
+    Dado um pacote, aprenda a fonte e o peg para um switch/inport.
+    :param con: Fonte do pacote.
+    :param inport: Porta de entrada.
+    :param packet: Pacote recebido.
+    :return: Sem retorno.
+    """
     """Given a packet, learn the source and peg to a switch/inport 
     """
     # learn MAC on incoming port
@@ -102,7 +127,17 @@ class dumb_l2_switch (EventMixin):
     # Replace any old entry for (switch,mac).
     #mac = mac_to_int(packet.src)
   
-  def forward_l2_packet(self, con, inport, packet, buf, bufid):   
+  def forward_l2_packet(self, con, inport, packet, buf, bufid):
+    """
+    Tenta aprender o destino MAC instituído à um fluxo e enviar apenas fora de suas portas de entrada.
+    Se não, usa inundação.
+    :param con: Fonte do pacote.
+    :param inport: Porta de entrada.
+    :param packet: Pacote recebido.
+    :param buf: Tamanho do Buffer.
+    :param bufid: ID do Buffer.
+    :return: Sem retorno.
+    """
     """If we've learned the destination MAC set up a flow and
     send only out of its inport.  Else, flood.
     """

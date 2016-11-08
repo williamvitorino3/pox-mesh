@@ -43,14 +43,19 @@ from pox.lib.revent import *
 import time
 
 # Timeout for flows
-FLOW_IDLE_TIMEOUT = 10
+FLOW_IDLE_TIMEOUT = 10    # Timeout dos fluxos.
 
 # Timeout for ARP entries
-ARP_TIMEOUT = 60 * 2
-
-
+ARP_TIMEOUT = 60 * 2    # Timeout para entradas ARP.
 
 class Entry (object):
+  """
+  Não estritamente uma entrada ARP.
+  Nós usamos a porta para determinar para qual porta encaminhar o tráfego de fora.
+  Nós usames o MAC para responder as respostas ARP.
+  Nós usamos o tempo limite para que se uma entrada é mais velho do que ARP_TIMEOUT,
+  nós inundarmos o pedido ARP em vez de tentar respondê-la nós mesmos.
+  """
   """
   Not strictly an ARP entry.
   We use the port to determine which port to forward traffic out of.
@@ -72,6 +77,10 @@ class Entry (object):
     return not self.__eq__(other)
 
   def isExpired (self):
+    """
+    Verifica se o time expirou.
+    :return: Booleano.
+    """
     return time.time() > self.timeout
 
 
@@ -79,14 +88,23 @@ class l3_switch (EventMixin):
   def __init__ (self):
     # For each switch, we map IP addresses to Entries
     self.arpTable = {}
-
     self.listenTo(core)
 
   def _handle_GoingUpEvent (self, event):
+    """
+    Lista os eventos ocorridos no coredo openflow.
+    :param event: Evento relacionado à chamada da função.
+    :return: Sem retorno.
+    """
     self.listenTo(core.openflow)
     log.debug("Up...")
 
   def _handle_PacketIn (self, event):
+    """
+    Gerencia os pacotes de entrada.
+    :param event:
+    :return: Sem retorno.
+    """
     dpid = event.connection.dpid
     inport = event.port
     packet = event.parsed
@@ -199,6 +217,10 @@ class l3_switch (EventMixin):
     return
 
 
-def launch ():
+def launch():
+  """
+  Inicia o switch l3.
+  :return: Sem retorno.
+  """
   core.registerNew(l3_switch)
 
