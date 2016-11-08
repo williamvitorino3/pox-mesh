@@ -1,5 +1,36 @@
+# Copyright 2011 Kyriakos Zarifis
+# Copyright 2008 (C) Nicira, Inc.
+#
+# This file is part of POX.
+#
+# POX is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# POX is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with POX.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+This is an L2 learning switch  derived originally from NOX's pyswitch
+example.  It is now a demonstration of the of command library for constructing
+OpenFlow messages.
+"""
+"""
+Este é um interruptor de aprendizagem de L2 derivadas originalmente de exemplo
+interruptor de NOX. Agora é uma demostração do caso biblioteca de comandos
+para a construção de mensagens OpenFlow.
+"""
+
 from time import time
 
+# TODO: mac_to_str and mact_to_int aren't currently defined in packet_utils...
+#from pox.lib.packet.packet_utils  import mac_to_str, mac_to_int
 from pox.lib.packet.ethernet      import ethernet
 from pox.lib.packet.tcp           import tcp
 from pox.lib.packet.udp           import udp
@@ -16,19 +47,18 @@ log = core.getLogger()
 
 import pox.openflow.ofcommand as ofcommand
 
+
+
 class dumb_l2_switch (EventMixin):
   def __init__ (self):
-    """
-    Construtor da classe.
-    """
     log.info("Starting")
     self.listenTo(core)
     self.st = {}
     
   def _handle_GoingUpEvent (self, event):
     """
-    Lista os eventos.
-    :param event: Evento.
+    Grava os eventos ocorridos no core.
+    :param event: Parametro obrigatório para relacionar eventos à métodos.
     :return: Sem retorno.
     """
     self.listenTo(core.openflow)
@@ -36,7 +66,8 @@ class dumb_l2_switch (EventMixin):
   def _handle_PacketIn (self, event):
     """
     Método de entrada de pacotes.
-    :param event: Evento.
+    Descartar pacotes LLDP, tentativa de aprendizagem e encaminhamento.
+    :param event: Evento ocorrido.
     :return: Sem retorno.
     """
     """Packet entry method.
@@ -67,10 +98,10 @@ class dumb_l2_switch (EventMixin):
       
   def do_l2_learning(self, con, inport, packet):
     """
-    Dado um pacote, aprende a fonte e pega um switch ou importação.
-    :param con:
-    :param inport: importação.
-    :param packet: Pacote.
+    Dado um pacote, aprenda a fonte e o peg para um switch/inport.
+    :param con: Fonte do pacote.
+    :param inport: Porta de entrada.
+    :param packet: Pacote recebido.
     :return: Sem retorno.
     """
     """Given a packet, learn the source and peg to a switch/inport 
@@ -98,13 +129,14 @@ class dumb_l2_switch (EventMixin):
   
   def forward_l2_packet(self, con, inport, packet, buf, bufid):
     """
-    Se nós aprendemos o destino MAC, cria um fluxo e enviaa apenas fora de sua entrada. Se não, cria e manda o pacote.
-    :param con:
-    :param inport:
-    :param packet:
-    :param buf:
-    :param bufid:
-    :return:
+    Tenta aprender o destino MAC instituído à um fluxo e enviar apenas fora de suas portas de entrada.
+    Se não, usa inundação.
+    :param con: Fonte do pacote.
+    :param inport: Porta de entrada.
+    :param packet: Pacote recebido.
+    :param buf: Tamanho do Buffer.
+    :param bufid: ID do Buffer.
+    :return: Sem retorno.
     """
     """If we've learned the destination MAC set up a flow and
     send only out of its inport.  Else, flood.
