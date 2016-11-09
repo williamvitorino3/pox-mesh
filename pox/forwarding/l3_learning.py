@@ -102,7 +102,7 @@ class l3_switch (EventMixin):
   def _handle_PacketIn (self, event):
     """
     Gerencia os pacotes de entrada.
-    :param event:
+    :param event:  Evento relacionado à chamada da função.
     :return: Sem retorno.
     """
     dpid = event.connection.dpid
