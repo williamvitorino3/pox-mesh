@@ -17,8 +17,12 @@
 # along with POX.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+Esta é uma porta do componente DNSpy do NOX.
+"""
+"""
 This is a port of NOX's DNSSpy component.
 """
+
 
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
@@ -34,6 +38,11 @@ class DNSSpy (EventMixin):
     self.listenTo(core.openflow)
 
   def _handle_ConnectionUp (self, event):
+    """
+    Gerência os eventos deconexão.
+    :param event: Evento relacionado à chamada da função.
+    :return: Sem retorno.
+    """
     msg = of.ofp_flow_mod()
     msg.match = of.ofp_match()
     msg.match.dl_type = ethernet.IP_TYPE
@@ -43,6 +52,11 @@ class DNSSpy (EventMixin):
     event.connection.send(msg)
 
   def _handle_PacketIn (self, event):
+    """
+    Gerência os eventos de entrada de pacotes.
+    :param event: Evento relacionado à chamada da função.
+    :return: Sem retorno.
+    """
     p = event.parse().find('dns')
     if p is not None:
       log.debug(p)
@@ -64,4 +78,8 @@ class DNSSpy (EventMixin):
 
 
 def launch ():
+  """
+  Inicia o DNSSpy.
+  :return: Sem retorno.
+  """
   core.registerNew(DNSSpy)
