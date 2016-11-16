@@ -177,7 +177,7 @@ def _handle_ConnectionUp (event):
       _prev[con.dpid][p.port_no] = False
       pm = of.ofp_port_mod(port_no=p.port_no,
                           hw_addr=p.hw_addr,
-                          config = of.OFPPC_NO_FLOOD, "OFPPC_NO_FLOOD: Não inclua essa porta ao inundando"
+                          config = of.OFPPC_NO_FLOOD, #OFPPC_NO_FLOOD: Não inclua essa porta ao inundando.
                           mask = of.OFPPC_NO_FLOOD)
       con.send(pm)
     _invalidate_ports(con.dpid)
@@ -234,8 +234,8 @@ def _update_tree (force_dpid = None):
     change_count = 0
     for sw, ports in tree.iteritems():
       con = core.openflow.getConnection(sw)
-      if con is None: continue "Deve ter desligado"
-      if con.connect_time is None: continue "Não está completamente conectado"
+      if con is None: continue #Deve ter desligado
+      if con.connect_time is None: continue #Não está completamente conectado
 
       if _hold_down:
         "Muito jovem - devemos mantenha mudanças ."
@@ -309,7 +309,7 @@ def _invalidate_ports (dpid):
   if dpid in _dirty_switches:
     # We're already planning to check
     return
-  t = Timer(_coalesce_period, _check_ports, args=(dpid,)) "coalesce: aderir"
+  t = Timer(_coalesce_period, _check_ports, args=(dpid,)) # coalesce: aderir
   _dirty_switches[dpid] = t
 
 "Envia um pedido de recursos para o DPID dadas"
@@ -344,5 +344,5 @@ def launch (no_flood = False, hold_down = False):
   def start_spanning_tree ():
     core.openflow.addListenerByName("ConnectionUp", _handle_ConnectionUp)
     core.openflow_discovery.addListenerByName("LinkEvent", _handle_LinkEvent)
-    log.debug("Spanning tree component ready") "Os componentes da árvore de expansão estão prontos"
-  core.call_when_ready(start_spanning_tree, "openflow_discovery") "openflow descoberto"
+    log.debug("Spanning tree component ready") #Os componentes da árvore de expansão estão prontos
+  core.call_when_ready(start_spanning_tree, "openflow_discovery") # openflow descoberto
