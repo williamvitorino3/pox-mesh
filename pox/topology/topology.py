@@ -13,6 +13,13 @@
 # limitations under the License.
 
 """
+O módulo de topologia é a raiz de um modelo de objeto composto por
+entidades como switches, hosts, ligações, etc. Esse modelo de objeto
+é preenchido por outros módulos. Por exemplo, o openflow.topology
+preenche o objeto de topologia com switches OpenFlow.
+"""
+
+"""
 The Topology module is the root of an object model composed of entities
 like switches, hosts, links, etc.  This object model is populated by other
 modules.  For example, openflow.topology populates the topology object

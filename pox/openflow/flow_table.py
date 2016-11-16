@@ -63,8 +63,8 @@ class TableEntry (object):
     self.actions = actions
     self.buffer_id = buffer_id
 
- "Retornar um método estático para a função ."
- "Componentes de uma entrada da tabela de fluxo"
+  "Retornar um método estático para a função ."
+  "Componentes de uma entrada da tabela de fluxo"
   @staticmethod 
   def from_flow_mod (flow_mod):
     return TableEntry(priority=flow_mod.priority, 
@@ -112,20 +112,20 @@ class TableEntry (object):
     else:
       return port_matches and match.matches_with_wildcards(self.match)
 
-  "Atualiza informações desta entrada com base em encontrar um pacote." 
-   "Atualizações ambos os cumulativos dadas contagens de bytes de pacotes encontrados e o temporizador de validade."
+    "Atualiza informações desta entrada com base em encontrar um pacote."
+    "Atualizações ambos os cumulativos dadas contagens de bytes de pacotes encontrados e o temporizador de validade."
     def touch_packet (self, byte_count, now=None):
-    """
-    Updates information of this entry based on encountering a packet.
+      """
+      Updates information of this entry based on encountering a packet.
 
-    Updates both the cumulative given byte counts of packets encountered and
-    the expiration timer.
-    """
-    
-    if now is None: now = time.time()
-    self.byte_count += byte_count
-    self.packet_count += 1
-    self.last_touched = now
+      Updates both the cumulative given byte counts of packets encountered and
+      the expiration timer.
+      """
+
+      if now is None: now = time.time()
+      self.byte_count += byte_count
+      self.packet_count += 1
+      self.last_touched = now
 
   def is_idle_timed_out (self, now=None):
     if now is None: now = time.time()
@@ -141,7 +141,7 @@ class TableEntry (object):
         return True
     return False
 
-   "Testa se esta entrada de fluxo é expirado devido ao seu tempo limite de ociosidade ou disco."
+  "Testa se esta entrada de fluxo é expirado devido ao seu tempo limite de ociosidade ou disco."
   def is_expired (self, now=None):
     """
     Tests whether this flow entry is expired due to its idle or hard timeout
@@ -183,7 +183,7 @@ class TableEntry (object):
                           actions=self.actions)
 
  
-"TODO : Renomear flow_stats para to_flow_stats e refatorar "
+  "TODO : Renomear flow_stats para to_flow_stats e refatorar "
   def to_flow_removed (self, now=None, reason=None):
     #TODO: Rename flow_stats to to_flow_stats and refactor?
     if now is None: now = time.time()
@@ -202,8 +202,8 @@ class TableEntry (object):
     return fr
 
 "Razão para modificação."
- "Atualmente, este é usado apenas para o afastamento e seja um dos OFPRR_x ,"
-  "Ou Nenhum se não se correlacionam com qualquer um dos itens da especificação ."
+"Atualmente, este é usado apenas para o afastamento e seja um dos OFPRR_x ,"" \
+""Ou Nenhum se não se correlacionam com qualquer um dos itens da especificação ."
 
 class FlowTableModification (Event):
   def __init__ (self, added=[], removed=[], reason=None):
@@ -218,8 +218,8 @@ class FlowTableModification (Event):
 
 "modelo geral de uma tabela de fluxo."
 
-  "Mantém uma lista ordenada das entradas de fluxos , e encontra entradas correspondentes para"
-  "pacotes e outras entradas . Suporta expiração de fluxos ."
+"Mantém uma lista ordenada das entradas de fluxos , e encontra entradas correspondentes para"
+"pacotes e outras entradas . Suporta expiração de fluxos ."
 
 class FlowTable (EventMixin):
   """
@@ -250,7 +250,7 @@ class FlowTable (EventMixin):
     return len(self._table)
 
   def add_entry (self, entry):
-  	"asset: Ajuda a encontrar erros mais facilmente"
+    "asset: Ajuda a encontrar erros mais facilmente"
     assert isinstance(entry, TableEntry)
 
     "Use a pesquisa binária para inserir no lugar correto"
@@ -284,7 +284,7 @@ class FlowTable (EventMixin):
     self.raiseEvent(FlowTableModification(removed=[entry], reason=reason))
 
   def matching_entries (self, match, priority=0, strict=False, out_port=None):
-  	"Lambda: lambdaé apenas uma maneira elegante de dizer function"
+    "Lambda: lambdaé apenas uma maneira elegante de dizer function"
     entry_match = lambda e: e.is_matched_by(match, priority, strict, out_port)
     return [ entry for entry in self._table if entry_match(entry) ]
 
@@ -342,10 +342,9 @@ class FlowTable (EventMixin):
     self._remove_specific_entries(remove_flows, reason=reason)
     return remove_flows
 
-   "Localiza a tabela de entrada de fluxo que corresponde ao pacote de dados ."
-
-    "Retorna o maior tabela de entrada de fluxo de prioridade que corresponde ao pacote de dados"
-   " na in_port dado, ou Nenhum se nenhuma entrada correspondente for encontrada ."
+  "Localiza a tabela de entrada de fluxo que corresponde ao pacote de dados ."
+  "Retorna o maior tabela de entrada de fluxo de prioridade que corresponde ao pacote de dados"
+  " na in_port dado, ou Nenhum se nenhuma entrada correspondente for encontrada ."
   def entry_for_packet (self, packet, in_port):
     """
     Finds the flow table entry that matches the given packet.
@@ -356,22 +355,20 @@ class FlowTable (EventMixin):
     packet_match = ofp_match.from_packet(packet, in_port, spec_frags = True)
 
     for entry in self._table:
-      if entry.match.matches_with_wildcards(packet_match,
-                                            consider_other_wildcards=False):
+      if entry.match.matches_with_wildcards(packet_match,consider_other_wildcards=False):
         return entry
-
     return None
 
-   "Testa se a entrada de entrada sobreponha a outra entrada nesta tabela ."
+  "Testa se a entrada de entrada sobreponha a outra entrada nesta tabela ."
 
-    "Retorna true se há uma sobreposição , caso contrário false . Uma vez que a tabela está"
-    "classificados , existe apenas a necessidade de verificar uma certa porção do mesmo."
-    "#NOTA : Assume que as entradas são classificadas segundo a diminuir effective_priority"
-    "#NOTA : Ambíguo se a correspondência deve ser baseada em effective_priority"
-    "# Ou a prioridade regular. Fazê-lo com base em effective_priority"
-    "# Uma vez que é o que realmente afeta a correspondência de pacotes."
-    "#NOTA : Poderíamos melhorar o desempenho , fazendo uma pesquisa binária para encontrar o"
-    "# entradas direito de prioridade ."
+  "Retorna true se há uma sobreposição , caso contrário false . Uma vez que a tabela está"
+  "classificados , existe apenas a necessidade de verificar uma certa porção do mesmo."
+  "#NOTA : Assume que as entradas são classificadas segundo a diminuir effective_priority"
+  "#NOTA : Ambíguo se a correspondência deve ser baseada em effective_priority"
+  "# Ou a prioridade regular. Fazê-lo com base em effective_priority"
+  "# Uma vez que é o que realmente afeta a correspondência de pacotes."
+  "#NOTA : Poderíamos melhorar o desempenho , fazendo uma pesquisa binária para encontrar o"
+  "# entradas direito de prioridade ."
   def check_for_overlapping_entry (self, in_entry):
     """
     Tests if the input entry overlaps with another entry in this table.
