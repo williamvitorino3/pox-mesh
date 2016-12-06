@@ -17,6 +17,9 @@ O módulo de topologia é a raiz de um modelo de objeto composto por
 entidades como switches, hosts, ligações, etc. Esse modelo de objeto
 é preenchido por outros módulos. Por exemplo, o openflow.topology
 preenche o objeto de topologia com switches OpenFlow.
+
+Note que isso significa que muitas vezes você deseja invocar algo como:
+  $ ./pox.py topology openflow.discovery openflow.topology
 """
 
 """
@@ -44,6 +47,16 @@ class EntityEvent (Event):
 
 class EntityJoin (EntityEvent):
   """
+  Foi adicionada uma entidade.
+
+  Observe que, se houver um evento de associação mais específico definido
+  para uma entidade específica (por exemplo, Alternar a associação), este
+  evento não será acionado.
+
+  FAZER: ou nós poderíamos sempre levantar Entity Joins juntamente com Switch Joins,
+  o que parece mais intuitivo para mim.
+  """
+  """
   An entity has been added.
 
   Note that if there is a more specific join event defined for a particular
@@ -55,6 +68,17 @@ class EntityJoin (EntityEvent):
   pass
 
 class EntityLeave (EntityEvent):
+  """
+  Foi removida uma entidade.
+
+  Observe que, se houver um evento de associação mais específico definido
+  para uma entidade específica (por exemplo, Alternar a associação), este
+  evento não será acionado.
+
+  PARA FAZER: ou nós poderíamos sempre levantar Folhas de Entidade(EntityLeaves)
+  juntamente com Folhas de Comutação(SwitchesLeaves), o que parece mais
+  intuitivo para mim.
+  """
   """
   An entity has been removed
 
@@ -70,6 +94,10 @@ class SwitchEvent (EntityEvent): pass
 
 class SwitchJoin (SwitchEvent):
   """
+  Ao contrário de ConnectionUp, SwitchJoin ocorre em escalas de tempo
+  grandes (por exemplo, um administrador movendo fisicamente um switch).
+  """
+  """
   As opposed to ConnectionUp, SwitchJoin occurs over large time scales
   (e.g. an administrator physically moving a switch).
   """
@@ -79,12 +107,19 @@ class SwitchJoin (SwitchEvent):
 
 class SwitchLeave (SwitchEvent):
   """
+  Ao contrário de ConnectionDown, SwitchJoin ocorre em escalas de tempo
+  grandes (por exemplo, um administrador movendo fisicamente um switch).
+  """
+  """
   As opposed to ConnectionDown, SwitchLeave occurs over large time scales
   (e.g. an administrator physically moving a switch).
   """
   pass
 
 class SwitchConnectionUp(SwitchEvent):
+  """
+  Representa um lançamento de conexão uma nova conexão wm um switch.
+  """
   def __init__(self, switch, connection):
     SwitchEvent.__init__(self, switch)
     self.switch = switch
@@ -98,13 +133,23 @@ class HostLeave (HostEvent): pass
 
 class Update (Event):
   """
-  Fired by Topology whenever anything has changed
+  Chamado por topologia sempre que algo muda.
   """
   def __init__ (self, event=None):
     Event.__init__(self)
     self.event = event
 
 class Entity (object):
+  """
+  Observe que a classe Entity é intencionalmente simples; Ele só serve
+  como um tipo conveniente SuperClass.
+
+  Cabe às subclasses implementar funcionalidade específica (p.
+  Funcionalidade de comutador OpenFlow1.0). O objetivo desta decisão de
+  design é impedir que detalhes específicos do protocolo sejam divulgados
+  neste módulo... Mas esta decisão de design / não / implica que pox.topology
+  serve para definir uma interface genérica para tipos de entidade abstrata.
+  """
   """
   Note that the Entity class is intentionally simple; It only serves as a
   convenient SuperClass type.
@@ -148,6 +193,9 @@ class Entity (object):
 
 class Host (Entity):
   """
+  Entidade genérica de Host.
+  """
+  """
   A generic Host entity.
   """
   def __init__(self,id=None):
@@ -155,8 +203,12 @@ class Host (Entity):
 
 class Switch (Entity):
   """
+  Subclasse por classes de comutação específicas do protocolo,
+  por exemplo. Pox.openflow.topology.OpenFlowSwitch.
+  """
+  """
   Subclassed by protocol-specific switch classes,
-  e.g. pox.openflow.topology.OpenFlowSwitch
+  e.g. pox.openflow.topology.OpenFlowSwitch;
   """
   def __init__(self, id=None):
     # Switches often have something more meaningful to use as an ID
@@ -164,6 +216,9 @@ class Switch (Entity):
     Entity.__init__(self, id)
 
 class Port (Entity):
+  """
+  Representação da porta de um Switch.
+  """
   def __init__ (self, num, hwAddr, name):
     Entity.__init__(self)
     self.number = num
@@ -171,6 +226,9 @@ class Port (Entity):
     self.name = name
 
 class Controller (Entity):
+  """
+  Representação de um controlador.
+  """
   def __init__(self, name, handshake_complete=False):
     self.id = name
     # TODO: python aliases?
@@ -181,6 +239,11 @@ class Controller (Entity):
     self.handshake_complete = True
 
 class Topology (EventMixin):
+  """
+  Classe que implemente a Topologia.
+  """
+
+  # Lista de eventos.
   _eventMixin_events = [
     SwitchJoin,
     SwitchLeave,
@@ -209,6 +272,13 @@ class Topology (EventMixin):
 
   def getEntityByID (self, ID, fail=False):
     """
+    Gera uma exceção se a falha for True ea entidade não existir
+    Consulte também: A propriedade 'entity'.
+    :param ID: Identificador da entidade.
+    :param fail: Valor da falha.
+    :return: Posição da lista de entidades.
+    """
+    """
     Raises an exception if fail is True and the entity doesn't exist
     See also: The 'entity' property.
     """
@@ -218,6 +288,12 @@ class Topology (EventMixin):
       return self._entities.get(ID, None)
 
   def removeEntity (self, entity):
+    """
+    Remove entidade da lista de entidades.
+
+    :param entity: Entidade à ser removida.
+    :return: Sem retorno.
+    """
     del self._entities[entity.id]
     self.log.info(str(entity) + " left")
     if isinstance(entity, Switch):
@@ -228,6 +304,11 @@ class Topology (EventMixin):
       self.raiseEvent(EntityLeave, entity)
 
   def addEntity (self, entity):
+    """
+    Adiciona entidade na lista de entidades.
+    :param entity: Entidade à ser adicionada.
+    :return: Sem retorno.
+    """
     """ Will raise an exception if entity.id already exists """
     if entity.id in self._entities:
       raise RuntimeError("Entity exists")
@@ -241,6 +322,12 @@ class Topology (EventMixin):
       self.raiseEvent(EntityJoin, entity)
 
   def getEntitiesOfType (self, t=Entity, subtypes=True):
+    """
+    Cria uma Lista de entidades com o tipo correspondente as de 't'.
+    :param t: Entidade à ser utilizada como padrão.
+    :param subtypes: Verificação de sub tipos.
+    :return:  Lista de entidades correspondentes à 't'.
+    """
     if subtypes is False:
       return [x for x in self._entities.itervalues() if type(x) is t]
     else:
@@ -248,6 +335,34 @@ class Topology (EventMixin):
 
   def addListener(self, eventType, handler, once=False, weak=False,
                   priority=None, byName=False):
+    """
+    Interagimos no EventMixin.addListener para verificar se o eventType
+    está na nossa lista de promessas. Em caso afirmativo, ative o
+    manipulador para todos os eventos acionados anteriormente.
+
+    :param eventType: Objeto de classe de evento (por exemplo, ConnectionUp).
+    Se byName for True, deve ser uma string (por exemplo, "ConnectionUp").
+
+    :param handler: Função / método a ser invocado quando o evento é levantado.
+
+    :param once:  Se verdadeiro, este manipulador é removido após a primeira vez que é acionado.
+
+    :param weak:  Se o manipulador for um método no objeto A,
+      então ouvir um evento no objeto B normalmente fará B ter
+      uma referência a A, então A não pode ser liberado até
+      que B seja liberado ou o ouvinte seja removido.
+      Se weak for True, não há relação entre as vidas do editor e do assinante.
+
+    :param priority:  A ordem em que chamar manipuladores de eventos
+      se houver múltiplos para um tipo de evento. Deve provavelmente ser
+      um número inteiro, onde maior significa chamá-lo mais cedo.
+      Não especifique se você não se importa.
+
+    :param byName: Verdadeiro se eventType for um nome de string,
+      senão é uma subclasse Event.
+
+    :return: Tupla contendo o tipo do evento e o ID do evento.
+    """
     """
     We interpose on EventMixin.addListener to check if the eventType is
     in our promise list. If so, trigger the handler for all previously
@@ -260,6 +375,7 @@ class Topology (EventMixin):
                                   weak=weak, priority=priority,
                                   byName=byName)
 
+  # Parei aqui...
   def raiseEvent (self, event, *args, **kw):
     """
     Whenever we raise any event, we also raise an Update, so we extend
