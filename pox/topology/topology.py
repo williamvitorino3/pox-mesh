@@ -375,9 +375,18 @@ class Topology (EventMixin):
                                   weak=weak, priority=priority,
                                   byName=byName)
 
-  # Parei aqui...
-  def raiseEvent (self, event, *args, **kw):
+  def raiseEvent(self, event, *args, **kw):
     """
+    Levanta um evento.
+    :param event: Evento a ser levantado.
+    :param args: Argumentos do evento.
+    :param kw: Argumentos chave.
+    :return: Retorna um Event recem levantado.
+    """
+    """
+    Sempre que levantamos qualquer evento, também levantamos uma atualização,
+    então estendemos a implementação em EventMixin.
+
     Whenever we raise any event, we also raise an Update, so we extend
     the implementation in EventMixin.
     """
@@ -386,7 +395,11 @@ class Topology (EventMixin):
       EventMixin.raiseEvent(self, Update(event))
     return rv
 
-  def serialize (self):
+  def serialize(self):
+    """
+    Escolhe as nossas entidades atuais.
+    :return: Retorna um  hash: { id -> Entidade em conserva }
+    """
     """
     Picklize our current entities.
 
@@ -399,6 +412,14 @@ class Topology (EventMixin):
     return id2entity
 
   def deserializeAndMerge (self, id2entity):
+    """
+    Dada a saída de topology.serialize(), desserializar cada entidade e:
+       - inserir uma nova entrada se ela ainda não existisse aqui, ou
+       - actualizar uma entrada pré-existente se já existisse
+
+    :param id2entity: Hash de entidades.
+    :return: Sem retorno.
+    """
     """
     Given the output of topology.serialize(), deserialize each entity, and:
       - insert a new Entry if it didn't already exist here, or
@@ -422,7 +443,16 @@ class Topology (EventMixin):
         self.addEntity(entity)
 
   def _fulfill_SwitchJoin_promise(self, handler):
-    """ Trigger the SwitchJoin handler for all pre-existing switches """
+    """
+    Cumpre a promessa de SwitchJoin.
+    :param handler: Cabeçalho.
+    :return: Sem retorno.
+    """
+    """
+    Ativar o manipulador SwitchJoin para todos os switches pré-existentes.
+
+    Trigger the SwitchJoin handler for all pre-existing switches.
+    """
     for switch in self.getEntitiesOfType(Switch, True):
       handler(SwitchJoin(switch))
 
