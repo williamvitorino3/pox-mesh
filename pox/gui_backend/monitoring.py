@@ -21,17 +21,24 @@ from pox.lib.revent import *
 import pox.openflow.libopenflow_01 as of
 log = core.getLogger()
 
+
 class Monitoring (EventMixin):
   
   _core_name = "monitoring"  
     
   _wantComponents = set(['guimessenger', 'topology'])
-  def __init__ (self):
+
+  def __init__(self):
     core.listenToDependencies(self, self._wantComponents)
     
     pending_xids = set()
       
   def _handle_guimessenger_MonitoringEvent(self, event):
+    """
+    Manipula as mensagens da Gui sobre os eventos monitorados.
+    :param event: Evento monitorado.
+    :return: Sem retorno.
+    """
     #if event.xid in pending_gui_requests:
     print event.__dict__
     if "dpid" in event.msg:
@@ -53,7 +60,12 @@ class Monitoring (EventMixin):
       else:
         log.debug("Got unknown command from GUI")
       #self.connection.send(msg)
-    
-def launch ():
+
+
+def launch():
+  """
+  Lança o componente.
+  :return: Sem retorno.
+  """
   if not core.hasComponent("monitoring"):
       core.registerNew(Monitoring)

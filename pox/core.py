@@ -426,7 +426,7 @@ class POXCore (EventMixin):
     
   def listenToDependencies(self, sink, components):
     """
-    Verifica o registro e os ouvir eventos dessas dependências.
+    Verifica o registro e ouve os eventos dessas dependências.
     :param sink:  o componente de espera em dependências.
     :param components:  uma lista de nomes de componentes dependentes.
     :return:  Retorna se todos os componentes desejados são registrados.
