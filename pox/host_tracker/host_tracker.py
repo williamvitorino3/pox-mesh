@@ -65,252 +65,329 @@ timeoutSec = dict(
 # --pingLim=2
 
 class Alive (object):
-  """ Holds liveliness information for MAC and IP entries
-  """
-  def __init__ (self, livelinessInterval=timeoutSec['arpAware']):
-    self.lastTimeSeen = time.time()
-    self.interval=livelinessInterval
-  
-  def expired (self):
-    return time.time() > self.lastTimeSeen + self.interval
+    """
+    Contém informações de animação para entradas MAC e IP
 
-  def refresh (self):
-    self.lastTimeSeen = time.time()
+    Holds liveliness information for MAC and IP entries
+    """
+    def __init__(self, livelinessInterval=timeoutSec['arpAware']):
+        self.lastTimeSeen = time.time()
+        self.interval = livelinessInterval
+  
+    def expired(self):
+        """
+        Verifica se o tempo de tratamento do pacote expirou.
+        :return: Valor booleano.
+        """
+        return time.time() > self.lastTimeSeen + self.interval
+
+    def refresh(self):
+        """
+        Atualiza o tempo de tratamento.
+        :return: Sem retorno.
+        """
+        self.lastTimeSeen = time.time()
 
 
 class PingCtrl (Alive):
-  """ Holds information for handling ARP pings for hosts
-  """
-  # Number of ARP ping attemps before deciding it failed
-  pingLim=3
+    """
+    Mantém informações para manipulação de pings ARP para hosts
 
-  def __init__ (self):
-    Alive.__init__(self, timeoutSec['arpReply'])
-    self.pending = 0
+    Holds information for handling ARP pings for hosts
+    """
+    # Number of ARP ping attemps before deciding it failed
+    pingLim = 3
 
-  def sent (self):
-    self.refresh()
-    self.pending += 1
+    def __init__ (self):
+        Alive.__init__(self, timeoutSec['arpReply'])
+        self.pending = 0
 
-  def failed (self):
-    return self.pending > PingCtrl.pingLim
+    def sent(self):
+        """
+        Atualiza o tempo e incrementa o pending.
+        :return: Sem retorno.
+        """
+        self.refresh()
+        self.pending += 1
 
-  def received (self):
-    # Clear any pending timeouts related to ARP pings
-    self.pending = 0
+    def failed(self):
+        """
+        Verifica se o "pending" utrapassou o ping limite.
+        :return: Valor booleano.
+        """
+        return self.pending > PingCtrl.pingLim
+
+    def received(self):
+        """
+        Limpa quaisquer tempos limite pendentes relacionados a pings ARP.
+        :return: Sem retorno.
+        """
+        # Clear any pending timeouts related to ARP pings
+        self.pending = 0
 
 
 class IpEntry (Alive):
-  """
-  This entry keeps track of IP addresses seen from each MAC entry and will
-  be kept in the macEntry object's ipAddrs dictionary. At least for now,
-  there is no need to refer to the original macEntry as the code is organized.
-  """
-  def __init__ (self, hasARP):
-    if hasARP:
-      Alive.__init__(self,timeoutSec['arpAware'])
-    else:
-      Alive.__init__(self,timeoutSec['arpSilent'])
-    self.hasARP = hasARP
-    self.pings = PingCtrl()
+    """
+    Essa entrada mantém um registro dos endereços IP vistos de cada entrada MAC
+    e será mantida no dicionário ipAddrs do objeto macEntry.
+    Pelo menos por enquanto,não há necessidade de se referir
+    ao macEntry original como o código é organizado.
 
-  def setHasARP (self):
-    if not self.hasARP:
-      self.hasARP = True
-      self.interval = timeoutSec['arpAware']
+    This entry keeps track of IP addresses seen from each MAC entry and will
+    be kept in the macEntry object's ipAddrs dictionary. At least for now,
+    there is no need to refer to the original macEntry as the code is organized.
+    """
+    def __init__(self, hasARP):
+        if hasARP:
+            Alive.__init__(self, timeoutSec['arpAware'])
+        else:
+            Alive.__init__(self, timeoutSec['arpSilent'])
+        self.hasARP = hasARP
+        self.pings = PingCtrl()
+
+    def setHasARP (self):
+        """
+        Define o objeto atual como um componente ARP.
+        :return: Sem retorno.
+        """
+        if not self.hasARP:
+            self.hasARP = True
+            self.interval = timeoutSec['arpAware']
 
 
 class MacEntry (Alive):
-  """
-  Not strictly an ARP entry.
-  When it gets moved to Topology, may include other host info, like
-  services, and it may replace dpid by a general switch object reference
-  We use the port to determine which port to forward traffic out of.
-  """
-  def __init__ (self, dpid, port, macaddr):
-    Alive.__init__(self)
-    self.dpid = dpid
-    self.port = port
-    self.macaddr = macaddr
-    self.ipAddrs = {}
-
-  def __str__(self):
-    return string.join([str(self.dpid), str(self.port), str(self.macaddr)],' ')
-
-  def __eq__ (self, other):
-    if type(other) == type(None):
-      return type(self) == type(None)
-    elif type(other) == tuple:
-      return (self.dpid,self.port,self.macaddr)==other
-    else:
-      return (self.dpid,self.port,self.macaddr)     \
-             ==(other.dpid,other.port,other.macaddr)
-
-  def __ne__ (self, other):
-    return not self.__eq__(other)
-
-
-class host_tracker (EventMixin):
-  def __init__ (self):
-    
-    # The following tables should go to Topology later
-    self.entryByMAC = {}
-    self._t = Timer(timeoutSec['timerInterval'],
-                   self._check_timeouts, recurring=True)
-    self.listenTo(core)
-    log.info("host_tracker ready")
-
-  # The following two functions should go to Topology also
-  def getMacEntry(self, macaddr):
-    try:
-      result = self.entryByMAC[macaddr]
-    except KeyError as e:
-      result = None
-    return result
-
-  def sendPing(self, macEntry, ipAddr):
-    r = arp() # Builds an "ETH/IP any-to-any ARP packet
-    r.opcode = arp.REQUEST
-    r.hwdst = macEntry.macaddr
-    r.protodst = ipAddr
-    # src is ETHER_ANY, IP_ANY
-    e = ethernet(type=ethernet.ARP_TYPE, src=r.hwsrc, dst=r.hwdst)
-    e.set_payload(r)
-    log.debug("%i %i sending ARP REQ to %s %s",
-            macEntry.dpid, macEntry.port, str(r.hwdst), str(r.protodst))
-    msg = of.ofp_packet_out(data = e.pack(),
-                           action = of.ofp_action_output(port = macEntry.port))
-    if core.openflow.sendToDPID(macEntry.dpid, msg.pack()):
-      ipEntry = macEntry.ipAddrs[ipAddr]
-      ipEntry.pings.sent()
-    else:
-      # macEntry is stale, remove it.
-      log.debug("%i %i ERROR sending ARP REQ to %s %s",
-                macEntry.dpid, macEntry.port, str(r.hwdst), str(r.protodst))
-      del macEntry.ipAddrs[ipAddr]
-    return
-
-  def getSrcIPandARP(self, packet):
     """
-    This auxiliary function returns the source IPv4 address for packets that
-    have one (IPv4, ARPv4). Returns None otherwise.
+    Não é estritamente uma entrada ARP.
+    Quando ele é movido para a topologia, pode incluir outras informações
+    de host, como serviços, e ele pode substituir dpid por uma referência
+    de objeto de alternância geral Nós usamos a porta para determinar qual
+    porta para encaminhar tráfego fora de.
+
+    Not strictly an ARP entry.
+    When it gets moved to Topology, may include other host info, like
+    services, and it may replace dpid by a general switch object reference
+    We use the port to determine which port to forward traffic out of.
     """
-    if isinstance(packet, ipv4):
-      log.debug("IP %s => %s",str(packet.srcip),str(packet.dstip))
-      return ( packet.srcip, False )
-    elif isinstance(packet, arp):
-      log.debug("ARP %s %s => %s", 
-               {arp.REQUEST:"request",arp.REPLY:"reply"}.get(packet.opcode,
-                   'op:%i' % (packet.opcode,)),
-               str(packet.protosrc), str(packet.protodst))
-      if packet.hwtype == arp.HW_TYPE_ETHERNET and \
-         packet.prototype == arp.PROTO_TYPE_IP and \
-         packet.protosrc != 0:
-        return ( packet.protosrc, True )
+    def __init__ (self, dpid, port, macaddr):
+        Alive.__init__(self)
+        self.dpid = dpid
+        self.port = port
+        self.macaddr = macaddr
+        self.ipAddrs = {}
 
-    return ( None, False )
+    def __str__(self):
+        return string.join([str(self.dpid), str(self.port), str(self.macaddr)],' ')
 
-  def updateIPInfo(self, pckt_srcip, macEntry, hasARP):
-    """ If there is IP info in the incoming packet, update the macEntry
-    accordingly. In the past we assumed a 1:1 mapping between MAC and IP
-    addresses, but removed that restriction later to accomodate cases 
-    like virtual interfaces (1:n) and distributed packet rewriting (n:1)
-    """
-    if pckt_srcip in macEntry.ipAddrs:
-      # that entry already has that IP
-      ipEntry = macEntry.ipAddrs[pckt_srcip]
-      ipEntry.refresh()
-      log.debug("%s already has IP %s, refreshing",
-              str(macEntry), str(pckt_srcip) )
-    else:
-      # new mapping
-      ipEntry = IpEntry(hasARP)
-      macEntry.ipAddrs[pckt_srcip] = ipEntry
-      log.info("Learned %s got IP %s", str(macEntry), str(pckt_srcip) )
-    if hasARP:
-      ipEntry.pings.received()
+    def __eq__(self, other):
+        if isinstance(other, None):
+            return type(self) == type(None)
+        elif isinstance(other, tuple):
+            return (self.dpid, self.port, self.macaddr) == other
+        else:
+            return (self.dpid, self.port, self.macaddr) == (other.dpid, other.port, other.macaddr)
 
-  def _handle_GoingUpEvent (self, event):
-    self.listenTo(core.openflow)
-    log.debug("Up...")
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
-  def _handle_PacketIn (self, event):
-    """
-    Populate MAC and IP tables based on incoming packets.
-    Handles only packets from ports identified as not switch-only.
-    If a MAC was not seen before, insert it in the MAC table;
-    otherwise, update table and enry.
-    If packet has a source IP, update that info for the macEntry (may require
-    removing the info from antoher entry previously with that IP address).
-    It does not forward any packets, just extract info from them.
-    """
-    dpid = event.connection.dpid
-    inport = event.port
-    packet = event.parse()
-    if not packet.parsed:
-      log.warning("%i %i ignoring unparsed packet", dpid, inport)
-      return
 
-    if packet.type == ethernet.LLDP_TYPE:    # Ignore LLDP packets
-      return
-    # This should use Topology later 
-    if core.openflow_discovery.isSwitchOnlyPort(dpid, inport):
-      # No host should be right behind a switch-only port
-      log.debug("%i %i ignoring packetIn at switch-only port", dpid, inport)
-      return
+class host_tracker(EventMixin):
 
-    log.debug("PacketIn: %i %i ETH %s => %s",
-            dpid, inport, str(packet.src), str(packet.dst))
+    def __init__ (self):
+        # The following tables should go to Topology later
+        self.entryByMAC = {}
+        self._t = Timer(timeoutSec['timerInterval'], self._check_timeouts, recurring=True)
+        self.listenTo(core)
+        log.info("host_tracker ready")
 
-    # Learn or update dpid/port/MAC info
-    macEntry = self.getMacEntry(packet.src)
-    if macEntry == None:
-      # there is no known host by that MAC
-      # should we raise a NewHostFound event (at the end)?
-      macEntry = MacEntry(dpid,inport,packet.src)
-      self.entryByMAC[packet.src] = macEntry
-      log.info("Learned %s", str(macEntry))
-    elif macEntry != (dpid, inport, packet.src):    
-      # there is already an entry of host with that MAC, but host has moved
-      # should we raise a HostMoved event (at the end)?
-      log.info("Learned %s moved to %i %i", str(macEntry), dpid, inport)
-      # if there has not been long since heard from it...
-      if time.time() - macEntry.lastTimeSeen < timeoutSec['entryMove']:
-        log.warning("Possible duplicate: %s at time %i, now (%i %i), time %i",
-                    str(macEntry), macEntry.lastTimeSeen(),
-                    dpid, inport, time.time())
-      # should we create a whole new entry, or keep the previous host info?
-      # for now, we keep it: IP info, answers pings, etc.
-      macEntry.dpid = dpid
-      macEntry.inport = inport
+    # The following two functions should go to Topology also
+    def getMacEntry(self, macaddr):
+        """
+        Pega as entradas de um certo endereço Mac.
+        :param macaddr: Endereço mac que terá as entradas solicitadas.
+        :return: Objeto de entrada correspondente ao endereço mac passado.
+        """
+        try:
+            result = self.entryByMAC[macaddr]
+        except KeyError as e:
+            result = None
+        return result
 
-    macEntry.refresh()
-
-    (pckt_srcip, hasARP) = self.getSrcIPandARP(packet.next)
-    if pckt_srcip != None:
-      self.updateIPInfo(pckt_srcip,macEntry,hasARP)
-
-    return
-
-  def _check_timeouts(self):
-    for macEntry in self.entryByMAC.values():
-      entryPinged = False
-      for ip_addr, ipEntry in macEntry.ipAddrs.items():
-        if ipEntry.expired():
-          if ipEntry.pings.failed():
-            del macEntry.ipAddrs[ip_addr]
-            log.info("Entry %s: IP address %s expired",
-                    str(macEntry), str(ip_addr) )
-          else: 
-            self.sendPing(macEntry,ip_addr)
+    def sendPing(self, macEntry, ipAddr):
+        """
+        Mostra os logs de ping do endereço solicitado.
+        :param macEntry: Entrada Mac.
+        :param ipAddr: Endereço IP.
+        :return: Sem retorno.
+        """
+        r = arp() # Builds an "ETH/IP any-to-any ARP packet
+        r.opcode = arp.REQUEST
+        r.hwdst = macEntry.macaddr
+        r.protodst = ipAddr
+        # src is ETHER_ANY, IP_ANY
+        e = ethernet(type=ethernet.ARP_TYPE, src=r.hwsrc, dst=r.hwdst)
+        e.set_payload(r)
+        log.debug("%i %i sending ARP REQ to %s %s", macEntry.dpid, macEntry.port, str(r.hwdst), str(r.protodst))
+        msg = of.ofp_packet_out(data = e.pack(), action = of.ofp_action_output(port = macEntry.port))
+        if core.openflow.sendToDPID(macEntry.dpid, msg.pack()):
+            ipEntry = macEntry.ipAddrs[ipAddr]
             ipEntry.pings.sent()
-            entryPinged = True
-      if macEntry.expired() and not entryPinged:
-        log.info("Entry %s expired", str(macEntry))
-        # sanity check: there should be no IP addresses left
-        if len(macEntry.ipAddrs) > 0:
-          for ip in macEntry.ipAddrs.keys():
-            log.warning("Entry %s expired but still had IP address %s",
-                        str(macEntry), str(ip_addr) )
-            del macEntry.ipAddrs[ip_addr]
-        del self.entryByMAC[macEntry.macaddr]
+        else:
+            # macEntry is stale, remove it.
+            log.debug("%i %i ERROR sending ARP REQ to %s %s",
+                      macEntry.dpid, macEntry.port, str(r.hwdst), str(r.protodst))
+            del macEntry.ipAddrs[ipAddr]
+        return
+
+    def getSrcIPandARP(self, packet):
+        """
+        Procura o endereço IPv4 do pacote.
+        :param packet: Pacote à ser verificado.
+        :return: Retorna o endereço IPv4 para pacotes que possuem um (IPv4, ARPv4). Retorna None caso contrário.
+        """
+        """
+        This auxiliary function returns the source IPv4 address for packets that
+        have one (IPv4, ARPv4). Returns None otherwise.
+        """
+        if isinstance(packet, ipv4):
+            log.debug("IP %s => %s",str(packet.srcip),str(packet.dstip))
+            return packet.srcip, False
+        elif isinstance(packet, arp):
+            log.debug("ARP %s %s => %s",
+                   {arp.REQUEST:"request",arp.REPLY:"reply"}.get(packet.opcode,
+                       'op:%i' % (packet.opcode,)),
+                   str(packet.protosrc), str(packet.protodst))
+        if packet.hwtype == arp.HW_TYPE_ETHERNET and packet.prototype == arp.PROTO_TYPE_IP and packet.protosrc != 0:
+            return packet.protosrc, True
+
+        return None, False
+
+    def updateIPInfo(self, pckt_srcip, macEntry, hasARP):
+        """
+        Atualiza as informações do pacote de acordo com as entradas do MAC.
+        :param pckt_srcip: Caminho do pacote pelo IP.
+        :param macEntry: Entradas do endereço Mac.
+        :param hasARP: Informa se o pacote esta na tabela ARP.
+        :return: Sem retorno.
+        """
+
+        """
+        Se houver informações de IP no pacote de entrada, atualize o macEntry
+        adequadamente. No passado, assumimos um mapeamento 1: 1 entre endereços
+        MAC e IP, mas removemos essa restrição posteriormente para acomodar casos
+        como interfaces virtuais (1: n) e reescrita de pacotes distribuídos (n: 1)
+
+        If there is IP info in the incoming packet, update the macEntry
+        accordingly. In the past we assumed a 1:1 mapping between MAC and IP
+        addresses, but removed that restriction later to accomodate cases
+        like virtual interfaces (1:n) and distributed packet rewriting (n:1)
+        """
+        if pckt_srcip in macEntry.ipAddrs:
+            # that entry already has that IP
+            ipEntry = macEntry.ipAddrs[pckt_srcip]
+            ipEntry.refresh()
+            log.debug("%s already has IP %s, refreshing",
+                  str(macEntry), str(pckt_srcip) )
+        else:
+            # new mapping
+            ipEntry = IpEntry(hasARP)
+            macEntry.ipAddrs[pckt_srcip] = ipEntry
+            log.info("Learned %s got IP %s", str(macEntry), str(pckt_srcip) )
+        if hasARP:
+            ipEntry.pings.received()
+
+    def _handle_GoingUpEvent (self, event):
+        """
+        Lista eventos de "Up".
+        :param event: Evento que chama este método.
+        :return: Sem retorno.
+        """
+        self.listenTo(core.openflow)
+        log.debug("Up...")
+
+    def _handle_PacketIn (self, event):
+        """
+        Gerencia os pacotes de entrada.
+        :param event: Evento que chama este método.
+        :return: Sem retorno.
+        """
+        """
+        Populate MAC and IP tables based on incoming packets.
+        Handles only packets from ports identified as not switch-only.
+        If a MAC was not seen before, insert it in the MAC table;
+        otherwise, update table and enry.
+        If packet has a source IP, update that info for the macEntry (may require
+        removing the info from antoher entry previously with that IP address).
+        It does not forward any packets, just extract info from them.
+        """
+        dpid = event.connection.dpid
+        inport = event.port
+        packet = event.parse()
+        if not packet.parsed:
+            log.warning("%i %i ignoring unparsed packet", dpid, inport)
+            return
+
+        if packet.type == ethernet.LLDP_TYPE:    # Ignore LLDP packets
+            return
+        # This should use Topology later
+        if core.openflow_discovery.isSwitchOnlyPort(dpid, inport):
+            # No host should be right behind a switch-only port
+            log.debug("%i %i ignoring packetIn at switch-only port", dpid, inport)
+            return
+
+        log.debug("PacketIn: %i %i ETH %s => %s", dpid, inport, str(packet.src), str(packet.dst))
+
+        # Learn or update dpid/port/MAC info
+        macEntry = self.getMacEntry(packet.src)
+        if macEntry == None:
+            # there is no known host by that MAC
+            # should we raise a NewHostFound event (at the end)?
+            macEntry = MacEntry(dpid,inport,packet.src)
+            self.entryByMAC[packet.src] = macEntry
+            log.info("Learned %s", str(macEntry))
+        elif macEntry != (dpid, inport, packet.src):
+            # there is already an entry of host with that MAC, but host has moved
+            # should we raise a HostMoved event (at the end)?
+            log.info("Learned %s moved to %i %i", str(macEntry), dpid, inport)
+            # if there has not been long since heard from it...
+            if time.time() - macEntry.lastTimeSeen < timeoutSec['entryMove']:
+                log.warning("Possible duplicate: %s at time %i, now (%i %i), time %i",
+                        str(macEntry), macEntry.lastTimeSeen(),
+                        dpid, inport, time.time())
+            # should we create a whole new entry, or keep the previous host info?
+            # for now, we keep it: IP info, answers pings, etc.
+            macEntry.dpid = dpid
+            macEntry.inport = inport
+
+        macEntry.refresh()
+
+        (pckt_srcip, hasARP) = self.getSrcIPandARP(packet.next)
+        if pckt_srcip != None:
+            self.updateIPInfo(pckt_srcip,macEntry,hasARP)
+
+        return
+
+    def _check_timeouts(self):
+        """
+        Checa os estouros de tempo.
+        :return: Sem retorno.
+        """
+        for macEntry in self.entryByMAC.values():
+            entryPinged = False
+            for ip_addr, ipEntry in macEntry.ipAddrs.items():
+                if ipEntry.expired():
+                    if ipEntry.pings.failed():
+                        del macEntry.ipAddrs[ip_addr]
+                        log.info("Entry %s: IP address %s expired",
+                                str(macEntry), str(ip_addr) )
+                    else:
+                        self.sendPing(macEntry,ip_addr)
+                        ipEntry.pings.sent()
+                        entryPinged = True
+            if macEntry.expired() and not entryPinged:
+                log.info("Entry %s expired", str(macEntry))
+                # sanity check: there should be no IP addresses left
+                if len(macEntry.ipAddrs) > 0:
+                    for ip in macEntry.ipAddrs.keys():
+                        log.warning("Entry %s expired but still had IP address %s", str(macEntry), str(ip_addr))
+                        del macEntry.ipAddrs[ip_addr]
+                del self.entryByMAC[macEntry.macaddr]
