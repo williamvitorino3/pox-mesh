@@ -15,9 +15,11 @@
 # NOTE: Not platform independent -- uses VT escape codes
 
 # Magic sequence used to introduce a command or color
+# Sequência mágica usada para inserir comando ou cor.
 MAGIC = "@@@"
 
 # Colors for log levels
+# Cores para os níveis de Log.
 LEVEL_COLORS = {
   'DEBUG': 'CYAN',
   'INFO': 'GREEN',
@@ -31,6 +33,9 @@ enabled = False
 
 # Gets set to True if we should strip special sequences but
 # not actually try to colorize
+
+# Obtém valor definido como True se devemos tirar sequências especiais,
+# mas não realmente tentar colorir
 _strip_only = False
 
 import logging
@@ -38,50 +43,64 @@ import sys
 
 # Name to (intensity, base_value) (more colors added later)
 COLORS = {
- 'black' : (0,0),
- 'red' : (0,1),
- 'green' : (0,2),
- 'yellow' : (0,3),
- 'blue' : (0,4),
- 'magenta' : (0,5),
- 'cyan' : (0,6),
- 'gray' : (0,7),
- 'darkgray' : (1,0),
- 'pink' : (1,1),
- 'white' : (1,7),
+ 'black': (0, 0),
+ 'red': (0, 1),
+ 'green': (0, 2),
+ 'yellow': (0, 3),
+ 'blue': (0, 4),
+ 'magenta': (0, 5),
+ 'cyan': (0, 6),
+ 'gray': (0, 7),
+ 'darkgray': (1, 0),
+ 'pink': (1, 1),
+ 'white': (1, 7),
 }
 
 # Add intense/bold colors (names it capitals)
+# Adiciona cores intensas/negrito (Nomeia as maiúsculas).
 for _c in [_n for _n,_v in COLORS.items() if _v[0] == 0]:
   COLORS[_c.upper()] = (1,COLORS[_c][1])
 
 COMMANDS = {
-  'reset' : 0,
-  'bold' : 1,
-  'dim' : 2,
-  'bright' : 1,
-  'dull' : 2,
-  'bright:' : 1,
-  'dull:' : 2,
-  'blink' : 5,
-  'BLINK' : 6,
-  'invert' : 7,
-  'bg:' : -1, # Special
-  'level' : -2, # Special -- color of current level
-  'normal' : 22,
-  'underline' : 4,
-  'nounderline' : 24,
+  'reset': 0,
+  'bold': 1,
+  'dim': 2,
+  'bright': 1,
+  'dull': 2,
+  'bright:': 1,
+  'dull:': 2,
+  'blink': 5,
+  'BLINK': 6,
+  'invert': 7,
+  'bg:': -1, # Special
+  'level': -2, # Special -- color of current level
+  'normal': 22,
+  'underline': 4,
+  'nounderline': 24,
 }
 
 
 # Control Sequence Introducer
+# Introdutor de sequência de controle
 CSI = "\033["
 
 def _color (color, msg):
-  """ Colorizes the given text """
-  return _proc(MAGIC + color) + msg + _proc(MAGIC + 'reset').lower()
+    """
+    Coloriza o texto fornecido.
+    :param color: Cor de destaque.
+    :param msg: Mensagem correspondente.
+    :return: Mensagem de log codificada por cores.
+    """
+    """ Colorizes the given text """
+    return _proc(MAGIC + color) + msg + _proc(MAGIC + 'reset').lower()
 
 def _proc (msg, level_color = "DEBUG"):
+  """
+  Faz algumas substituições no texto.
+  :param msg: Mensagem relacionada.
+  :param level_color: Nível de cor.
+  :return: Texto com alterações feitas.
+  """
   """
   Do some replacements on the text
   """
@@ -140,7 +159,18 @@ def _proc (msg, level_color = "DEBUG"):
   return r
 
 
-def launch (entire=False):
+def launch(entire=False):
+  """
+  Se --entire for verdadeira, então toda a mensagem é codificada por cores,
+  caso contrário, apenas o nível de log.
+
+  Também ativa a interpretação de algumas seqüências especiais na seqüência
+  de caracteres de formato de log.
+
+  :param entire:
+  :return: Texto codificado do log de coloramento se --entire for verdadeiro
+  ou None se --entire for falso.
+  """
   """
   If --entire then the whole message is color-coded, otherwise just the
   log level.
