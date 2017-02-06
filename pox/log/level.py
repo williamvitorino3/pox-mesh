@@ -19,6 +19,11 @@ from pox.core import core
 
 def launch (**kw):
   """
+  Permite configurar os níveis de log a partir da linha de comando.
+  :param kw: Parâmetros alternativos.
+  :return: Sem retorno.
+  """
+  """
   Allows configuring log levels from the commandline.
 
   For example, to turn off the verbose web logging, try:
