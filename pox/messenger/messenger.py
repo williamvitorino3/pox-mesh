@@ -97,12 +97,16 @@ class MessengerListening(Event):
   pass
 
 class ConnectionStarted (Event):
-  def __init__ (self, connection):
+  def __init__(self, connection):
     Event.__init__(self)
     self.con = connection
     self._claimed = False
 
-  def claim (self):
+  def claim(self):
+    """
+    Atualiza os argumentos da conexão.
+    :return: Argumento de conexão do objeto.
+    """
     #assert self._claimed == False
     self._claimed = True
     self.halt = True
@@ -116,13 +120,27 @@ class MessageReceived (Event):
     self._claimed = False
     self.msg = msg
 
-  def claim (self):
+  def claim(self):
+    """
+    Atualiza os argumentos da conexão.
+    :return: Argumento de conexão do objeto.
+    """
     assert self._claimed == False
     self._claimed = True
     self.halt = True
     return self.con
 
   def _invoke (self, handler, *args, **kw):
+    """
+    Se o manipulador não retornar qualquer disposição,
+    então olhamos para ver se eles lerem a mensagem. Se assim for,
+    deixamos de processar este evento agora.
+
+    :param handler: Manipulador.
+    :param args: Lista de argumentos posicionais.
+    :param kw: Dicionário de argumentos nomeados.
+    :return: Instância que interrompe o evento.
+    """
     # Special handling.  If the handler doesn't return any disposition, then
     # we look to see if they read the message.  If so, we stop processing
     # this event now.
@@ -168,7 +186,11 @@ class MessengerConnection (EventMixin):
       # Unclaimed events get forwarded to here too
       self.addListener(MessageReceived, self._defaultMessageReceived, priority=-1) # Low priority
 
-  def _close (self):
+  def _close(self):
+    """
+    Fecha a conexão.
+    :return: Sem retorno.
+    """
     # Called internally
     if self._isConnected is False: return
     if self._source:
@@ -178,10 +200,18 @@ class MessengerConnection (EventMixin):
     self.raiseEventNoErrors(MessageReceived, self, None)
     core.messenger.raiseEventNoErrors(ConnectionClosed, self)
 
-  def send (self, whatever, **kw):
-    if self._isConnected is False: return False
+  def send(self, whatever, **kw):
+    """
+    Envia o Json.
+    :param whatever: Objeto que será serializado para Json.
+    :param kw: Dicionário de argumentos nomeados.
+    :return: Booleano.
+    """
+    if self._isConnected is False:
+      return False
     s = json.dumps(whatever, **kw)
-    if self._newlines: s += "\n"
+    if self._newlines:
+      s += "\n"
     self.sendRaw(s)
     return True
 
@@ -189,40 +219,73 @@ class MessengerConnection (EventMixin):
     raise RuntimeError("Not implemented")
 
   def isConnected (self):
+    """
+    Verifica se s conexão está ativa.
+    :return: Booleano.
+    """
     return self._isConnected
 
   def isReadable (self):
+    """
+    Verifica se a tem mensagens.
+    :return: Booleano.
+    """
     return len(self._msgs) > 0
 
-  def peek (self, default = None):
+  def peek(self, default = None):
     return self.read(default = default, peek=True)
 
-  def read (self, default = None, peek = False):
-    if len(self._msgs) == 0: return default
+  def read(self, default=None, peek=False):
+    """
+
+    :param default: Retorno padrão.
+    :param peek: Argumento à ser verificado.
+    :return: default se não houverem mensagens, a primeirda mensagem peek for verdadeiro,
+    e remove e retorna a primeira mensagem para qualquer outro caso.
+    """
+    if len(self._msgs) == 0:
+      return default
     if peek:
       return self._msgs[0]
     else:
       return self._msgs.pop(0)
 
-  def _recv_msg (self, msg):
+  def _recv_msg(self, msg):
+    """
+    Lista a mensagem recebida.
+    :param msg: Mensagem recebida.
+    :return: Sem retorno.
+    """
     #print self,"recv:",msg
     self._msgs.append(msg)
     self.raiseEventNoErrors(MessageReceived, self, msg)
     if not self.buffered:
       del self._msgs[:]
 
-  def _recv_raw (self, data):
-    if len(data) == 0: return
+  def _recv_raw(self, data):
+    """
+    Decodifica o JSON contido em data.
+    :param data: Informação da mensagem.
+    :return: Semretorno.
+    """
+    if len(data) == 0:
+      return
+    # Se o buffer estiver vazio.
     if len(self._buf) == 0:
+      # Se data começar com espaço.
       if data[0].isspace():
+        # Retira os espaços e salva no buffer.
         self._buf = data.lstrip()
       else:
+        # Salva a informação no buffer.
         self._buf = data
     else:
+      # Concatena a informação com a que já está no buffer.
       self._buf += data
 
     while len(self._buf) > 0:
       try:
+        # Decodifica o JSON em self._buf e retorna (mensagem, index final).
         msg, l = defaultDecoder.raw_decode(self._buf)
       except:
         # Need more data before it's a valid message
@@ -239,42 +302,69 @@ class MessengerConnection (EventMixin):
     return "<" + self.__class__.__name__ + "/" + self.ID + ">"
 
   def _defaultMessageReceived (self, event, msg):
+    """
+    Lança o evento no Core e o remove se for preciso.
+    :param event: Evento do qual o método trata.
+    :param msg: Utilização do argumento não implementada.
+    :return: Sem retorno, se o evento não tiver sido chamado.
+    Caso contrário, retorna EventRemove para remover o evento.
+    """
     #print self,"default recv:",msg
     #TODO: make sure this actually works. I have never tried re-raising an event.
+    # Lança o evento sem erros no core.
     core.messenger.raiseEventNoErrors(event)
     if event._claimed:
       # Someone claimed this connection -- stop forwarding it globally
+      # Se o evento já tiver sido chamado, remove o mesmo.
       return EventRemove
 
-  def close (self):
+  def close(self):
+    """
+    Chama o método que fecha a conexão.
+    :return: Sem retorno.
+    """
     self._close()
 
 
 class TCPMessengerConnection (MessengerConnection, Task):
-  def __init__ (self, source=None, socket=None):
+  def __init__(self, source=None, socket=None):
     self._socket = socket
     MessengerConnection.__init__(self, source, ID=str(id(self))) #TODO: better ID
     Task.__init__(self)
 
     #self.start()
 
-  def _close (self):
+  def _close(self):
+    """
+    Fecha a conexão.
+    :return: Sem retorno.
+    """
     super(TCPMessengerConnection, self)._close()
     try:
       self._socket.shutdown(socket.SHUT_RDWR)
     except:
       pass
 
-  def sendRaw (self, data):
+  def sendRaw(self, data):
+    """
+    Envia data pelo socket do objeto.
+    :param data: Informação à ser tratada.
+    :return: Sem retorno.
+    """
     try:
       l = self._socket.send(data)
-      if l == len(data): return
+      if l == len(data):
+        return
     except:
       pass
     #TODO: do something more graceful!
     self._close()
 
-  def run (self):
+  def run(self):
+    """
+    Recebe as informações transmitidas pelo socket enquanto tiver alguma conexão.
+    :return: Sem retorno.
+    """
     log.debug("%s started" % (self,))
     while self.isConnected():
       d = yield Recv(self._socket)
@@ -291,10 +381,10 @@ class TCPMessengerConnection (MessengerConnection, Task):
 
 class MessengerHub (EventMixin):
   _eventMixin_events = set([
-    ConnectionStarted,  # Immediately when a connection goes up
-    ConnectionClosed,   # When a connection goes down
-    MessageReceived,    # For unclaimed messages
-    MessengerListening, # The TCP listening port is up
+    ConnectionStarted,    # Immediately when a connection goes up - Imediatamente quando uma conexão sobe
+    ConnectionClosed,     # When a connection goes down - Quando uma conexão cai
+    MessageReceived,      # For unclaimed messages - Para mensagens não reclamadas
+    MessengerListening,   # The TCP listening port is up - A porta de escuta TCP está ativa
   ])
   def __init__ (self):
     EventMixin.__init__(self)
@@ -310,12 +400,21 @@ class TCPMessengerSource (Task):
     self._connections = set()
 
   def _forget (self, connection):
+    """
+    Remove as conexões de --self._connections.
+    :param connection: Conexão à ser removida.
+    :return: Sem retorno.
+    """
     """ Forget about a connection (because it has closed) """
     if connection in self._connections:
       #print "forget about",connection
       self._connections.remove(connection)
 
-  def run (self):
+  def run(self):
+    """
+    Inicia o socket.
+    :return: Sem retorno.
+    """
     listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     listener.bind(self._addr)
@@ -346,7 +445,13 @@ class TCPMessengerSource (Task):
     log.debug("No longer listening for connections")
 
 
-def launch (tcp_address = "0.0.0.0", tcp_port = 7790):
+def launch(tcp_address="0.0.0.0", tcp_port=7790):
+  """
+  Lança os eventos no core.
+  :param tcp_address: Endereço TCP.
+  :param tcp_port: Porta TCP.
+  :return: Sem retorno.
+  """
   core.register("messenger", MessengerHub())
   t = TCPMessengerSource(tcp_address, tcp_port)
   core.addListener(pox.core.GoingUpEvent, lambda event: t.start())
