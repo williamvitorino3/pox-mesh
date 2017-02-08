@@ -20,6 +20,24 @@ from pox.messenger.messenger import *
 
 class MessengerExample (object):
   """
+  Uma demonstração de mensageiro
+
+  A ideia é muito simples. Quando você cria um MessengerExample,
+  você diz a ele um nome que você está interessado dentro e
+  ele escuta core.messenger! MessageReceived. Se ele vê uma mensagem
+  com uma chave "Olá" onde o valor é o nome que você está interessado,
+  ele reivindica a conexão que a mensagem veio em e, em seguida,
+  escuta <thatConnection>! MessageReceived. Ele imprime mensagens sobre
+  essa conexão a partir de então. Se uma mensagem tem uma chave chamada
+  "bye" com o valor True, fecha a conexão.
+
+  Para experimentá-lo, faça o seguinte no interpretador POX:
+  POX> import pox.messenger.messenger_example
+  POX> pox.messenger.messenger_example.MessengerExample ("foo")
+  E então faça o seguinte a partir da linha de comando:
+  Bash $ echo '{"hello": "foo"} [1,2,3] "limpo"' | Nc localhost 7790
+  """
+  """
   A demo of messenger.
 
   The idea is pretty simple. When you create a MessengerExample, you tell it a
@@ -41,6 +59,12 @@ class MessengerExample (object):
     self._targetName = targetName
 
   def _handle_global_MessageReceived (self, event, msg):
+    """
+    Trata as mensagens globais recebidas.
+    :param event: Evento que causa o lançamento do método.
+    :param msg: Mensagem recebida.
+    :return: Sem retorno.
+    """
     try:
       n = msg['hello']
       if n == self._targetName:
@@ -48,24 +72,36 @@ class MessengerExample (object):
         event.con.read() # Consume the message
         event.claim()
         event.con.addListener(MessageReceived, self._handle_MessageReceived, weak=True)
-        print self._targetName, "- started conversation with", event.con
+        print(self._targetName, "- started conversation with", event.con)
       else:
-        print self._targetName, "- ignoring", n
+        print(self._targetName, "- ignoring", n)
     except:
       pass
 
   def _handle_MessageReceived (self, event, msg):
+    """
+    Trata as mensagens recebidas.
+    :param event: Evento que causa o lançamento do método.
+    :param msg: Mensagem recebida.
+    :return: Sem retorno.
+    """
     if event.con.isReadable():
       r = event.con.read()
-      print self._targetName, "-",r
+      print(self._targetName, "-", r)
       if type(r) is dict and r.get("bye",False):
-        print self._targetName, "- GOODBYE!"
+        print(self._targetName, "- GOODBYE!")
         event.con.close()
       if type(r) is dict and "echo" in r:
-        event.con.send({"echo":r["echo"]})
+        event.con.send({"echo": r["echo"]})
     else:
-      print self._targetName, "- conversation finished"
+      print(self._targetName, "- conversation finished")
 
 examples = {}
-def launch (name = "example"):
+
+def launch(name = "example"):
+  """
+  Adiciona valor no dicionário --examples
+  :param name: Posição da informação no dicionário de exemplos.
+  :return: Sem retorno.
+  """
   examples[name] = MessengerExample(name)
