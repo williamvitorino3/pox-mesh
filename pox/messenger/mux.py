@@ -16,6 +16,32 @@
 # along with POX.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+Às vezes, você gostaria de ser capaz de se comunicar com vários serviços
+de mensagens na mesma conexão. Você pode usar o serviço mux messenger para fazer isso.
+
+Se você enviar uma mensagem "hello": "mux", o muxer irá reivindicar essa conexão.
+Mensagens subseqüentes devem incluir "_mux": pares <Key>. Para cada chave única,
+o muxer criará uma nova conexão virtual - mensagens subseqüentes com o mesmo "_mux": <Key>
+será enviado para baixo que a conexão virtual, e as mensagens desse serviço terá a chave marcada.
+Observe que isso significa que as mensagens de e para os serviços que você gostaria de muxed
+devem ser objetos JSON (dicionários). Se isso é um problema, deixe-me saber,
+porque o muxer poderia ser estendido.
+
+Um exemplo:
+(Suponha que criamos um MessengerExample ("foo"))
+-> {"hello":"mux"}
+-> {"_mux":"logger1", "hello":"log"}
+-> {"_mux":"logger2", "hello":"log"}
+-> {"_mux":"logger1", "level":"ERROR"}
+-> {"_mux":"bar", "hello":"foo"}
+-> {"_mux":"bar", "echo":"hello world"}
+<- {"_mux":"bar", "echo":"hello world"}
+
+Nesse caso, criamos dois registradores, configurados um deles independente do outro,
+enviamos uma solicitação de eco para um objeto MessengerExample e recebemos o resultado.
+"""
+
+"""
 Sometimes you'd like to be able to communicate with multiple messenger
 services over the same connection.  You can use the mux messenger service
 to do this.
@@ -66,28 +92,50 @@ class MuxConnection (MessengerConnection):
 
     self._newlines = False
 
-  def send (self, whatever, **kw):
+  def send(self, whatever, **kw):
+    """
+    Envia a mensagem contida em whatever.
+    :param whatever: Objeto que será usado como dicionário.
+    :param kw: Dicionário de argumentos nomeados.
+    :return: Sem retorno.
+    """
     whatever = dict(whatever)
     whatever['_mux'] = self.channelName
-    print whatever
+    print(whatever)
     MessengerConnection.send(self, whatever, **kw)
 
-  def sendRaw (self, data):
+  def sendRaw(self, data):
+    """
+    Envia a informação recebida.
+    :param data: Informação à ser enviada.
+    :return: Sem retorno.
+    """
     self.con.sendRaw(data)
 
 
 class MuxSource (EventMixin):
-  def __init__ (self, con):
+  def __init__(self, con):
     self.listenTo(con)
     self.channels = {}
 
-  def _forget (self, connection):
+  def _forget(self, connection):
+    """
+    Remove a conexão recebida por parametro.
+    :param connection: Conexão à ser removida.
+    :return: Sem retorno.
+    """
     if connection in self.channels:
       del self.channels[connection.channelName]
     else:
       log.warn("Tried to forget a channel I didn't know")
 
-  def _handle_MessageReceived (self, event, msg):
+  def _handle_MessageReceived(self, event, msg):
+    """
+    Processa os parâmetros do evento.
+    :param event: Evento que chama este método.
+    :param msg: Mensagem de parâmetro.
+    :return: Sem retorno.
+    """
     if event.con.isReadable():
       r = event.con.read()
       if type(r) is dict:
@@ -95,14 +143,14 @@ class MuxSource (EventMixin):
         if channelName is not None:
           del r['_mux']
           if channelName not in self.channels:
-            print self.__class__.__name__, "- creating channel", channelName
+            print(self.__class__.__name__, "- creating channel", channelName)
             # New channel
             channel = MuxConnection(self, channelName, event.con)
             self.channels[channelName] = channel
           else:
             channel = self.channels[channelName]
           channel._recv_msg(r)
-        elif r.get("_mux_bye",False):
+        elif r.get("_mux_bye", False):
           event.con.close()
         else:
           log.warn("Message to demuxer didn't specify a channel or valid command")
@@ -111,22 +159,35 @@ class MuxSource (EventMixin):
     else:
       self._closeAll()
 
-  def _handle_ConnectionClosed (self, event):
+  def _handle_ConnectionClosed(self, event):
+    """
+    Chama o método que fecha todas as conexões.
+    :param event: Evento causador da chamada da função.
+    :return: Sem retorno.
+    """
     self._closeAll()
 
-  def _closeAll (self):
+  def _closeAll(self):
+    """
+    Fecha todas as conexões.
+    :return: Sem retorno.
+    """
     channels = self.channels.values()
     for connection in channels:
       connection._close()
 
 
-class MuxHub (object):
-  """
-  """
-  def __init__ (self):
+class MuxHub(object):
+  def __init__(self):
     core.messenger.addListener(MessageReceived, self._handle_global_MessageReceived)#, weak=True)
 
-  def _handle_global_MessageReceived (self, event, msg):
+  def _handle_global_MessageReceived(self, event, msg):
+    """
+    Trata as mensagens globais recebidas.
+    :param event: Evento que causa o lançamento do método.
+    :param msg: Mensagem recebida.
+    :return: Sem retorno.
+    """
     try:
       if msg['hello'] == 'mux':
         # It's for me!
@@ -134,12 +195,16 @@ class MuxHub (object):
         event.con.read()
         m = MuxSource(event.con)
 
-        print self.__class__.__name__, "- started conversation with", event.con
+        print(self.__class__.__name__, "- started conversation with", event.con)
     except:
       pass
 
 
-def launch ():
+def launch():
+  """
+  Cria uma instância de MuxHub().
+  :return: Sem retorno.
+  """
   #  core.register("demux", MessengerHub())
   global hub
   hub = MuxHub()
