@@ -16,6 +16,8 @@
 # along with POX.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+Classes para endereços de vários tipos.
+
 Classes for addresses of various types.
 """
 
@@ -30,6 +32,7 @@ if 'long' not in sys.modules['__builtin__'].__dict__:
 
 """
 # Unfinished oui name stuff formerly from packet library.
+  Material de nome de terminação inacabado anteriormente da biblioteca de pacotes.
 
     oui = int(a[0]) << 16 | int(a[1]) << 8 | int(a[2])
 
@@ -38,9 +41,15 @@ if 'long' not in sys.modules['__builtin__'].__dict__:
         if _ethoui2name.has_key(oui):
             return "(%s):%02x:%02x:%02x" %( _ethoui2name[oui], a[3],a[4],a[5])
 """
+
 _eth_oui_to_name = {}
 
-def _load_oui_names ():
+
+def _load_oui_names():
+    """
+    Carrega nomes do arquivo oui.txt.
+    :return: Sem retorno.
+    """
     import inspect
     import os.path
     filename = os.path.join(os.path.dirname(inspect.stack()[0][1]), 'oui.txt')
@@ -56,7 +65,7 @@ def _load_oui_names ():
             if not '-' in split[0]:
                 continue
             # grab 3-byte OUI
-            oui_str  = split[0].replace('-','')
+            oui_str = split[0].replace('-', '')
             # strip off (hex) identifer and keep rest of name
             end = ' '.join(split[1:]).strip()
             end = end.split('\t')
@@ -68,15 +77,22 @@ def _load_oui_names ():
     except:
         import logging
         logging.getLogger().warn("Could not load OUI list")
-    if f: f.close()
+    if f:
+        f.close()
 _load_oui_names()
 
 
 class EthAddr (object):
   """
   An Ethernet (MAC) address type.
+  Um tipo de endereço Ethernet (MAC).
   """
-  def __init__ (self, addr):
+  def __init__(self, addr):
+    """
+    Entende o endereço Ethernet é várias formas. Seqüências hexadecimais,
+    sequências de bytes brutos, inteiros longos, etc.
+    :param addr: Endereço.
+    """
     """
     Understands Ethernet address is various forms.  Hex strings, raw byte
     strings, long integers, etc.
@@ -125,54 +141,75 @@ class EthAddr (object):
 
   def isBridgeFiltered (self):
     """
+    Verifica se o endereço MAC é válido.
+    :return: Retorna True se for IEEE 802.1D Ponte MAC filtrada do grupo endereço MAC.
+    """
+    """
     Returns True if this is IEEE 802.1D MAC Bridge Filtered MAC Group Address,
     01-80-C2-00-00-00 to 01-80-C2-00-00-0F. MAC frames that have a destination MAC address
     within this range are not relayed by MAC bridges conforming to IEEE 802.1D
     """
-    return  ((ord(self._value[0]) == 0x01)
-    	and (ord(self._value[1]) == 0x80)
-    	and (ord(self._value[2]) == 0xC2)
-    	and (ord(self._value[3]) == 0x00)
-    	and (ord(self._value[4]) == 0x00)
-    	and (ord(self._value[5]) <= 0x0F))
+    return ((ord(self._value[0]) == 0x01) and (ord(self._value[1]) == 0x80)
+            and (ord(self._value[2]) == 0xC2) and (ord(self._value[3]) == 0x00)
+            and (ord(self._value[4]) == 0x00) and (ord(self._value[5]) <= 0x0F))
 
-  def isGlobal (self):
+  def isGlobal(self):
+    """
+    Verifica se o endereço é global.
+    :return: Retorna True se este é um exclusivo endereço (OUI aplicada).
+    """
     """
     Returns True if this is a globally unique (OUI enforced) address.
     """
     return not self.isLocal()
 
-  def isLocal (self):
+  def isLocal(self):
+    """
+    Verifica se o endereço é local.
+    :return: Retorna True se este é um endereço (não global) administrado localmente.
+    """
     """
     Returns True if this is a locally-administered (non-global) address.
     """
     return True if (ord(self._value[0]) & 2) else False
 
   @property
-  def is_local (self):
+  def is_local(self):
     return self.isLocal()
 
   @property
-  def is_global (self):
+  def is_global(self):
     return self.isGlobal()
 
   def isMulticast (self):
+    """
+    Verifica se o endereço é Multicast.
+    :return: Retorna True se este é um endereço multicast.
+    """
     """
     Returns True if this is a multicast address.
     """
     return True if (ord(self._value[0]) & 1) else False
 
   @property
-  def is_multicast (self):
+  def is_multicast(self):
     return self.isMulticast()
 
-  def toRaw (self):
+  def toRaw(self):
+    """
+    Retorna o endereço como um objeto de bytes de comprimento 6.
+    :return: Objeto de bytes de comprimento 6.
+    """
     """
     Returns the address as a 6-long bytes object.
     """
     return self._value
 
-  def toInt (self):
+  def toInt(self):
+    """
+    Retorna o endereço como um inteiro não sinalizado.
+    :return: Unsigned Integer.
+    """
     '''
     Returns the address as an (unsigned) integer
     '''
@@ -188,26 +225,36 @@ class EthAddr (object):
       value += (byte_value << (8*byte_shift))
     return value
 
-  def toTuple (self):
+  def toTuple(self):
+    """
+    Retorna uma tupla de 6-entrada longa onde cada entrada é o valor numérico do byte do endereço correspondente.
+    :return: Tupla com 6 endereços de entrada.
+    """
     """
     Returns a 6-entry long tuple where each entry is the numeric value
     of the corresponding byte of the address.
     """
     return tuple((ord(x) for x in self._value))
 
-  def toStr (self, separator = ':', resolveNames  = False): #TODO: show OUI info from packet lib
+  def toStr(self, separator=':', resolveNames  = False): #TODO: show OUI info from packet lib
+    """
+    Retorna o endereço como sequência de caracteres consistindo de 12 caracteres hexadecimais separados pelo separador.
+    :param separator: Caracter para separação de atributos no texto.
+    :param resolveNames: Nomes de empresas resolvidos.
+    :return: Endereço como String.
+    """
     """
     Returns the address as string consisting of 12 hex chars separated
     by separator.
-    If resolveNames is True, it may return company names based on
-    the OUI. (Currently unimplemented)
+      If resolveNames is True, it may return company names based on
+      the OUI. (Currently unimplemented)
     """
     return separator.join(('%02x' % (ord(x),) for x in self._value))
 
-  def __str__ (self):
+  def __str__(self):
     return self.toStr()
 
-  def __cmp__ (self, other):
+  def __cmp__(self, other):
     try:
       if type(other) == EthAddr:
         other = other._value
@@ -225,16 +272,16 @@ class EthAddr (object):
     except:
       return -other.__cmp__(self)
 
-  def __hash__ (self):
+  def __hash__(self):
     return self._value.__hash__()
 
-  def __repr__ (self):
+  def __repr__(self):
     return self.__class__.__name__ + "('" + self.toStr() + "')"
 
-  def __len__ (self):
+  def __len__(self):
     return 6
 
-  def __setattr__ (self, a, v):
+  def __setattr__(self, a, v):
     if hasattr(self, '_value'):
       raise TypeError("This object is immutable")
     object.__setattr__(self, a, v)
@@ -242,9 +289,11 @@ class EthAddr (object):
 
 class IPAddr (object):
   """
+  Representa o endereço IPv4.
+
   Represents an IPv4 address.
   """
-  def __init__ (self, addr, networkOrder = False):
+  def __init__(self, addr, networkOrder = False):
     """ Can be initialized with several formats.
         If addr is an int/long, then it is assumed to be in host byte order
         unless networkOrder = True
@@ -266,28 +315,50 @@ class IPAddr (object):
     else:
       raise RuntimeError("Unexpected IP address format")
 
-  def toSignedN (self):
+  def toSignedN(self):
+    """
+    Atalho para self.toSigned().
+    :return: Inteiro sinalizado.
+    """
     """ A shortcut """
-    return self.toSigned(networkOrder = True)
+    return self.toSigned(networkOrder=True)
 
-  def toUnsignedN (self):
+  def toUnsignedN(self):
+    """
+    Atalho para self.toUnsigned().
+    :return: Inteiro não sinalizado.
+    """
     """ A shortcut """
     return self.toUnsigned(networkOrder = True)
 
-  def toSigned (self, networkOrder = False):
+  def toSigned(self, networkOrder = False):
+    """
+    Retorna o endereço como inteiro sinalizado.
+    :param networkOrder: Ordem de rede.
+    :return: Inteiro sinalizado.
+    """
     """ Return the address as a signed int """
     if networkOrder:
       return self._value
     v = socket.htonl(self._value & 0xffFFffFF)
     return struct.unpack("i", struct.pack("I", v))[0]
 
-  def toRaw (self):
+  def toRaw(self):
+    """
+    Retorna o endereço como uma String de byte de quatro caracteres.
+    :return: String.
+    """
     """
     Returns the address as a four-character byte string.
     """
     return struct.pack("i", self._value)
 
-  def toUnsigned (self, networkOrder = False):
+  def toUnsigned(self, networkOrder = False):
+    """
+    Retorna o endereço como um número inteiro em rede ou host (o padrão) ordem de byte.
+    :param networkOrder: Ordem de rede.
+    :return: Inteiro não sinalizado.
+    """
     """
     Returns the address as an integer in either network or host (the
     default) byte order.
@@ -296,11 +367,21 @@ class IPAddr (object):
       return socket.htonl(self._value & 0xffFFffFF)
     return self._value & 0xffFFffFF
 
-  def toStr (self):
+  def toStr(self):
+    """
+    representação de sequência de caracteres de padrão pontilhada-quad.
+    :return: String.
+    """
     """ Return dotted quad representation """
     return socket.inet_ntoa(self.toRaw())
 
-  def inNetwork (self, network, netmask = None):
+  def inNetwork(self, network, netmask=None):
+    """
+    True se esta rede retorna é a rede especificada.
+    :param network: Rede.
+    :param netmask: Mascara da rede.
+    :return: Booleano.
+    """
     """
     Returns True if this network is in the specified network.
     network is a dotted quad (with or without a CIDR or normal style
@@ -319,10 +400,10 @@ class IPAddr (object):
 
     return (self.toUnsigned() & ~((1 << b)-1)) == n.toUnsigned()
 
-  def __str__ (self):
+  def __str__(self):
     return self.toStr()
 
-  def __cmp__ (self, other):
+  def __cmp__(self, other):
     if other is None: return 1
     try:
       if not isinstance(other, IPAddr):
@@ -331,16 +412,16 @@ class IPAddr (object):
     except:
       return -other.__cmp__(self)
 
-  def __hash__ (self):
+  def __hash__(self):
     return self._value.__hash__()
 
-  def __repr__ (self):
+  def __repr__(self):
     return self.__class__.__name__ + "('" + self.toStr() + "')"
 
-  def __len__ (self):
+  def __len__(self):
     return 4
 
-  def __setattr__ (self, a, v):
+  def __setattr__(self, a, v):
     if hasattr(self, '_value'):
       raise TypeError("This object is immutable")
     object.__setattr__(self, a, v)
@@ -349,19 +430,27 @@ class IPAddr (object):
 
 def parseCIDR (addr, infer=True):
   """
+  Leva um endereço CIDR ou planície pontilhada-quad
+  e retorna uma tupla de bits de endereço e curinga
+  (apropriado para uma flow_mod).
+  :param addr: Endereço de rede.
+  :param infer: Verificação de inferência.
+  :return: Tupla.
+  """
+  """
   Takes a CIDR address or plain dotted-quad, and returns a tuple of address
   and wildcard bits (suitable for a flow_mod).
   Can infer the wildcard bits based on network classes if infer=True.
   Can also take a string in the form 'address/netmask', as long as the
   netmask is representable in CIDR.
   """
-  def check (r0, r1):
+  def check(r0, r1):
     a = r0.toUnsigned()
     b = r1
-    if a & ((1<<b)-1):
+    if a & ((1 << b)-1):
       raise RuntimeError("Host part of CIDR address not compatible with " +
                          "network part")
-    return (r0,r1)
+    return r0, r1
   addr = addr.split('/', 2)
   if len(addr) == 1:
     if infer is False:
@@ -392,7 +481,14 @@ def parseCIDR (addr, infer=True):
   assert wild >= 0 and wild <= 32
   return check(IPAddr(addr[0]), wild)
 
-def inferNetMask (addr):
+
+def inferNetMask(addr):
+  """
+  Usa classes de rede para adivinhar o número de bits
+  de curinga e retorna esse número no formato flow_mod-amigável.
+  :param addr: Endereço de rede.
+  :return: Inteiro.
+  """
   """
   Uses network classes to guess the number of wildcard bits, and returns
   that number in flow_mod-friendly format.
@@ -412,7 +508,7 @@ def inferNetMask (addr):
     return 8
   if (addr & (15 << 28)) == 14 << 28:
     # Class D (Multicast)
-    return 0 # exact match
+    return 0  # exact match
   # Must be a Class E (Experimental)
     return 0
 
