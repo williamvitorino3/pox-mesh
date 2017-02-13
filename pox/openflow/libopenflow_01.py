@@ -1,4 +1,6 @@
-# Copyright 2011,2012 James McCauley
+# -*- coding: utf-8 -*-
+
+#  Copyright 2011,2012 James McCauley
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -378,111 +380,111 @@ def openflow_stats_reply (stats_type, type_val=None, is_list=None,
 # ----------------------------------------------------------------------
 
 ofp_error_type_rev_map = {
-  'OFPET_HELLO_FAILED'    : 0, "Olá protocolo falhou"
-  'OFPET_BAD_REQUEST'     : 1, "Pedido não foi compreendido"
-  'OFPET_BAD_ACTION'      : 2, "Erro na descrição da ação"
-  'OFPET_FLOW_MOD_FAILED' : 3, "Problema na modificação da entrada de fluxo"
-  'OFPET_PORT_MOD_FAILED' : 4, "Pedido da porta mod falhou"
-  'OFPET_QUEUE_OP_FAILED' : 5, "Falha na operação da fila"
+  'OFPET_HELLO_FAILED'    : 0, #"Olá protocolo falhou"
+  'OFPET_BAD_REQUEST'     : 1, #"Pedido não foi compreendido"
+  'OFPET_BAD_ACTION'      : 2, #"Erro na descrição da ação"
+  'OFPET_FLOW_MOD_FAILED' : 3, #"Problema na modificação da entrada de fluxo"
+  'OFPET_PORT_MOD_FAILED' : 4, #"Pedido da porta mod falhou"
+  'OFPET_QUEUE_OP_FAILED' : 5, #"Falha na operação da fila"
 }
 
 ofp_hello_failed_code_rev_map = {
-  'OFPHFC_INCOMPATIBLE' : 0, "Nenhuma versão compatível"
-  'OFPHFC_EPERM'        : 1, "Erro de permissões"
+  'OFPHFC_INCOMPATIBLE' : 0, #"Nenhuma versão compatível"
+  'OFPHFC_EPERM'        : 1, #"Erro de permissões"
 }
 
 ofp_bad_request_code_rev_map = {
-  'OFPBRC_BAD_VERSION'    : 0, "ofp_header.version não suportada"
-  'OFPBRC_BAD_TYPE'       : 1, "ofp_header.type não suportada"
+  'OFPBRC_BAD_VERSION'    : 0, #"ofp_header.version não suportada"
+  'OFPBRC_BAD_TYPE'       : 1, #"ofp_header.type não suportada"
   'OFPBRC_BAD_STAT'       : 2, 
 
-  "Para indicar que um switch não compreende uma extensão de fornecedor, um código de erro OFPBRC_BAD_VENDOR"
-  "foi definido sob o OFPET_BAD_REQUEST tipo de erro."
+  #"Para indicar que um switch não compreende uma extensão de fornecedor, um código de erro OFPBRC_BAD_VENDOR"
+  #"foi definido sob o OFPET_BAD_REQUEST tipo de erro."
   'OFPBRC_BAD_VENDOR'     : 3,
 
   'OFPBRC_BAD_SUBTYPE'    : 4, 
-  'OFPBRC_EPERM'          : 5, "Erro de permissões"
-  'OFPBRC_BAD_LEN'        : 6, "Comprimento pedido errado para comprimento do pedido de tipo typeWrong"
-  'OFPBRC_BUFFER_EMPTY'   : 7, "Buffer especificado já foi utilizado"
-  'OFPBRC_BUFFER_UNKNOWN' : 8, "Buffer especificado não existe"
+  'OFPBRC_EPERM'          : 5, #"Erro de permissões"
+  'OFPBRC_BAD_LEN'        : 6, #"Comprimento pedido errado para comprimento do pedido de tipo typeWrong"
+  'OFPBRC_BUFFER_EMPTY'   : 7, #"Buffer especificado já foi utilizado"
+  'OFPBRC_BUFFER_UNKNOWN' : 8, #"Buffer especificado não existe"
 }
 
 ofp_bad_action_code_rev_map = {
-  'OFPBAC_BAD_TYPE'        : 0, "Tipo de acção desconhecida ou sem suporte"
-  'OFPBAC_BAD_LEN'         : 1, "Problema no comprimento em ações"
+  'OFPBAC_BAD_TYPE'        : 0, #"Tipo de acção desconhecida ou sem suporte"
+  'OFPBAC_BAD_LEN'         : 1, #"Problema no comprimento em ações"
   'OFPBAC_BAD_VENDOR'      : 2, 
   'OFPBAC_BAD_VENDOR_TYPE' : 3,
-  'OFPBAC_BAD_OUT_PORT'    : 4, "Problema na validação da porta de saída."
-  'OFPBAC_BAD_ARGUMENT'    : 5, "Má argumento de ação"
-  'OFPBAC_EPERM'           : 6, "Erro de permissões"
-  'OFPBAC_TOO_MANY'        : 7, "Não pode lidar com isso com muitas ações"
-  'OFPBAC_BAD_QUEUE'       : 8, "Problema na validação da fila de saída."
+  'OFPBAC_BAD_OUT_PORT'    : 4, #"Problema na validação da porta de saída."
+  'OFPBAC_BAD_ARGUMENT'    : 5, #"Má argumento de ação"
+  'OFPBAC_EPERM'           : 6, #"Erro de permissões"
+  'OFPBAC_TOO_MANY'        : 7, #"Não pode lidar com isso com muitas ações"
+  'OFPBAC_BAD_QUEUE'       : 8, #"Problema na validação da fila de saída."
 }
 
 ofp_flow_mod_failed_code_rev_map = {
-  """
-  OFPFMFC_ALL_TABLES_FULL:
-  O switch agora envia uma mensagem de erro quando um fluxo é adicionado, 
-  mas não pode porque todas as mesas estão cheias.
-  A mensagem tem um tipo de erro de OFPET_FLOW_MOD_FAILED e 
-  código do OFPFMFC_ALL_TABLES_FULL. E se
-  as referências comando Flow-Mod um pacote buffer, 
-  em seguida, ações não são executadas no pacote. E se
-  quer o controlador do pacote a ser enviado, 
-  independentemente de haver ou não uma entrada de fluxo é adicionada, 
-  em seguida, ele deve usar um Packet-out diretamente.
-  """
+  #"""
+  #OFPFMFC_ALL_TABLES_FULL:
+  #O switch agora envia uma mensagem de erro quando um fluxo é adicionado,
+  #mas não pode porque todas as mesas estão cheias.
+  #A mensagem tem um tipo de erro de OFPET_FLOW_MOD_FAILED e
+  #código do OFPFMFC_ALL_TABLES_FULL. E se
+  #as referências comando Flow-Mod um pacote buffer,
+  #em seguida, ações não são executadas no pacote. E se
+  #quer o controlador do pacote a ser enviado,
+  #independentemente de haver ou não uma entrada de fluxo é adicionada,
+  #em seguida, ele deve usar um Packet-out diretamente.
+  #"""
   'OFPFMFC_ALL_TABLES_FULL'   : 0, 
-  'OFPFMFC_OVERLAP'           : 1, "Tentou adicionar fluxo de sobreposição com CHECK_OVERLAP jogo da bandeira"
-  'OFPFMFC_EPERM'             : 2, "Erro de permissões"
-  'OFPFMFC_BAD_EMERG_TIMEOUT' : 3, "Fluxo não acrescentado por causa do tempo limite não suportado"
-  'OFPFMFC_BAD_COMMAND'       : 4, "Comando não suportado ou desconhecido"
-  'OFPFMFC_UNSUPPORTED'       : 5, "Comando não suportado"
+  'OFPFMFC_OVERLAP'           : 1, #"Tentou adicionar fluxo de sobreposição com CHECK_OVERLAP jogo da bandeira"
+  'OFPFMFC_EPERM'             : 2, #"Erro de permissões"
+  'OFPFMFC_BAD_EMERG_TIMEOUT' : 3, #"Fluxo não acrescentado por causa do tempo limite não suportado"
+  'OFPFMFC_BAD_COMMAND'       : 4, #"Comando não suportado ou desconhecido"
+  'OFPFMFC_UNSUPPORTED'       : 5, #"Comando não suportado"
 }
 
 ofp_port_mod_failed_code_rev_map = {
-  'OFPPMFC_BAD_PORT'    : 0, "Número da porta especificado não existe"
-  'OFPPMFC_BAD_HW_ADDR' : 1, "Endereço de hardware especificado não corresponde ao número da porta"
+  'OFPPMFC_BAD_PORT'    : 0, #"Número da porta especificado não existe"
+  'OFPPMFC_BAD_HW_ADDR' : 1, #"Endereço de hardware especificado não corresponde ao número da porta"
 }
 
 ofp_queue_op_failed_code_rev_map = {
-  'OFPQOFC_BAD_PORT'  : 0, "Porta inválida (ou a porta não existe)"
-  'OFPQOFC_BAD_QUEUE' : 1, "Fila não existe."
-  'OFPQOFC_EPERM'     : 2, "Erro de permissões"
+  'OFPQOFC_BAD_PORT'  : 0, #"Porta inválida (ou a porta não existe)"
+  'OFPQOFC_BAD_QUEUE' : 1, #"Fila não existe."
+  'OFPQOFC_EPERM'     : 2, #"Erro de permissões"
 }
 
 ofp_port_config_rev_map = {
-  'OFPPC_PORT_DOWN'    : 1, "Porta é administrativamente para baixo"
-  'OFPPC_NO_STP'       : 2, "Desativar Spanning Tree na porta 802.1D  "
-  'OFPPC_NO_RECV'      : 4, "Soltar mais pacotes recebidos na porta"
-  'OFPPC_NO_RECV_STP'  : 8, "Soltar pacotes 802.1D STP recebidos"
-  'OFPPC_NO_FLOOD'     : 16, "Não inclua essa porta a inundação"
-  'OFPPC_NO_FWD'       : 32, "Descartar pacotes enviados para a porta"
-  'OFPPC_NO_PACKET_IN' : 64, "Não enviar msgs de pacotes-in para porta"
+  'OFPPC_PORT_DOWN'    : 1, #"Porta é administrativamente para baixo"
+  'OFPPC_NO_STP'       : 2, #"Desativar Spanning Tree na porta 802.1D  "
+  'OFPPC_NO_RECV'      : 4, #"Soltar mais pacotes recebidos na porta"
+  'OFPPC_NO_RECV_STP'  : 8, #"Soltar pacotes 802.1D STP recebidos"
+  'OFPPC_NO_FLOOD'     : 16, #"Não inclua essa porta a inundação"
+  'OFPPC_NO_FWD'       : 32, #"Descartar pacotes enviados para a porta"
+  'OFPPC_NO_PACKET_IN' : 64, #"Não enviar msgs de pacotes-in para porta"
 }
 
 ofp_port_state_rev_map = {
-  'OFPPS_STP_LISTEN'  : 0, "Ouvir a Spanning Tree"
-  'OFPPS_LINK_DOWN'   : 1, "Sem ligação física presente"
-  'OFPPS_STP_LEARN'   : 256, "Informar a Spanning Tree"
-  'OFPPS_STP_FORWARD' : 512, "Enviar Spanning Tree"
-  'OFPPS_STP_BLOCK'   : 768, "Bloquear Spanning Tree"
+  'OFPPS_STP_LISTEN'  : 0, #"Ouvir a Spanning Tree"
+  'OFPPS_LINK_DOWN'   : 1, #"Sem ligação física presente"
+  'OFPPS_STP_LEARN'   : 256, #"Informar a Spanning Tree"
+  'OFPPS_STP_FORWARD' : 512, #"Enviar Spanning Tree"
+  'OFPPS_STP_BLOCK'   : 768, #"Bloquear Spanning Tree"
 }
 OFPPS_STP_MASK        = 768
 
 ofp_port_features_rev_map = {
-  'OFPPF_10MB_HD'    : 1, "10 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
-  'OFPPF_10MB_FD'    : 2, "10 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_100MB_HD'   : 4, "100 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
-  'OFPPF_100MB_FD'   : 8, "100 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_1GB_HD'     : 16, "1 Gb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
-  'OFPPF_1GB_FD'     : 32, "1 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_10GB_FD'    : 64, "10 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
-  'OFPPF_COPPER'     : 128, "Médio de cobre"
-  'OFPPF_FIBER'      : 256, "Médio do filamento"
-  'OFPPF_AUTONEG'    : 512, "Auto-negociação"
-  'OFPPF_PAUSE'      : 1024, "Pausa"
-  'OFPPF_PAUSE_ASYM' : 2048, "Pausa assimétrica"
+  'OFPPF_10MB_HD'    : 1, #"10 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
+  'OFPPF_10MB_FD'    : 2, #"10 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_100MB_HD'   : 4, #"100 Mb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
+  'OFPPF_100MB_FD'   : 8, #"100 Mb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_1GB_HD'     : 16, #"1 Gb sustentação da taxa de half-duplex (transmissor e receptor enviam mas não ao mesmo tempo)"
+  'OFPPF_1GB_FD'     : 32, #"1 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_10GB_FD'    : 64, #"10 Gb sustentação da taxa de full-duplex (transmissor e receptor enviam ao mesmo tempo)"
+  'OFPPF_COPPER'     : 128, #"Médio de cobre"
+  'OFPPF_FIBER'      : 256, #"Médio do filamento"
+  'OFPPF_AUTONEG'    : 512, #"Auto-negociação"
+  'OFPPF_PAUSE'      : 1024, #"Pausa"
+  'OFPPF_PAUSE_ASYM' : 2048, #"Pausa assimétrica"
 }
 
 ofp_queue_properties_rev_map = {
@@ -491,92 +493,92 @@ ofp_queue_properties_rev_map = {
 OFPQT_NONE         = 0
 
 ofp_capabilities_rev_map = {
-  'OFPC_FLOW_STATS'   : 1, "Estatísticas de fluxos"
-  'OFPC_TABLE_STATS'  : 2, "Estatísticas da tabela"
-  'OFPC_PORT_STATS'   : 4, "Estatísticas da porta"
-  'OFPC_STP'          : 8, "Spanning Tree"
-  'OFPC_RESERVED'     : 16, "Reservado"
-  'OFPC_IP_REASM'     : 32, "Pode remontar os fragmentos IP"
-  'OFPC_QUEUE_STATS'  : 64, "Estatísticas da fila"
-  'OFPC_ARP_MATCH_IP' : 128, "ARP de combinação do Ip"
+  'OFPC_FLOW_STATS'   : 1, #"Estatísticas de fluxos"
+  'OFPC_TABLE_STATS'  : 2, #"Estatísticas da tabela"
+  'OFPC_PORT_STATS'   : 4, #"Estatísticas da porta"
+  'OFPC_STP'          : 8, #"Spanning Tree"
+  'OFPC_RESERVED'     : 16, #"Reservado"
+  'OFPC_IP_REASM'     : 32, #"Pode remontar os fragmentos IP"
+  'OFPC_QUEUE_STATS'  : 64, #"Estatísticas da fila"
+  'OFPC_ARP_MATCH_IP' : 128, #"ARP de combinação do Ip"
   }
 
 ofp_config_flags_rev_map = {
-  'OFPC_FRAG_NORMAL' : 0, "Nenhum tratamento especial para fragmentos"
-  'OFPC_FRAG_DROP'   : 1, "Exclusão de fragmentos"
-  'OFPC_FRAG_REASM'  : 2, "Remontar (apenas se OFPC_IP_REASM definido)."
-  'OFPC_FRAG_MASK'   : 3, "Fragmento da máscara"
+  'OFPC_FRAG_NORMAL' : 0, #"Nenhum tratamento especial para fragmentos"
+  'OFPC_FRAG_DROP'   : 1, #"Exclusão de fragmentos"
+  'OFPC_FRAG_REASM'  : 2, #"Remontar (apenas se OFPC_IP_REASM definido)."
+  'OFPC_FRAG_MASK'   : 3, #"Fragmento da máscara"
   }
 
 ofp_flow_mod_command_rev_map = {
-  'OFPFC_ADD'           : 0, "Novo fluxo"
-  'OFPFC_MODIFY'        : 1, "Modificar todos os fluxos correspondentes"
-  'OFPFC_MODIFY_STRICT' : 2, "Alterar inscrição estritamente wildcards correspondentes e prioridade"
-  'OFPFC_DELETE'        : 3, "Excluir todos os fluxos correspondentes"
-  'OFPFC_DELETE_STRICT' : 4, "Excluir entrada estritamente wildcards correspondentes e prioridade"
+  'OFPFC_ADD'           : 0, #"Novo fluxo"
+  'OFPFC_MODIFY'        : 1, #"Modificar todos os fluxos correspondentes"
+  'OFPFC_MODIFY_STRICT' : 2, #"Alterar inscrição estritamente wildcards correspondentes e prioridade"
+  'OFPFC_DELETE'        : 3, #"Excluir todos os fluxos correspondentes"
+  'OFPFC_DELETE_STRICT' : 4, #"Excluir entrada estritamente wildcards correspondentes e prioridade"
 }
 
 ofp_flow_mod_flags_rev_map = {
-  'OFPFF_SEND_FLOW_REM' : 1, "Enviar fluxo de mensagens removidas quando o fluxo expirar ou for deletado"
-  'OFPFF_CHECK_OVERLAP' : 2, "Verifique se há sobreposição nas primeiras entradas"
+  'OFPFF_SEND_FLOW_REM' : 1, #"Enviar fluxo de mensagens removidas quando o fluxo expirar ou for deletado"
+  'OFPFF_CHECK_OVERLAP' : 2, #"Verifique se há sobreposição nas primeiras entradas"
   'OFPFF_EMERG'         : 4, 
 }
 
 ofp_stats_reply_flags_rev_map = {
-  'OFPSF_REPLY_MORE' : 1, "Em vez de usar pacote vazio, utilizar a flag OFPSF_REPLY_MORE para mudar a estratégia de fragmentação de respostas estatísticas"
+  'OFPSF_REPLY_MORE' : 1, #"Em vez de usar pacote vazio, utilizar a flag OFPSF_REPLY_MORE para mudar a estratégia de fragmentação de respostas estatísticas"
 }
 
 ofp_packet_in_reason_rev_map = {
   'OFPR_NO_MATCH' : 0, 
-  'OFPR_ACTION'   : 1, "Saída para o controlador no conjunto de ações"
+  'OFPR_ACTION'   : 1, #"Saída para o controlador no conjunto de ações"
 }
 
 ofp_flow_removed_reason_rev_map = {
-  'OFPRR_IDLE_TIMEOUT' : 0, "Fluxo tempo ocioso excedeu idle_timeout."
-  'OFPRR_HARD_TIMEOUT' : 1, "Tempo excedido hard_timeout"
-  'OFPRR_DELETE'       : 2, "Despejados por um APAGAR no mod fluxo "
+  'OFPRR_IDLE_TIMEOUT' : 0, #"Fluxo tempo ocioso excedeu idle_timeout."
+  'OFPRR_HARD_TIMEOUT' : 1, #"Tempo excedido hard_timeout"
+  'OFPRR_DELETE'       : 2, #"Despejados por um APAGAR no mod fluxo "
 }
 
 ofp_port_reason_rev_map = {
-  'OFPPR_ADD'    : 0, "A porta foi adicionada"
-  'OFPPR_DELETE' : 1, "A porta foi removida"
-  'OFPPR_MODIFY' : 2, "Algum atributo da porta mudou"
+  'OFPPR_ADD'    : 0, #"A porta foi adicionada"
+  'OFPPR_DELETE' : 1, #"A porta foi removida"
+  'OFPPR_MODIFY' : 2, #"Algum atributo da porta mudou"
 }
 
 ofp_port_rev_map = {
-  'OFPP_MAX'        : 65280, "O número máximo de portas de switch físicos e lógicos"
+  'OFPP_MAX'        : 65280, #"O número máximo de portas de switch físicos e lógicos"
   
-  """
-  OFPP_IN_PORT: Enviar o pacote para a porta de entrada. Esta
-  porta reservada deve ser utilizado de forma explícita
-  de modo a enviar de volta para fora da porta de entrada
-  """
+  #"""
+  #OFPP_IN_PORT: Enviar o pacote para a porta de entrada. Esta
+  #porta reservada deve ser utilizado de forma explícita
+  #de modo a enviar de volta para fora da porta de entrada
+  #"""
   'OFPP_IN_PORT'    : 65528, 
   
-  """
-  Submeta o pacote para a primeira tabela de fluxo
-  NB: A porta de destino só pode ser
-  utilizada em mensagens para pacotes de saída.
-  """
+  #"""
+  #Submeta o pacote para a primeira tabela de fluxo
+  #NB: A porta de destino só pode ser
+  #utilizada em mensagens para pacotes de saída.
+  #"""
   'OFPP_TABLE'      : 65529, 
 
-  'OFPP_NORMAL'     : 65530, "Enviar usando o non-OpenFlow pipeline."
-  'OFPP_FLOOD'      : 65531, "Fluxo usando o non-OpenFlow pipeline."
-  'OFPP_ALL'        : 65532, "Todas as portas padrão, exceto a porta de entrada"
-  'OFPP_CONTROLLER' : 65533, "Enviar para o controlador"
-  'OFPP_LOCAL'      : 65534, "'Porta' local do Openflow"
-  'OFPP_NONE'       : 65535, "Valor especial usado em algumas solicitações quando nenhuma porta for especificado (ou seja wildcarded)."
+  'OFPP_NORMAL'     : 65530, #"Enviar usando o non-OpenFlow pipeline."
+  'OFPP_FLOOD'      : 65531, #"Fluxo usando o non-OpenFlow pipeline."
+  'OFPP_ALL'        : 65532, #"Todas as portas padrão, exceto a porta de entrada"
+  'OFPP_CONTROLLER' : 65533, #"Enviar para o controlador"
+  'OFPP_LOCAL'      : 65534, #"'Porta' local do Openflow"
+  'OFPP_NONE'       : 65535, #"Valor especial usado em algumas solicitações quando nenhuma porta for especificado (ou seja wildcarded)."
 }
 
 ofp_flow_wildcards_rev_map = {
-  'OFPFW_IN_PORT'      : 1, "Alternar porta de entrada"
-  'OFPFW_DL_VLAN'      : 2, "VLAN"
-  'OFPFW_DL_SRC'       : 4, "Endereço de origem Ethernet"
-  'OFPFW_DL_DST'       : 8, "Endereço de destino Ethernet"
-  'OFPFW_DL_TYPE'      : 16, "Tipo de quadro Ethernet"
-  'OFPFW_NW_PROTO'     : 32, "Protocolo IP"
-  'OFPFW_TP_SRC'       : 64, "Porta de origem TCP / UDP"
-  'OFPFW_TP_DST'       : 128, "Porta de destino TCP / UDP"
+  'OFPFW_IN_PORT'      : 1, #"Alternar porta de entrada"
+  'OFPFW_DL_VLAN'      : 2, #"VLAN"
+  'OFPFW_DL_SRC'       : 4, #"Endereço de origem Ethernet"
+  'OFPFW_DL_DST'       : 8, #"Endereço de destino Ethernet"
+  'OFPFW_DL_TYPE'      : 16, #"Tipo de quadro Ethernet"
+  'OFPFW_NW_PROTO'     : 32, #"Protocolo IP"
+  'OFPFW_TP_SRC'       : 64, #"Porta de origem TCP / UDP"
+  'OFPFW_TP_DST'       : 128, #"Porta de destino TCP / UDP"
   'OFPFW_DL_VLAN_PCP'  : 1048576,
   'OFPFW_NW_TOS'       : 1<<21,
 }
@@ -605,8 +607,8 @@ NO_BUFFER = 4294967295
 # ----------------------------------------------------------------------
 
 #1. Openflow Header
-"Classe do cabeçalho OFP, cabeçalho de todos os pacotes Openflow"
 class ofp_header (ofp_base):
+  "Classe do cabeçalho OFP, cabeçalho de todos os pacotes Openflow"
   _MIN_LENGTH = 8
   def __init__ (self, **kw):
     self.version = OFP_VERSION
@@ -617,50 +619,50 @@ class ofp_header (ofp_base):
       self.header_type = kw.pop('header_type')
     initHelper(self, kw)
 
-  """
+  @property
+  def xid (self):
+    """
   XID: ID da transação associado a este pacote.
       Respostas usar o mesmo ID como era no pedido
       para facilitar o emparelhamento
   """
-  @property
-  def xid (self):
     if self._xid is None:
       self._xid = generate_xid()
     return self._xid
 
-  "Montador XID"
   @xid.setter
   def xid (self, val):
+    "Montador XID"
     self._xid = val
 
-  "Define Validação"
   def _validate (self):
+    "Define Validação"
     if self.header_type not in ofp_type_map:
       return "type is not a known message type"
     return None
 
-  "Define Pacote"
   def pack (self):
+    "Define Pacote"
     assert self._assert()
 
     packed = b""
     packed += struct.pack("!BBHL", self.version, self.header_type,
-        len(self), self.xid)
+                          len(self), self.xid)
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     offset,length = self._unpack_header(raw, offset)
     return offset,length
 
-  "Define o cabeçalho do pacote desempacotado"
   def _unpack_header (self, raw, offset):
+    "Define o cabeçalho do pacote desempacotado"
     offset,(self.version, self.header_type, length, self.xid) = \
-        _unpack("!BBHL", raw, offset)
+      _unpack("!BBHL", raw, offset)
     return offset,length
 
-  "Retorna verdadeiro se igual. Verifica os campos do cabeçalho do pacote Openflow: type/version/length/xid"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual. Verifica os campos do cabeçalho do pacote Openflow: type/version/length/xid"
     if type(self) != type(other): return False
     if self.version != other.version: return False
     if self.header_type != other.header_type: return False
@@ -668,8 +670,8 @@ class ofp_header (ofp_base):
     if self.xid != other.xid: return False
     return True
 
-  "Função para mostrar"
   def show (self, prefix=''):
+    "Função para mostrar"
     outstr = ''
     outstr += prefix + 'version: ' + str(self.version) + '\n'
     outstr += prefix + 'type:    ' + str(self.header_type)# + '\n'
@@ -684,15 +686,17 @@ class ofp_header (ofp_base):
   def __str__ (self):
     return self.__class__.__name__ + "\n  " + self.show('  ').strip()
 
-"Classe base para corpos estatísticas"
-"""
-Corpos Estatísticas realmente não tem um campo de tipo no OpenFlow -
-As informações de tipo é no pedido ou resposta. É realmente
-Conveniente, embora, por isso, adicioná-lo. Note que você geralmente
-Não é necessário definir isso sozinho - o openflow_stats_XXX
-Decorador vai fazer isso por você.
-"""
+
 class ofp_stats_body_base (ofp_base):
+  """
+  Classe base para corpos estatísticas
+
+  Corpos Estatísticas realmente não tem um campo de tipo no OpenFlow -
+  As informações de tipo é no pedido ou resposta. É realmente
+  Conveniente, embora, por isso, adicioná-lo. Note que você geralmente
+  Não é necessário definir isso sozinho - o openflow_stats_XXX
+  Decorador vai fazer isso por você.
+  """
   """
   Base class for stats bodies
   """
@@ -707,11 +711,11 @@ class ofp_stats_body_base (ofp_base):
   def unpack (self, data, offset=0, avail=None):
   """
 
-"""
-Esta é uma espécie de equivalente de ofp_action_header na spec.
-No entanto, ofp_action_header como a especificação define que não é super
-útil para nós, já que tem o preenchimento nele.
-"""
+  #"""
+  #Esta é uma espécie de equivalente de ofp_action_header na spec.
+  #No entanto, ofp_action_header como a especificação define que não é super
+  #útil para nós, já que tem o preenchimento nele.
+  #"""
 class ofp_action_base (ofp_base):
   """
   Base class for actions
@@ -1397,12 +1401,12 @@ class ofp_match (ofp_base):
 
     return packed
 
-  """
-  nw_src e nw_dst valores superiores a 32 significam a mesma coisa como 32.
-  Nós normalizá-los aqui apenas para ser limpo e para que comparações act
-  como você quer que eles.
-  """
   def _normalize_wildcards (self, wildcards):
+    """
+    nw_src e nw_dst valores superiores a 32 significam a mesma coisa como 32.
+    Nós normalizá-los aqui apenas para ser limpo e para que comparações act
+    como você quer que eles.
+    """
     """
     nw_src and nw_dst values greater than 32 mean the same thing as 32.
     We normalize them here just to be clean and so that comparisons act
@@ -1416,23 +1420,23 @@ class ofp_match (ofp_base):
       wildcards |= (32 << OFPFW_NW_DST_SHIFT)
     return wildcards
 
-  """
-  Normalizar os bits curinga
-
-  Observe o seguinte a partir do OpenFlow 1.1 spec:
-
-      campos específicos de protocolo dentro ofp_match serão ignorados dentro
-      uma única tabela quando o protocolo correspondente não é especificado na
-      partida. Os campos de cabeçalho de cabeçalho IP e de transporte
-      irá ser ignorado, a menos que o Ethertype é especificado como o IPv4 ou
-      ARP. Os campos tp_src tp_dst e será ignorado, a menos que a rede
-      protocolo especificado é como TCP, UDP ou SCTP. Os campos que são ignorados
-      não precisa ser caracteres universais e deve ser definido como 0.
-
-    OpenFlow 1.0.1 Seção 3.4, na verdade tem uma versão melhorada do que precede,
-    mas não vamos citá-lo aqui, porque ele parece ter uma licença restritiva.
-  """
   def _wire_wildcards (self, wildcards):
+    """
+    Normalizar os bits curinga
+
+    Observe o seguinte a partir do OpenFlow 1.1 spec:
+
+        campos específicos de protocolo dentro ofp_match serão ignorados dentro
+        uma única tabela quando o protocolo correspondente não é especificado na
+        partida. Os campos de cabeçalho de cabeçalho IP e de transporte
+        irá ser ignorado, a menos que o Ethertype é especificado como o IPv4 ou
+        ARP. Os campos tp_src tp_dst e será ignorado, a menos que a rede
+        protocolo especificado é como TCP, UDP ou SCTP. Os campos que são ignorados
+        não precisa ser caracteres universais e deve ser definido como 0.
+
+      OpenFlow 1.0.1 Seção 3.4, na verdade tem uma versão melhorada do que precede,
+      mas não vamos citá-lo aqui, porque ele parece ter uma licença restritiva.
+    """
     """
     Normalize the wildcard bits
 
@@ -1451,66 +1455,66 @@ class ofp_match (ofp_base):
     """
     #TODO: Set the masked fields to 0.
     if self.dl_type == 0x0800:
-        # IP
-        if  self.nw_proto not in (1,6,17):
-          # not TCP/UDP/ICMP -> Clear TP wildcards for the wire
-          return wildcards & ~(OFPFW_TP_SRC | OFPFW_TP_DST)
-        else:
-          return wildcards
+      # IP
+      if  self.nw_proto not in (1,6,17):
+        # not TCP/UDP/ICMP -> Clear TP wildcards for the wire
+        return wildcards & ~(OFPFW_TP_SRC | OFPFW_TP_DST)
+      else:
+        return wildcards
     elif self.dl_type == 0x0806:
-        # ARP: clear NW_TOS / TP wildcards for the wire
-        return wildcards & ~( OFPFW_NW_TOS | OFPFW_TP_SRC | OFPFW_TP_DST)
+      # ARP: clear NW_TOS / TP wildcards for the wire
+      return wildcards & ~( OFPFW_NW_TOS | OFPFW_TP_SRC | OFPFW_TP_DST)
     else:
-        # not even IP. Clear NW/TP wildcards for the wire
-        return wildcards & ~( OFPFW_NW_TOS | OFPFW_NW_PROTO
-            | OFPFW_NW_SRC_MASK | OFPFW_NW_DST_MASK
-            | OFPFW_TP_SRC | OFPFW_TP_DST)
+      # not even IP. Clear NW/TP wildcards for the wire
+      return wildcards & ~( OFPFW_NW_TOS | OFPFW_NW_PROTO
+                            | OFPFW_NW_SRC_MASK | OFPFW_NW_DST_MASK
+                            | OFPFW_TP_SRC | OFPFW_TP_DST)
 
-  "Remove campos inigualáveis. A lógica desta deve corresponder exatamente isso em _wire_wildcards ()"
   def fix (self):
+    "Remove campos inigualáveis. A lógica desta deve corresponder exatamente isso em _wire_wildcards ()"
     """
     Removes unmatchable fields
 
     The logic in this should exactly match that in _wire_wildcards()
     """
     if self.dl_type == 0x0800:
-        # IP
-        if  self.nw_proto not in (1,6,17):
-          # not TCP/UDP/ICMP -> Clear TP wildcards for the wire
-          self.tp_src = None
-          self.tp_dst = None
-          return
+      # IP
+      if  self.nw_proto not in (1,6,17):
+        # not TCP/UDP/ICMP -> Clear TP wildcards for the wire
+        self.tp_src = None
+        self.tp_dst = None
+        return
     elif self.dl_type == 0x0806:
-        # ARP: clear NW_TOS / TP wildcards for the wire
-        self.tp_src = None
-        self.tp_dst = None
-        self.nw_tos = None
-        return
+      # ARP: clear NW_TOS / TP wildcards for the wire
+      self.tp_src = None
+      self.tp_dst = None
+      self.nw_tos = None
+      return
     else:
-        # not even IP. Clear NW/TP wildcards for the wire
-        self.nw_tos = None
-        self.nw_proto = None
-        self.nw_src = None
-        self.nw_dst = None
-        self.tp_src = None
-        self.tp_dst = None
-        return
+      # not even IP. Clear NW/TP wildcards for the wire
+      self.nw_tos = None
+      self.nw_proto = None
+      self.nw_src = None
+      self.nw_dst = None
+      self.tp_src = None
+      self.tp_dst = None
+      return
 
-  """
-  Liberar os caracteres universais
-
-  Normalizar os bits curinga da representação fio openflow.
-
-    Nota esta atrocidade da especificação OF1.1:
-    campos específicos de protocolo dentro ofp_match serão ignorados dentro
-    uma única tabela quando o protocolo correspondente não é especificado no
-    partida. Os campos de cabeçalho de cabeçalho IP e de transporte
-    irá ser ignorado, a menos que o Ethertype é especificado como o IPv4 ou
-    ARP. Os campos tp_src tp_dst e será ignorado, a menos que a rede
-    protocolo especificado é como TCP, UDP ou SCTP. Os campos que são ignorados
-    não precisa ser caracteres universais e deve ser definido como 0.
-  """
   def _unwire_wildcards (self, wildcards):
+    """
+    Liberar os caracteres universais
+
+    Normalizar os bits curinga da representação fio openflow.
+
+      Nota esta atrocidade da especificação OF1.1:
+      campos específicos de protocolo dentro ofp_match serão ignorados dentro
+      uma única tabela quando o protocolo correspondente não é especificado no
+      partida. Os campos de cabeçalho de cabeçalho IP e de transporte
+      irá ser ignorado, a menos que o Ethertype é especificado como o IPv4 ou
+      ARP. Os campos tp_src tp_dst e será ignorado, a menos que a rede
+      protocolo especificado é como TCP, UDP ou SCTP. Os campos que são ignorados
+      não precisa ser caracteres universais e deve ser definido como 0.
+    """
     """
     Normalize the wildcard bits from the openflow wire representation.
 
@@ -1524,30 +1528,30 @@ class ofp_match (ofp_base):
     don't need to be wildcarded and should be set to 0.
     """
     if self._dl_type == 0x0800:
-        # IP
-        if  self._nw_proto not in (1,6,17):
-          # not TCP/UDP/ICMP -> Set TP wildcards for the object
-          return wildcards | (OFPFW_TP_SRC | OFPFW_TP_DST)
-        else:
-          return wildcards
+      # IP
+      if  self._nw_proto not in (1,6,17):
+        # not TCP/UDP/ICMP -> Set TP wildcards for the object
+        return wildcards | (OFPFW_TP_SRC | OFPFW_TP_DST)
+      else:
+        return wildcards
     elif self._dl_type == 0x0806:
-        # ARP: Set NW_TOS / TP wildcards for the object
-        return wildcards | ( OFPFW_NW_TOS | OFPFW_TP_SRC | OFPFW_TP_DST)
+      # ARP: Set NW_TOS / TP wildcards for the object
+      return wildcards | ( OFPFW_NW_TOS | OFPFW_TP_SRC | OFPFW_TP_DST)
     else:
-        # not even IP. Set NW/TP wildcards for the object
-        return wildcards | ( OFPFW_NW_TOS | OFPFW_NW_PROTO
-                             | OFPFW_NW_SRC_MASK | OFPFW_NW_DST_MASK
-                             | OFPFW_TP_SRC | OFPFW_TP_DST)
+      # not even IP. Set NW/TP wildcards for the object
+      return wildcards | ( OFPFW_NW_TOS | OFPFW_NW_PROTO
+                           | OFPFW_NW_SRC_MASK | OFPFW_NW_DST_MASK
+                           | OFPFW_TP_SRC | OFPFW_TP_DST)
 
 
   @property
-  "É caracter universal"
   def is_wildcarded (self):
+    "É caracter universal"
     return self.wildcards & OFPFW_ALL != 0
 
   @property
-  "É exato"
-  def is_exact (self):
+  def is_exact(self):
+    "É exato"
     return not self.is_wildcarded
 
   "Define o pacote desempacotado"
@@ -1574,16 +1578,16 @@ class ofp_match (ofp_base):
     return offset
 
   @staticmethod
-  "Define o tamanho"
-  def __len__ ():
+  def __len__():
+    "Define o tamanho"
     return 40
 
-  """
-  Gerar um valor de hash para este jogo
-
-  Isso gera um código hash que pode ser útil, mas sem bloquear a combinação do objeto.
-  """
   def hash_code (self):
+    """
+    Gerar um valor de hash para este jogo
+
+    Isso gera um código hash que pode ser útil, mas sem bloquear a combinação do objeto.
+    """
     """
     generate a hash value for this match
 
@@ -1603,27 +1607,27 @@ class ofp_match (ofp_base):
 
     return int(h & 0x7fFFffFF)
 
-  """
-  _hash_: Devolver o valor de hash do objeto (se tiver um). 
-  valores de hash são inteiros. Eles são usados ​​para comparar 
-  rapidamente chaves de dicionário durante uma pesquisa no dicionário. 
-  Os valores numéricos que comparam iguais têm 
-  o mesmo valor de hash (mesmo se eles são de diferentes tipos, 
-  como é o caso para 1 e 1,0).
-  """
   def __hash__ (self):
+    """
+    _hash_: Devolver o valor de hash do objeto (se tiver um).
+    valores de hash são inteiros. Eles são usados ​​para comparar
+    rapidamente chaves de dicionário durante uma pesquisa no dicionário.
+    Os valores numéricos que comparam iguais têm
+    o mesmo valor de hash (mesmo se eles são de diferentes tipos,
+    como é o caso para 1 e 1,0).
+    """
     self._locked = True
     return self.hash_code()
 
-  """
-  Teste se / presente / combinação abrange completamente o outro jogo.
-
-    se consider_other_wildcards, então a * outra * combinação também não deve ter
-    mais curingas do que nós (não deve ser mais do que nós somos)
-
-    Importante para que não seja estrita modificar flow_mods etc.
-  """
   def matches_with_wildcards (self, other, consider_other_wildcards=True):
+    """
+    Teste se / presente / combinação abrange completamente o outro jogo.
+
+      se consider_other_wildcards, então a * outra * combinação também não deve ter
+      mais curingas do que nós (não deve ser mais do que nós somos)
+
+      Importante para que não seja estrita modificar flow_mods etc.
+    """
     """
     Test whether /this/ match completely encompasses the other match.
 
@@ -1644,8 +1648,8 @@ class ofp_match (ofp_base):
       other_bits = other.wildcards&~(OFPFW_NW_SRC_MASK|OFPFW_NW_DST_MASK)
       if (self_bits | other_bits) != self_bits: return False
 
-    "Combinações faltosas"
     def match_fail (mine, others):
+      "Combinações faltosas"
       if mine is None: return False # Wildcarded
       return mine != others
 
@@ -1672,18 +1676,18 @@ class ofp_match (ofp_base):
       other_nw_src = other.get_nw_src()
       if self_nw_src[1] > other_nw_src[1]: return False #???
       if not IPAddr(other_nw_src[0]).inNetwork(
-            (self_nw_src[0], self_nw_src[1])): return False
+              (self_nw_src[0], self_nw_src[1])): return False
 
     self_nw_dst = self.get_nw_dst()
     if self_nw_dst[0] is not None:
       other_nw_dst = other.get_nw_dst()
       if self_nw_dst[1] > other_nw_dst[1]: return False #???
       if not IPAddr(other_nw_dst[0]).inNetwork(
-            (self_nw_dst[0], self_nw_dst[1])): return False
+              (self_nw_dst[0], self_nw_dst[1])): return False
 
     return True
-  "Compara os campos do fluxo dos wildcards e retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Compara os campos do fluxo dos wildcards e retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.wildcards != other.wildcards: return False
     if self.in_port != other.in_port: return False
@@ -1700,29 +1704,29 @@ class ofp_match (ofp_base):
     if self.tp_dst != other.tp_dst: return False
     return True
 
-  "Retorna uma string"
   def __str__ (self):
+    "Retorna uma string"
     return self.__class__.__name__ + "\n  " + self.show('  ').strip()
 
-  "Mostrar"
   def show (self, prefix=''):
-    "String binaria"
+    "Mostrar"
     def binstr (n):
+      "String binaria"
       s = ''
       while True:
         s = ('1' if n & 1 else '0') + s
         n >>= 1
         if n == 0: break
       return s
-    "Hexa seguro"
     def safehex(n):
+      "Hexa seguro"
       if n is None:
         return "(None)"
       else:
         return hex(n)
 
-    "Mostra wildcards"
     def show_wildcards(w):
+      "Mostra wildcards"
       parts = [ k.lower()[len("OFPFW_"):]
                 for (k,v) in ofp_flow_wildcards_rev_map.iteritems()
                 if v & w == v ]
@@ -1740,9 +1744,9 @@ class ofp_match (ofp_base):
     outstr += prefix + 'wildcards: '
     outstr += show_wildcards(self.wildcards)
     outstr += ' (%s = %x)\n' % (binstr(self.wildcards), self.wildcards)
-    
-    "Adicionar em outstr os campos do fluxo dos wildcards"
+
     def append (f, formatter=str):
+      "Adicionar em outstr os campos do fluxo dos wildcards"
       v = self.__getattr__(f)
       if v is None: return ''
       return prefix + f + ": " + formatter(v) + "\n"
@@ -1760,8 +1764,8 @@ class ofp_match (ofp_base):
     outstr += append('tp_dst')
     return outstr
 
-"Classe para ação genérica"
 class ofp_action_generic (ofp_action_base):
+  "Classe para ação genérica"
   _MIN_LENGTH = 8
   def __init__ (self, **kw):
     self.type = None # Purposely bad
@@ -1769,8 +1773,8 @@ class ofp_action_generic (ofp_action_base):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -1778,27 +1782,27 @@ class ofp_action_generic (ofp_action_base):
     packed += self.data
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length) = _unpack("!HH", raw, offset)
     offset,self.data = _read(raw, offset, length-4)
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 4 + len(self.data)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if self.data != other.data: return False
     return True
 
-  "Função para mostrar type/len"
   def show (self, prefix=''):
+    "Função para mostrar type/len"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -1806,17 +1810,17 @@ class ofp_action_generic (ofp_action_base):
 
 
 @openflow_action('OFPAT_OUTPUT', 0)
-"OFPAT_OUTPUT: Saída para porta do switch."
-"CLasse para ação de saída"
 class ofp_action_output (ofp_action_base):
+  "OFPAT_OUTPUT: Saída para porta do switch."
+  "CLasse para ação de saída"
   def __init__ (self, **kw):
     self.port = None # Purposely bad -- require specification
     self.max_len = 0xffFF
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     if self.port != OFPP_CONTROLLER:
       self.max_len = 0
 
@@ -1827,21 +1831,21 @@ class ofp_action_output (ofp_action_base):
                           self.max_len)
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length, self.port, self.max_len) = \
-        _unpack("!HHHH", raw, offset)
+      _unpack("!HHHH", raw, offset)
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamaho"
   def __len__ ():
+    "Retorna o tamaho"
     return 8
 
-  "Verifica se os campos coincidem"
   def __eq__ (self, other):
+    "Verifica se os campos coincidem"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
@@ -1849,8 +1853,8 @@ class ofp_action_output (ofp_action_base):
     if self.max_len != other.max_len: return False
     return True
 
-  "Mostra os campos type/len/port/max_len"
   def show (self, prefix=''):
+    "Mostra os campos type/len/port/max_len"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -1860,16 +1864,16 @@ class ofp_action_output (ofp_action_base):
 
 
 @openflow_action('OFPAT_ENQUEUE', 11)
-"Classe para ações enfileiradas"
 class ofp_action_enqueue (ofp_action_base):
+  "Classe para ações enfileiradas"
   def __init__ (self, **kw):
     self.port = None # Require user to set
     self.queue_id = 0
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -1878,8 +1882,8 @@ class ofp_action_enqueue (ofp_action_base):
     packed += struct.pack("!L", self.queue_id)
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length, self.port) = _unpack("!HHH", raw, offset)
     offset = _skip(raw, offset, 6)
@@ -1888,12 +1892,12 @@ class ofp_action_enqueue (ofp_action_base):
     return offset
 
   @staticmethod
-  "Retorna o tamaho"
   def __len__ ():
+    "Retorna o tamaho"
     return 16
 
-  "Verifica se os campos coincidem"
   def __eq__ (self, other):
+    "Verifica se os campos coincidem"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
@@ -1901,8 +1905,8 @@ class ofp_action_enqueue (ofp_action_base):
     if self.queue_id != other.queue_id: return False
     return True
 
-  "Mostra os campos type/len/port/queue_id"
   def show (self, prefix=''):
+    "Mostra os campos type/len/port/queue_id"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -1912,19 +1916,19 @@ class ofp_action_enqueue (ofp_action_base):
 
 
 @openflow_action('OFPAT_STRIP_VLAN', 3)
-"OFPAT_STRIP_VLAN: Tira o cabeçalho 802.1q"
-"Classe para ação de retirada da VLAN"
 class ofp_action_strip_vlan (ofp_action_base):
+  "OFPAT_STRIP_VLAN: Tira o cabeçalho 802.1q"
+  "Classe para ação de retirada da VLAN"
   def __init__ (self):
     pass
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     packed = struct.pack("!HHi", self.type, len(self), 0)
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length) = _unpack("!HH", raw, offset)
     offset = _skip(raw, offset, 4)
@@ -1932,19 +1936,19 @@ class ofp_action_strip_vlan (ofp_action_base):
     return offset
 
   @staticmethod
- "Retorna o tamaho"
   def __len__ ():
+    "Retorna o tamaho"
     return 8
 
-  "Verifica se os campos coincidem"
   def __eq__ (self, other):
+    "Verifica se os campos coincidem"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     return True
 
-  "Mostra os campos type/len"
   def show (self, prefix=''):
+    "Mostra os campos type/len"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -1952,16 +1956,16 @@ class ofp_action_strip_vlan (ofp_action_base):
 
 
 @openflow_action('OFPAT_SET_VLAN_VID', 1)
-"OFPAT_SET_VLAN_VID: Defina o id 802.1q VLAN."
-"Classe para ação do ID da VLAN"
 class ofp_action_vlan_vid (ofp_action_base):
+  "OFPAT_SET_VLAN_VID: Defina o id 802.1q VLAN."
+  "Classe para ação do ID da VLAN"
   def __init__ (self, **kw):
     self.vlan_vid = 0
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -1969,31 +1973,31 @@ class ofp_action_vlan_vid (ofp_action_base):
     packed += _PAD2 # Pad
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length, self.vlan_vid) = \
-        _unpack("!HHH", raw, offset)
+      _unpack("!HHH", raw, offset)
     offset = _skip(raw, offset, 2)
     #TODO: check length for this and other actions
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamaho"
   def __len__ ():
+    "Retorna o tamaho"
     return 8
 
-  "Verifica se os campos coincidem"
   def __eq__ (self, other):
+    "Verifica se os campos coincidem"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.vlan_vid != other.vlan_vid: return False
     return True
 
-  "Mostra os campos type/len/vlan_id"
   def show (self, prefix=''):
+    "Mostra os campos type/len/vlan_id"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -2003,16 +2007,16 @@ ofp_action_set_vlan_vid = ofp_action_vlan_vid
 
 
 @openflow_action('OFPAT_SET_VLAN_PCP', 2)
-"OFPAT_SET_VLAN_PCP: Definir a prioridade 802.1q."
-"Classe para ação de prioridade da VLAN"
 class ofp_action_vlan_pcp (ofp_action_base):
+  "OFPAT_SET_VLAN_PCP: Definir a prioridade 802.1q."
+  "Classe para ação de prioridade da VLAN"
   def __init__ (self, **kw):
     self.vlan_pcp = 0
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2020,30 +2024,30 @@ class ofp_action_vlan_pcp (ofp_action_base):
     packed += _PAD3 # Pad
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length, self.vlan_pcp) = \
-        _unpack("!HHB", raw, offset)
+      _unpack("!HHB", raw, offset)
     offset = _skip(raw, offset, 3)
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamaho"
   def __len__ ():
+    "Retorna o tamaho"
     return 8
 
-  "Verifica se os campos coincidem"
   def __eq__ (self, other):
+    "Verifica se os campos coincidem"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.vlan_pcp != other.vlan_pcp: return False
     return True
 
-  "Mostra os campos type/len/vlan_pcp"
   def show (self, prefix=''):
+    "Mostra os campos type/len/vlan_pcp"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -2051,19 +2055,19 @@ class ofp_action_vlan_pcp (ofp_action_base):
     return outstr
 ofp_action_set_vlan_pcp = ofp_action_vlan_pcp
 
-"OFPAT_SET_DL_DST: Endereço Ethernet de destino"
+#"OFPAT_SET_DL_DST: Endereço Ethernet de destino"
 @openflow_action('OFPAT_SET_DL_DST', 5)
-"OFPAT_SET_DL_SRC: Endereço Ethernet de origem"
+#"OFPAT_SET_DL_SRC: Endereço Ethernet de origem"
 @openflow_action('OFPAT_SET_DL_SRC', 4)
-"Classe para ação de endereço Ethernet"
 class ofp_action_dl_addr (ofp_action_base):
+  "Classe para ação de endereço Ethernet"
   @classmethod
-  "Define o destino"
   def set_dst (cls, dl_addr = None):
+    "Define o destino"
     return cls(OFPAT_SET_DL_DST, dl_addr)
   @classmethod
-  "Define a origem"
   def set_src (cls, dl_addr = None):
+    "Define a origem"
     return cls(OFPAT_SET_DL_SRC, dl_addr)
 
   def __init__ (self, type = None, dl_addr = None):
@@ -2076,8 +2080,8 @@ class ofp_action_dl_addr (ofp_action_base):
     if dl_addr is not None:
       self.dl_addr = EthAddr(dl_addr)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if (not isinstance(self.dl_addr, EthAddr)
         and not isinstance(self.dl_addr, bytes)):
       return "dl_addr is not string or EthAddr"
@@ -2085,8 +2089,8 @@ class ofp_action_dl_addr (ofp_action_base):
       return "dl_addr is not of size 6"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2098,8 +2102,8 @@ class ofp_action_dl_addr (ofp_action_base):
     packed += _PAD6
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length) = _unpack("!HH", raw, offset)
     offset,self.dl_addr = _readether(raw, offset)
@@ -2108,39 +2112,39 @@ class ofp_action_dl_addr (ofp_action_base):
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 16
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.dl_addr != other.dl_addr: return False
     return True
 
-  "Mostra os campos: type/len/dl_addr"
   def show (self, prefix=''):
+    "Mostra os campos: type/len/dl_addr"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
     outstr += prefix + 'dl_addr: ' + str(self.dl_addr) + '\n'
     return outstr
 
-"OFPAT_SET_NW_DST: endereço IP de destino"
+#"OFPAT_SET_NW_DST: endereço IP de destino"
 @openflow_action('OFPAT_SET_NW_DST', 7)
-"OFPAT_SET_NW_SRC: endereço IP de origem"
+#"OFPAT_SET_NW_SRC: endereço IP de origem"
 @openflow_action('OFPAT_SET_NW_SRC', 6)
-"CLasse de ação do endereço IP"
 class ofp_action_nw_addr (ofp_action_base):
+  "CLasse de ação do endereço IP"
   @classmethod
-  "Define o destino"
   def set_dst (cls, nw_addr = None):
+    "Define o destino"
     return cls(OFPAT_SET_NW_DST, nw_addr)
   @classmethod
-  "Define a origem"
   def set_src (cls, nw_addr = None):
+    "Define a origem"
     return cls(OFPAT_SET_NW_SRC, nw_addr)
 
   def __init__ (self, type = None, nw_addr = None):
@@ -2154,8 +2158,8 @@ class ofp_action_nw_addr (ofp_action_base):
     else:
       self.nw_addr = IPAddr(0)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2163,8 +2167,8 @@ class ofp_action_nw_addr (ofp_action_base):
                           self.nw_addr.toSigned())
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length) = _unpack("!HH", raw, offset)
     offset,self.nw_addr = _readip(raw, offset)
@@ -2172,36 +2176,36 @@ class ofp_action_nw_addr (ofp_action_base):
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.nw_addr != other.nw_addr: return False
     return True
 
-  "Mostra os campos: type/len/nw_addr"
   def show (self, prefix=''):
+    "Mostra os campos: type/len/nw_addr"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
     outstr += prefix + 'nw_addr: ' + str(self.nw_addr) + '\n'
     return outstr
 
-"TOS (Type Of Service: é utilizado para diferenciar o tipo do pacote a ser transportado,"
-"classificando-o para que possa ter prioridade em sua transmissão. No cabeçalho IP, 8 bits são reservados para o Identificar ToS "
+#"TOS (Type Of Service: é utilizado para diferenciar o tipo do pacote a ser transportado,"
+#"classificando-o para que possa ter prioridade em sua transmissão. No cabeçalho IP, 8 bits são reservados para o Identificar ToS "
 @openflow_action('OFPAT_SET_NW_TOS', 8)
-"Classe para ação do TOS"
 class ofp_action_nw_tos (ofp_action_base):
+  "Classe para ação do TOS"
   def __init__ (self, nw_tos = 0):
     self.nw_tos = nw_tos
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2209,8 +2213,8 @@ class ofp_action_nw_tos (ofp_action_base):
     packed += _PAD3
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length, self.nw_tos) = _unpack("!HHB", raw, offset)
     offset = _skip(raw, offset, 3)
@@ -2218,39 +2222,39 @@ class ofp_action_nw_tos (ofp_action_base):
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.nw_tos != other.nw_tos: return False
     return True
-  
-  "Mostra os campos: type/len/nw_tos"
+
   def show (self, prefix=''):
+    "Mostra os campos: type/len/nw_tos"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
     outstr += prefix + 'nw_tos: ' + str(self.nw_tos) + '\n'
     return outstr
 
-"OFPAT_SET_TP_DST: Porta de destino TCP/UDP"
+#"OFPAT_SET_TP_DST: Porta de destino TCP/UDP"
 @openflow_action('OFPAT_SET_TP_DST', 10)
-"OFPAT_SET_TP_SRC: Porta de origem TCP/UDP"
+#"OFPAT_SET_TP_SRC: Porta de origem TCP/UDP"
 @openflow_action('OFPAT_SET_TP_SRC', 9)
-"Classe para ação da porta TCP/UDP"
 class ofp_action_tp_port (ofp_action_base):
+  "Classe para ação da porta TCP/UDP"
   @classmethod
-  "Define o destino"
   def set_dst (cls, tp_port = None):
+    "Define o destino"
     return cls(OFPAT_SET_TP_DST, tp_port)
   @classmethod
-  "Define a origem"
   def set_src (cls, tp_port = None):
+    "Define a origem"
     return cls(OFPAT_SET_TP_SRC, tp_port)
 
   def __init__ (self, type=None, tp_port = 0):
@@ -2260,8 +2264,8 @@ class ofp_action_tp_port (ofp_action_base):
     self.type = type
     self.tp_port = tp_port
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2269,75 +2273,79 @@ class ofp_action_tp_port (ofp_action_base):
     packed += _PAD2
     return packed
 
-  "Define o pacote desempacotado"
   def unpack (self, raw, offset=0):
+    "Define o pacote desempacotado"
     _offset = offset
     offset,(self.type, length, self.tp_port) = \
-        _unpack("!HHH", raw, offset)
+      _unpack("!HHH", raw, offset)
     offset = _skip(raw, offset, 2)
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.tp_port != other.tp_port: return False
     return True
 
-  "Mostra os campos: type/len/tp_port"
   def show (self, prefix=''):
+    "Mostra os campos: type/len/tp_port"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
     outstr += prefix + 'tp_port: ' + str(self.tp_port) + '\n'
     return outstr
 
-"Classe base para ações vendedor"
 class ofp_action_vendor_base (ofp_action_base):
+  "Classe base para ações vendedor"
   """
   Base class for vendor actions
   """
   type = 65535 # OFPAT_VENDOR
 
-  "Retorna verdadeiro se igual"
   def _eq (self, other):
+    "Retorna verdadeiro se igual"
     """
     Return True if equal
 
     Overide this.
     """
     return True
-  "Inicializa os campos"
+
   def _init (self, kw):
+    "Inicializa os campos"
     """
     Initialize fields
 
     Overide this.
     """
     pass
-  "Define o corpo do pacote"
+
   def _pack_body (self):
+    "Define o corpo do pacote"
     """
     Pack body.
     """
     return b""
-  "Define o corpo do pacote desempacotado"
+
   def _unpack_body (self, raw, offset, avail):
+    "Define o corpo do pacote desempacotado"
     """
     Unpack body in raw starting at offset.
 
     Return new offset
     """
     return offset
-  "Retorna o tamanho do corpo do pacote.Isto deve incluir tudo após o campo de comprimento. Opcionalmente substituir esse."
+
   def _body_length (self):
+    "Retorna o tamanho do corpo do pacote.Isto deve incluir tudo após o campo de comprimento. Opcionalmente substituir esse."
     """
     Return length of body.
 
@@ -2345,8 +2353,9 @@ class ofp_action_vendor_base (ofp_action_base):
     Optionally override this.
     """
     return len(self._pack_body())
-  "Formato de campos adicionais como texto"
+
   def _show (self, prefix):
+    "Formato de campos adicionais como texto"
     """
     Format additional fields as text
     """
@@ -2357,14 +2366,16 @@ class ofp_action_vendor_base (ofp_action_base):
     assert hasattr(self, 'vendor')
     #self.vendor = 0
     initHelper(self, kw)
-  "Define o corpo do pacote"
+
   def _pack_body (self):
+    "Define o corpo do pacote"
     if hasattr(self.body, 'pack'):
       return self.body.pack()
     else:
       return bytes(self.body)
-  "Define o pacote"
+
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     body = self._pack_body()
@@ -2374,25 +2385,29 @@ class ofp_action_vendor_base (ofp_action_base):
     packed += body
     assert (len(packed) % 8) == 0, "Vendor action length not multiple of 8"
     return packed
-  "Define o desempacotamento"
+
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.type, length, self.vendor) = _unpack("!HHL", raw, offset)
     offset = self._unpack_body(raw, offset, length - 8)
     assert offset - _offset == len(self)
     return offset
-  "Retorna o tamanho"
+
   def __len__ (self):
+    "Retorna o tamanho"
     return 8 + self._body_length()
-  "Retorna verdadeiro se igual"
+
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.vendor != other.vendor: return False
     return self._eq(other)
-  "Mostra os campos type/len/vendor"
+
   def show (self, prefix=''):
+    "Mostra os campos type/len/vendor"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -2402,7 +2417,7 @@ class ofp_action_vendor_base (ofp_action_base):
 
 
 @openflow_action('OFPAT_VENDOR', 65535)
-"Classe para ação do vendedor generico"
+#"Classe para ação do vendedor generico"
 class ofp_action_vendor_generic (ofp_action_base):
   def __init__ (self, **kw):
     self.vendor = 0
@@ -2410,15 +2425,15 @@ class ofp_action_vendor_generic (ofp_action_base):
 
     initHelper(self, kw)
 
-  "Define o corpo do pacote"
   def _pack_body (self):
+    "Define o corpo do pacote"
     if hasattr(self.body, 'pack'):
       return self.body.pack()
     else:
       return bytes(self.body)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     body = self._pack_body()
@@ -2428,28 +2443,28 @@ class ofp_action_vendor_generic (ofp_action_base):
     packed += body
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.type, length, self.vendor) = _unpack("!HHL", raw, offset)
     offset,self.body = _read(raw, offset, length - 8)
     assert offset - _offset == len(self)
     return offset
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 8 + len(self._pack_body())
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.type != other.type: return False
     if len(self) != len(other): return False
     if self.vendor != other.vendor: return False
     return True
 
-  "Mostra os campos type/len/vendor"
   def show (self, prefix=''):
+    "Mostra os campos type/len/vendor"
     outstr = ''
     outstr += prefix + 'type: ' + str(self.type) + '\n'
     outstr += prefix + 'len: ' + str(len(self)) + '\n'
@@ -2460,11 +2475,11 @@ class ofp_action_vendor_generic (ofp_action_base):
 #3. Controller-to-Switch Messages
 
 ##3.1 Handshake
-"Mensagens do controlador para switch"
+#"Mensagens do controlador para switch"
 @openflow_s_message("OFPT_FEATURES_REPLY", 6,
     reply_to="ofp_features_request")
-"Classe das caracaterísticas de resposta"
 class ofp_features_reply (ofp_header):
+  "Classe das caracaterísticas de resposta"
   _MIN_LENGTH = 32
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -2477,8 +2492,8 @@ class ofp_features_reply (ofp_header):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2491,11 +2506,11 @@ class ofp_features_reply (ofp_header):
       packed += i.pack()
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.datapath_id, self.n_buffers, self.n_tables) = \
-        _unpack("!QLB", raw, offset)
+      _unpack("!QLB", raw, offset)
     offset = _skip(raw, offset, 3)
     offset,(self.capabilities, self.actions) = _unpack("!LL", raw, offset)
     portCount = (length - 32) / len(ofp_phy_port)
@@ -2507,12 +2522,12 @@ class ofp_features_reply (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 32 + len(self.ports) * len(ofp_phy_port)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.datapath_id != other.datapath_id: return False
@@ -2523,8 +2538,8 @@ class ofp_features_reply (ofp_header):
     if self.ports != other.ports: return False
     return True
 
-  "Mostra os campos do ofp_switch_features: header/datapath_id/n_buffers/n_tables/capabilities/actions/ports"
   def show (self, prefix=''):
+    "Mostra os campos do ofp_switch_features: header/datapath_id/n_buffers/n_tables/capabilities/actions/ports"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -2541,10 +2556,10 @@ ofp_switch_features = ofp_features_reply
 
 
 ##3.2 Switch Configuration
-"Configuração do switch"
+#"Configuração do switch"
 @openflow_c_message("OFPT_SET_CONFIG", 9)
-"Classe para definição das configurações"
 class ofp_set_config (ofp_header): # uses ofp_switch_config
+  "Classe para definição das configurações"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     self.flags = 0
@@ -2552,8 +2567,8 @@ class ofp_set_config (ofp_header): # uses ofp_switch_config
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2561,28 +2576,28 @@ class ofp_set_config (ofp_header): # uses ofp_switch_config
     packed += struct.pack("!HH", self.flags, self.miss_send_len)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.flags, self.miss_send_len) = _unpack("!HH", raw, offset)
     assert length == len(self)
     return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 12
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.flags != other.flags: return False
     if self.miss_send_len != other.miss_send_len: return False
     return True
 
-  "Mostra os campos do ofp_switch_config: header/flags/miss_and_len"
   def show (self, prefix=''):
+    "Mostra os campos do ofp_switch_config: header/flags/miss_and_len"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -2592,11 +2607,11 @@ class ofp_set_config (ofp_header): # uses ofp_switch_config
 
 
 ##3.3 Modify State Messages
-"Modifica as mensagens do Estado"
-"OFPT_FLOW_MOD: As modificações em um tabela de fluxo do controlador é feito com a mensagem OFPT_FLOW_MOD"
+#"Modifica as mensagens do Estado"
+#"OFPT_FLOW_MOD: As modificações em um tabela de fluxo do controlador é feito com a mensagem OFPT_FLOW_MOD"
 @openflow_c_message("OFPT_FLOW_MOD", 14)
-"Classe ofp_flow_mod: configuração de fluxo e desmontagem"
 class ofp_flow_mod (ofp_header):
+  "Classe ofp_flow_mod: configuração de fluxo e desmontagem"
   _MIN_LENGTH = 72
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -2630,8 +2645,8 @@ class ofp_flow_mod (ofp_header):
       self.actions = [self.actions]
 
   @property
-  "Define o ID do buffer"
   def buffer_id (self):
+    "Define o ID do buffer"
     if self._buffer_id == NO_BUFFER: return None
     return self._buffer_id
   @buffer_id.setter
@@ -2639,14 +2654,14 @@ class ofp_flow_mod (ofp_header):
     if val is None: val = NO_BUFFER
     self._buffer_id = val
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.match, ofp_match):
       return "match is not class ofp_match"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     """
     Packs this object into its wire format.
     May normalize fields.
@@ -2688,28 +2703,28 @@ class ofp_flow_mod (ofp_header):
       packed += po.pack()
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset = self.match.unpack(raw, offset, flow_mod=True)
     offset,(self.cookie, self.command, self.idle_timeout,
             self.hard_timeout, self.priority, self._buffer_id,
             self.out_port, self.flags) = \
-            _unpack("!QHHHHLHH", raw, offset)
+      _unpack("!QHHHHLHH", raw, offset)
     offset,self.actions = _unpack_actions(raw,
-        length-(32 + len(self.match)), offset)
+                                          length-(32 + len(self.match)), offset)
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     l = 32 + len(self.match)
     for i in self.actions:
       l += len(i)
     return l
 
-  "Compara se os campos da Flow Table coincidem"
   def __eq__ (self, other):
+    "Compara se os campos da Flow Table coincidem"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.match != other.match: return False
@@ -2725,11 +2740,11 @@ class ofp_flow_mod (ofp_header):
     if self.data != other.data: return False
     return True
 
-  """
-  Mostra os campos da Flow Table:
-  header/match/cookie/command/idle_timeout/hard_timeout/priority/buffer_id/out_port/flags/actions
-  """
   def show (self, prefix=''):
+    """
+    Mostra os campos da Flow Table:
+    header/match/cookie/command/idle_timeout/hard_timeout/priority/buffer_id/out_port/flags/actions
+    """
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -2748,10 +2763,10 @@ class ofp_flow_mod (ofp_header):
       outstr += obj.show(prefix + '  ')
     return outstr
 
-"OFPT_PORT_MOD: O controlador utiliza a mensagem OFPT_PORT_MOD para modificar o comportamento da porta:"
+#"OFPT_PORT_MOD: O controlador utiliza a mensagem OFPT_PORT_MOD para modificar o comportamento da porta:"
 @openflow_c_message("OFPT_PORT_MOD", 15)
-"Classe de modificação da porta"
 class ofp_port_mod (ofp_header):
+  "Classe de modificação da porta"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     self.port_no = 0
@@ -2762,8 +2777,8 @@ class ofp_port_mod (ofp_header):
 
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if (not isinstance(self.hw_addr, bytes)
         and not isinstance(self.hw_addr, EthAddr)):
       return "hw_addr is not bytes or EthAddr"
@@ -2771,8 +2786,8 @@ class ofp_port_mod (ofp_header):
       return "hw_addr is not of size 6"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2786,24 +2801,24 @@ class ofp_port_mod (ofp_header):
     packed += _PAD4
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.port_no,) = _unpack("!H", raw, offset)
     offset,self.hw_addr = _readether(raw, offset)
     offset,(self.config, self.mask, self.advertise) = \
-        _unpack("!LLL", raw, offset)
+      _unpack("!LLL", raw, offset)
     offset = _skip(raw, offset, 4)
     assert length == len(self)
     return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 32
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.port_no != other.port_no: return False
@@ -2813,8 +2828,8 @@ class ofp_port_mod (ofp_header):
     if self.advertise != other.advertise: return False
     return True
 
-  "Mostra os campos da ofp_port_mod: header/port_no/hw_addr/config/mask/advertise"
   def show (self, prefix=''):
+    "Mostra os campos da ofp_port_mod: header/port_no/hw_addr/config/mask/advertise"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -2827,17 +2842,17 @@ class ofp_port_mod (ofp_header):
 
 
 ##3.4 Queue Configuration Messages
-"Messagens de configuração da fila"
+#"Messagens de configuração da fila"
 @openflow_c_message("OFPT_QUEUE_GET_CONFIG_REQUEST", 20)
-"Classe para obtenção da requisição de configuração da fila"
 class ofp_queue_get_config_request (ofp_header):
+  "Classe para obtenção da requisição de configuração da fila"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     self.port = 0
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2846,8 +2861,8 @@ class ofp_queue_get_config_request (ofp_header):
     packed += _PAD2
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.port,) = _unpack("!H", raw, offset)
     offset = _skip(raw, offset, 2)
@@ -2855,19 +2870,19 @@ class ofp_queue_get_config_request (ofp_header):
     return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 12
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.port != other.port: return False
     return True
 
-  "Mostra os campos do ofp_queue_get_config_request: header/port"
   def show (self, prefix=''):
+    "Mostra os campos do ofp_queue_get_config_request: header/port"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -2876,7 +2891,7 @@ class ofp_queue_get_config_request (ofp_header):
 
 
 @openflow_s_message("OFPT_QUEUE_GET_CONFIG_REPLY", 21)
-"Classe para obtenção da resposta de configuração da fila"
+#"Classe para obtenção da resposta de configuração da fila"
 class ofp_queue_get_config_reply (ofp_header):
   _MIN_LENGTH = 16
   def __init__ (self, **kw):
@@ -2886,8 +2901,8 @@ class ofp_queue_get_config_reply (ofp_header):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -2898,8 +2913,8 @@ class ofp_queue_get_config_reply (ofp_header):
       packed += i.pack()
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.port,) = _unpack("!H", raw, offset)
     offset = _skip(raw, offset, 6)
@@ -2920,23 +2935,23 @@ class ofp_queue_get_config_reply (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     l = 16
     for i in self.queues:
       l += len(i)
     return l
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.port != other.port: return False
     if self.queues != other.queues: return False
     return True
 
-  "Mostra os campos do ofp_queue_get_config_request: header/port/queues"
   def show (self, prefix=''):
+    "Mostra os campos do ofp_queue_get_config_request: header/port/queues"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -2948,8 +2963,8 @@ class ofp_queue_get_config_reply (ofp_header):
 
 
 @openflow_c_message("OFPT_STATS_REQUEST", 16)
-"Classe para estatísticas de requisições"
 class ofp_stats_request (ofp_header):
+  "Classe para estatísticas de requisições"
   _MIN_LENGTH = 12
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -2960,8 +2975,8 @@ class ofp_stats_request (ofp_header):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     if self.type is None:
       if isinstance(self.body, ofp_stats_body_base):
         self.type = self.body._type
@@ -2977,8 +2992,8 @@ class ofp_stats_request (ofp_header):
     packed += self._pack_body()
     return packed
 
-  "Define o corpo do pacote"
   def _pack_body (self):
+    "Define o corpo do pacote"
     if self._body_packed is None:
       if hasattr(self.body, 'pack'):
         self._body_packed = self._body.pack()
@@ -2987,17 +3002,18 @@ class ofp_stats_request (ofp_header):
     return self._body_packed
 
   @property
-  "Define o corpo"
   def body (self):
+    "Define o corpo"
     return self._body
+
   @body.setter
-  "Define a composição do corpo"
   def body (self, data):
+    "Define a composição do corpo"
     self._body = data
     self._body_packed_cache = None
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.type, self.flags) = _unpack("!HH", raw, offset)
     offset,body = _read(raw, offset, length - 12)
@@ -3015,12 +3031,12 @@ class ofp_stats_request (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 12 + len(self._pack_body())
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.type != other.type: return False
@@ -3028,8 +3044,8 @@ class ofp_stats_request (ofp_header):
     if self._pack_body() != other._pack_body(): return False
     return True
 
-  "Mostra os campos: header/type/flags/body"
   def show (self, prefix=''):
+    "Mostra os campos: header/type/flags/body"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -3042,8 +3058,8 @@ class ofp_stats_request (ofp_header):
 
 @openflow_s_message("OFPT_STATS_REPLY", 17,
     reply_to="ofp_stats_request")
-"Classe para estatísticas da resposta"
 class ofp_stats_reply (ofp_header):
+  "Classe para estatísticas da resposta"
   _MIN_LENGTH = 12
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -3055,19 +3071,20 @@ class ofp_stats_reply (ofp_header):
     initHelper(self, kw)
 
   @property
-  "É última resposta"
   def is_last_reply (self):
+    "É última resposta"
     return (self.flags & 1) == 0
+
   @is_last_reply.setter
-  "É última mensagem montada"
   def is_last_reply (self, value):
+    "É última mensagem montada"
     self.flags = self.flags & 0xfffe
     if not value:
       self.flags |= 1
 
   @property
-  "Define o corpo dos dados"
   def body_data (self):
+    "Define o corpo dos dados"
     if self._body_data[0] is not self.body:
       "Define o pacote"
       def _pack(b):
@@ -3082,8 +3099,8 @@ class ofp_stats_reply (ofp_header):
       self._body_data = (self.body, data)
     return self._body_data[1]
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     if self.type is None:
       if is_listlike(self.body):
         if len(self.body):
@@ -3106,8 +3123,8 @@ class ofp_stats_reply (ofp_header):
     packed += self.body_data
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.type, self.flags) = _unpack("!HH", raw, offset)
     offset,packed = _read(raw, offset, length - 12)
@@ -3137,14 +3154,14 @@ class ofp_stats_reply (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     if isinstance(self.body, list):
       return 12 + sum(len(part) for part in self.body)
     return 12 + len(self.body)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.type != other.type: return False
@@ -3152,8 +3169,8 @@ class ofp_stats_reply (ofp_header):
     if self.body != other.body: return False
     return True
 
-  "Mostra os campos header/type/flags/body"
   def show (self, prefix=''):
+    "Mostra os campos header/type/flags/body"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -3167,21 +3184,21 @@ class ofp_stats_reply (ofp_header):
       outstr += _format_body(b, prefix + '  ') + '\n'
     return outstr
 
-"OFPST_DESC: O número OFPST_DESC foi adicionada para descrever o hardware e software em execução no switch:"
+#"OFPST_DESC: O número OFPST_DESC foi adicionada para descrever o hardware e software em execução no switch:"
 @openflow_stats_reply("OFPST_DESC", 0)
-"Classe para descrever as estatísticas de hardware e software"
 class ofp_desc_stats (ofp_stats_body_base):
+  "Classe para descrever as estatísticas de hardware e software"
   def __init__ (self, **kw):
     self.mfr_desc   = "" #mfr_desc: descrição do fabricante
     self.hw_desc    = "" #hw_desc: descrição de hardware
     self.sw_desc    = "" #sw_desc: descrição de software
     self.serial_num = "" #serial_num: número de série
-    self.dp_desc    = "" 
+    self.dp_desc    = ""
 
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.mfr_desc, str):
       return "mfr_desc is not string"
     if len(self.mfr_desc) > DESC_STR_LEN:
@@ -3204,8 +3221,8 @@ class ofp_desc_stats (ofp_stats_body_base):
       return "dp_desc is not of size 256"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3216,8 +3233,8 @@ class ofp_desc_stats (ofp_stats_body_base):
     packed += self.dp_desc.ljust(DESC_STR_LEN,'\0')
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,self.mfr_desc   = _readzs(raw, offset, DESC_STR_LEN)
     offset,self.hw_desc    = _readzs(raw, offset, DESC_STR_LEN)
@@ -3228,12 +3245,12 @@ class ofp_desc_stats (ofp_stats_body_base):
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 1056
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.mfr_desc != other.mfr_desc: return False
     if self.hw_desc != other.hw_desc: return False
@@ -3242,8 +3259,8 @@ class ofp_desc_stats (ofp_stats_body_base):
     if self.dp_desc != other.dp_desc: return False
     return True
 
-  "Mostra os campos de ofp_desc_stats: mfr_desc/hw_desc/sw_desc/serial_num/dp_desc"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_desc_stats: mfr_desc/hw_desc/sw_desc/serial_num/dp_desc"
     outstr = ''
     outstr += prefix + 'mfr_desc: ' + str(self.mfr_desc) + '\n'
     outstr += prefix + 'hw_desc: ' + str(self.hw_desc) + '\n'
@@ -3254,15 +3271,15 @@ class ofp_desc_stats (ofp_stats_body_base):
 
 ofp_desc_stats_reply = ofp_desc_stats
 
-"""
-Superclasse de estatísticas da tabela solicita com corpos vazios
-
-  OFPST_DESC e OFPST_TABLE têm corpos de solicitação vazias. Em ordem
-  para fazer tipo de adivinhação e desembalar consistentes, definimos
-  aulas para eles de qualquer maneira.
-"""
-"Classe para estatísticas vazias do corpo solicitado"
 class _empty_stats_request_body (ofp_stats_body_base):
+  """
+  Superclasse de estatísticas da tabela solicita com corpos vazios
+
+    OFPST_DESC e OFPST_TABLE têm corpos de solicitação vazias. Em ordem
+    para fazer tipo de adivinhação e desembalar consistentes, definimos
+    aulas para eles de qualquer maneira.
+  """
+  "Classe para estatísticas vazias do corpo solicitado"
   """
   Superclass for table stats requests with empty bodies
 
@@ -3273,64 +3290,64 @@ class _empty_stats_request_body (ofp_stats_body_base):
   def __init__ (self, **kw):
     pass
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     return b""
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     if avail != 0:
       raise RuntimeError("Expected empty body")
     return offset
 
   @staticmethod
-  "Define o tamanho"
   def __len__ ():
+    "Define o tamanho"
     return 0
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     return True
 
-  "Mostra 'vazio'"
   def show (self, prefix=''):
+    "Mostra 'vazio'"
     return "<empty>"
 
 @openflow_stats_request('OFPST_DESC', 0)
-"Classe para descrever as estatísticas da requisição"
 class ofp_desc_stats_request (_empty_stats_request_body):
+  "Classe para descrever as estatísticas da requisição"
   """
   See _empty_stats_request_body superclass documentation
   """
   pass
 
 @openflow_stats_request('OFPST_TABLE', 3)
-"Classe para a tabela de estatísticas da requisição"
 class ofp_table_stats_request (_empty_stats_request_body):
+  "Classe para a tabela de estatísticas da requisição"
   """
   See _empty_stats_request_body superclass documentation
   """
   pass
 
-"Estatísticas de requisição"
+#"Estatísticas de requisição"
 @openflow_stats_request('OFPST_FLOW', 1)
-"Classe para o fluxo de estatísticas da requisição"
 class ofp_flow_stats_request (ofp_stats_body_base):
+  "Classe para o fluxo de estatísticas da requisição"
   def __init__ (self, **kw):
     self.match = ofp_match()
     self.table_id = TABLE_ALL
     self.out_port = OFPP_NONE
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.match, ofp_match):
       return "match is not class ofp_match"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3338,31 +3355,31 @@ class ofp_flow_stats_request (ofp_stats_body_base):
     packed += struct.pack("!BBH", self.table_id, 0, self.out_port)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset = self.match.unpack(raw, offset)
     offset,(self.table_id, pad, self.out_port) = \
-        _unpack("!BBH", raw, offset)
+      _unpack("!BBH", raw, offset)
     assert pad == 0
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 4 + len(ofp_match)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.match != other.match: return False
     if self.table_id != other.table_id: return False
     if self.out_port != other.out_port: return False
     return True
 
-  "Mostra os campos de ofp_flow_stats_request: match/table_id/out_port"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_flow_stats_request: match/table_id/out_port"
     outstr = ''
     outstr += prefix + 'match: \n'
     outstr += self.match.show(prefix + '  ')
@@ -3370,10 +3387,10 @@ class ofp_flow_stats_request (ofp_stats_body_base):
     outstr += prefix + 'out_port: ' + str(self.out_port) + '\n'
     return outstr
 
-"Estatísticas de resposta"
+#"Estatísticas de resposta"
 @openflow_stats_reply('OFPST_FLOW', is_list = True)
-"Classe para o fluxo de estatísticas da resposta"
 class ofp_flow_stats (ofp_stats_body_base):
+  "Classe para o fluxo de estatísticas da resposta"
   _MIN_LENGTH = 88
   def __init__ (self, **kw):
     "Campos da Flow Table"
@@ -3391,14 +3408,14 @@ class ofp_flow_stats (ofp_stats_body_base):
 
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.match, ofp_match):
       return "match is not class ofp_match"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3413,34 +3430,34 @@ class ofp_flow_stats (ofp_stats_body_base):
     for i in self.actions:
       packed += i.pack()
     return packed
-  
-  "Define o desempacotamento"
+
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,(length, self.table_id, pad) = _unpack("!HBB", raw, offset)
     assert pad == 0
     offset = self.match.unpack(raw, offset)
     offset,(self.duration_sec, self.duration_nsec, self.priority,
             self.idle_timeout, self.hard_timeout) = \
-            _unpack("!LLHHH", raw, offset)
+      _unpack("!LLHHH", raw, offset)
     offset = _skip(raw, offset, 6)
     offset,(self.cookie, self.packet_count, self.byte_count) = \
-        _unpack("!QQQ", raw, offset)
+      _unpack("!QQQ", raw, offset)
     assert (offset - _offset) == 48 + len(self.match)
     offset,self.actions = _unpack_actions(raw,
-        length - (48 + len(self.match)), offset)
+                                          length - (48 + len(self.match)), offset)
     assert offset - _offset == len(self)
     return offset
-  
-  "Retorna o tamanho"
+
   def __len__ (self):
+    "Retorna o tamanho"
     l = 48 + len(self.match)
     for i in self.actions:
       l += len(i)
     return l
-  
-  "Retorna verdadeiro se igual"
+
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if len(self) != len(other): return False
     if self.table_id != other.table_id: return False
@@ -3456,10 +3473,10 @@ class ofp_flow_stats (ofp_stats_body_base):
     if self.actions != other.actions: return False
     return True
 
-  """Mostra os campos de ofp_flow_stats: 
-  length/table_id/match/duration_sec/duration_nsec/priority/idle_timeout/hard_timeout/
-  cookie/packet_count/byte_count/actions""" 
   def show (self, prefix=''):
+    """Mostra os campos de ofp_flow_stats:
+      length/table_id/match/duration_sec/duration_nsec/priority/idle_timeout/hard_timeout/
+      cookie/packet_count/byte_count/actions"""
     outstr = ''
     outstr += prefix + 'length: ' + str(len(self)) + '\n'
     outstr += prefix + 'table_id: ' + str(self.table_id) + '\n'
@@ -3479,10 +3496,10 @@ class ofp_flow_stats (ofp_stats_body_base):
     return outstr
 ofp_flow_stats_reply = ofp_flow_stats
 
-"Estatísticas de requisição"
+#"Estatísticas de requisição"
 @openflow_stats_request('OFPST_AGGREGATE', 2)
-"Classe para o conjunto de estatísticas da requisição"
 class ofp_aggregate_stats_request (ofp_stats_body_base):
+  "Classe para o conjunto de estatísticas da requisição"
   def __init__ (self, **kw):
     self.match = ofp_match()
     self.table_id = TABLE_ALL
@@ -3490,14 +3507,14 @@ class ofp_aggregate_stats_request (ofp_stats_body_base):
 
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.match, ofp_match):
       return "match is not class ofp_match"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3505,31 +3522,31 @@ class ofp_aggregate_stats_request (ofp_stats_body_base):
     packed += struct.pack("!BBH", self.table_id, 0, self.out_port)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset = self.match.unpack(raw, offset)
     offset,(self.table_id, pad, self.out_port) = \
-        _unpack("!BBH", raw, offset)
+      _unpack("!BBH", raw, offset)
     assert pad == 0
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 44
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.match != other.match: return False
     if self.table_id != other.table_id: return False
     if self.out_port != other.out_port: return False
     return True
 
-  "Mostra os campos do ofp_aggregate_stats_request: match/table_id/out_port"
   def show (self, prefix=''):
+    "Mostra os campos do ofp_aggregate_stats_request: match/table_id/out_port"
     outstr = ''
     outstr += prefix + 'match: \n'
     outstr += self.match.show(prefix + '  ')
@@ -3537,10 +3554,10 @@ class ofp_aggregate_stats_request (ofp_stats_body_base):
     outstr += prefix + 'out_port: ' + str(self.out_port) + '\n'
     return outstr
 
-"Estatísticas de resposta"
+#"Estatísticas de resposta"
 @openflow_stats_reply('OFPST_AGGREGATE')
-"Classe para o conjunto de estatísticas da requisição"
 class ofp_aggregate_stats (ofp_stats_body_base):
+  "Classe para o conjunto de estatísticas da requisição"
   def __init__ (self, **kw):
     self.packet_count = 0
     self.byte_count = 0
@@ -3548,8 +3565,8 @@ class ofp_aggregate_stats (ofp_stats_body_base):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3558,30 +3575,30 @@ class ofp_aggregate_stats (ofp_stats_body_base):
     packed += _PAD4 # Pad
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.packet_count, self.byte_count, self.flow_count) = \
-        _unpack("!QQL", raw, offset)
+      _unpack("!QQL", raw, offset)
     offset = _skip(raw, offset, 4)
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 24
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.packet_count != other.packet_count: return False
     if self.byte_count != other.byte_count: return False
     if self.flow_count != other.flow_count: return False
     return True
 
-  "Mostra os campos do ofp_aggregate_stats: packet_count/byte_count/flow_count"
   def show (self, prefix=''):
+    "Mostra os campos do ofp_aggregate_stats: packet_count/byte_count/flow_count"
     outstr = ''
     outstr += prefix + 'packet_count: ' + str(self.packet_count) + '\n'
     outstr += prefix + 'byte_count: ' + str(self.byte_count) + '\n'
@@ -3589,10 +3606,10 @@ class ofp_aggregate_stats (ofp_stats_body_base):
     return outstr
 ofp_aggregate_stats_reply = ofp_aggregate_stats
 
-"Estatísticas de resposta"
+#"Estatísticas de resposta"
 @openflow_stats_reply('OFPST_TABLE', 3, is_list = True)
-"Classe para a tabela de estatísticas"
 class ofp_table_stats (ofp_stats_body_base):
+  "Classe para a tabela de estatísticas"
   def __init__ (self, **kw):
     self.table_id = 0
     self.name = ""
@@ -3604,16 +3621,16 @@ class ofp_table_stats (ofp_stats_body_base):
 
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.name, str):
       return "name is not string"
     if len(self.name) > OFP_MAX_TABLE_NAME_LEN:
       return "name is too long"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3625,25 +3642,25 @@ class ofp_table_stats (ofp_stats_body_base):
                           self.matched_count)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.table_id,) = _unpack("!B", raw, offset)
     offset = _skip(raw, offset, 3)
     offset,self.name = _readzs(raw, offset, OFP_MAX_TABLE_NAME_LEN)
     offset,(self.wildcards, self.max_entries, self.active_count,
             self.lookup_count, self.matched_count) = \
-            _unpack("!LLLQQ", raw, offset)
+      _unpack("!LLLQQ", raw, offset)
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 64
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.table_id != other.table_id: return False
     if self.name != other.name: return False
@@ -3654,8 +3671,8 @@ class ofp_table_stats (ofp_stats_body_base):
     if self.matched_count != other.matched_count: return False
     return True
 
-  "Mostra os campos de ofp_table_stats: table_id/name/wildcards/max_entries/active_count/lookup_count/matched_count"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_table_stats: table_id/name/wildcards/max_entries/active_count/lookup_count/matched_count"
     outstr = ''
     outstr += prefix + 'table_id: ' + str(self.table_id) + '\n'
     outstr += prefix + 'name: ' + str(self.name) + '\n'
@@ -3667,16 +3684,16 @@ class ofp_table_stats (ofp_stats_body_base):
     return outstr
 ofp_table_stats_reply = ofp_table_stats
 
-"Estatísticas de requisição"
+#"Estatísticas de requisição"
 @openflow_stats_request("OFPST_PORT", 4)
-"Classe de estatísticas de requisição da porta "
 class ofp_port_stats_request (ofp_stats_body_base):
+  "Classe de estatísticas de requisição da porta "
   def __init__ (self, **kw):
     self.port_no = OFPP_NONE
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3684,8 +3701,8 @@ class ofp_port_stats_request (ofp_stats_body_base):
     packed += _PAD6
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.port_no,) = _unpack("!H", raw, offset)
     offset = _skip(raw, offset, 6)
@@ -3693,26 +3710,26 @@ class ofp_port_stats_request (ofp_stats_body_base):
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.port_no != other.port_no: return False
     return True
 
-  "Mostra os campos de ofp_port_stats_request: port_no"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_port_stats_request: port_no"
     outstr = ''
     outstr += prefix + 'port_no: ' + str(self.port_no) + '\n'
     return outstr
 
-"Estatísticas de resposta"
+#"Estatísticas de resposta"
 @openflow_stats_reply("OFPST_PORT", is_list = True)
-"Classe de estatísticas de resposta da porta "
 class ofp_port_stats (ofp_stats_body_base):
+  "Classe de estatísticas de resposta da porta "
   def __init__ (self, **kw):
     "Campos do ofp_port_stats"
     self.port_no = OFPP_NONE
@@ -3731,8 +3748,8 @@ class ofp_port_stats (ofp_stats_body_base):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3746,8 +3763,8 @@ class ofp_port_stats (ofp_stats_body_base):
                           self.rx_crc_err, self.collisions)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.port_no,) = _unpack("!H", raw, offset)
     offset = _skip(raw, offset, 6)
@@ -3755,17 +3772,17 @@ class ofp_port_stats (ofp_stats_body_base):
             self.tx_bytes, self.rx_dropped, self.tx_dropped,
             self.rx_errors, self.tx_errors, self.rx_frame_err,
             self.rx_over_err, self.rx_crc_err, self.collisions) = \
-            _unpack("!QQQQQQQQQQQQ", raw, offset)
+      _unpack("!QQQQQQQQQQQQ", raw, offset)
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 104
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.port_no != other.port_no: return False
     if self.rx_packets != other.rx_packets: return False
@@ -3782,33 +3799,33 @@ class ofp_port_stats (ofp_stats_body_base):
     if self.collisions != other.collisions: return False
     return True
 
-  "Função para adicionar os campos de ofp_port_stats"
   def __add__(self, other):
+    "Função para adicionar os campos de ofp_port_stats"
     if type(self) != type(other): raise NotImplemented()
     port_no = OFPP_NONE
     if self.port_no == other.port_no:
       port_no = self.port_no
     return ofp_port_stats(
-        port_no=port_no,
-        rx_packets = self.rx_packets + other.rx_packets,
-        tx_packets = self.tx_packets + other.tx_packets,
-        rx_bytes = self.rx_bytes + other.rx_bytes,
-        tx_bytes = self.tx_bytes + other.tx_bytes,
-        rx_dropped = self.rx_dropped + other.rx_dropped,
-        tx_dropped = self.tx_dropped + other.tx_dropped,
-        rx_errors = self.rx_errors + other.rx_errors,
-        tx_errors = self.tx_errors + other.tx_errors,
-        rx_frame_err = self.rx_frame_err + other.rx_frame_err,
-        rx_over_err = self.rx_over_err + other.rx_over_err,
-        rx_crc_err = self.rx_crc_err + other.rx_crc_err,
-        collisions = self.collisions + other.collisions)
+      port_no=port_no,
+      rx_packets = self.rx_packets + other.rx_packets,
+      tx_packets = self.tx_packets + other.tx_packets,
+      rx_bytes = self.rx_bytes + other.rx_bytes,
+      tx_bytes = self.tx_bytes + other.tx_bytes,
+      rx_dropped = self.rx_dropped + other.rx_dropped,
+      tx_dropped = self.tx_dropped + other.tx_dropped,
+      rx_errors = self.rx_errors + other.rx_errors,
+      tx_errors = self.tx_errors + other.tx_errors,
+      rx_frame_err = self.rx_frame_err + other.rx_frame_err,
+      rx_over_err = self.rx_over_err + other.rx_over_err,
+      rx_crc_err = self.rx_crc_err + other.rx_crc_err,
+      collisions = self.collisions + other.collisions)
 
-  """
-  Mostra os campos de ofp_port_stats:
-  port_no/rx_packets/tx_packets/rx_bytes/tx_bytes/rx_dropped/tx_dropped/rx_errors/tx_errors/
-  rx_frame_err/rx_over_err/rx_crc_err/collisions
-  """
   def show (self, prefix=''):
+    """
+    Mostra os campos de ofp_port_stats:
+    port_no/rx_packets/tx_packets/rx_bytes/tx_bytes/rx_dropped/tx_dropped/rx_errors/tx_errors/
+    rx_frame_err/rx_over_err/rx_crc_err/collisions
+    """
     outstr = ''
     outstr += prefix + 'port_no: ' + str(self.port_no) + '\n'
     outstr += prefix + 'rx_packets: ' + str(self.rx_packets) + '\n'
@@ -3826,18 +3843,18 @@ class ofp_port_stats (ofp_stats_body_base):
     return outstr
 ofp_port_stats_reply = ofp_port_stats
 
-"Estatísticas de requisição"
+#"Estatísticas de requisição"
 @openflow_stats_request("OFPST_QUEUE", 5)
-"Estatísticas de requisição da fila"
 class ofp_queue_stats_request (ofp_stats_body_base):
+  "Estatísticas de requisição da fila"
   def __init__ (self, **kw):
     self.port_no = OFPP_ALL
     self.queue_id = OFPQ_ALL
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3846,8 +3863,8 @@ class ofp_queue_stats_request (ofp_stats_body_base):
     packed += struct.pack("!L", self.queue_id)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.port_no,pad,self.queue_id) = _unpack("!HHL", raw, offset)
     assert pad == 0
@@ -3855,28 +3872,28 @@ class ofp_queue_stats_request (ofp_stats_body_base):
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.port_no != other.port_no: return False
     if self.queue_id != other.queue_id: return False
     return True
 
-  "Mostra os campos de ofp_queue_stats_request: port_no/queue_id"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_queue_stats_request: port_no/queue_id"
     outstr = ''
     outstr += prefix + 'port_no: ' + str(self.port_no) + '\n'
     outstr += prefix + 'queue_id: ' + str(self.queue_id) + '\n'
     return outstr
 
-"Estatísticas de resposta"
+#"Estatísticas de resposta"
 @openflow_stats_reply("OFPST_QUEUE", is_list = True)
-"Classe de estatísticas da fila"
 class ofp_queue_stats (ofp_stats_body_base):
+  "Classe de estatísticas da fila"
   def __init__ (self, **kw):
     self.port_no = 0 #Porta a fila está ligado a
     self.queue_id = 0 #ID da fila
@@ -3886,8 +3903,8 @@ class ofp_queue_stats (ofp_stats_body_base):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -3897,22 +3914,22 @@ class ofp_queue_stats (ofp_stats_body_base):
                           self.tx_packets, self.tx_errors)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     _offset = offset
     offset,(self.port_no, pad, self.queue_id, self.tx_bytes,
             self.tx_packets, self.tx_errors) = \
-            _unpack("!HHLQQQ", raw, offset)
+      _unpack("!HHLQQQ", raw, offset)
     assert offset - _offset == len(self)
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 32
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.port_no != other.port_no: return False
     if self.queue_id != other.queue_id: return False
@@ -3921,8 +3938,8 @@ class ofp_queue_stats (ofp_stats_body_base):
     if self.tx_errors != other.tx_errors: return False
     return True
 
-  "Mostra os campos de ofp_queue_stats: port_no/queue_id/tx_bytes/tx_packets/tx_errors"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_queue_stats: port_no/queue_id/tx_bytes/tx_packets/tx_errors"
     outstr = ''
     outstr += prefix + 'port_no: ' + str(self.port_no) + '\n'
     outstr += prefix + 'queue_id: ' + str(self.queue_id) + '\n'
@@ -3932,12 +3949,13 @@ class ofp_queue_stats (ofp_stats_body_base):
     return outstr
 ofp_queue_stats_reply = ofp_queue_stats
 
-"Estatísticas de requisição"
+#"Estatísticas de requisição"
 @openflow_stats_request("OFPST_VENDOR", 65535, is_list = False)
-"Estatísticas de resposta"
+#"Estatísticas de resposta"
 @openflow_stats_reply("OFPST_VENDOR", 65535, is_list = False)
-"Classe de estatísticas do vendedor generico"
+
 class ofp_vendor_stats_generic (ofp_stats_body_base):
+  "Classe de estatísticas do vendedor generico"
   _MIN_LENGTH = 4
   def __init__ (self, **kw):
     self.vendor = None
@@ -3945,23 +3963,23 @@ class ofp_vendor_stats_generic (ofp_stats_body_base):
 
     initHelper(self, kw)
 
-  "Define o corpo do pacote"
   def _pack_body (self):
+    "Define o corpo do pacote"
     if hasattr(self.data, "pack"):
       return self.data.pack()
     else:
       return self.data
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = struct.pack("!L", self.vendor)
     packed += self._pack_body()
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     if avail is None: RuntimeError("Requires length")
     _offset = offset
     offset,(self.vendor,) = _unpack("!L", raw, offset)
@@ -3969,66 +3987,66 @@ class ofp_vendor_stats_generic (ofp_stats_body_base):
     return offset
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 4+len(self._pack_body())
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.vendor != other.vendor: return False
     if self.data != other.data: return False
     return True
 
-  "Mostra os campos de ofp_vendor_stats_generic: vendor id/data len"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_vendor_stats_generic: vendor id/data len"
     outstr = ''
     outstr += prefix + 'vendor id: ' + str(self.vendor) + '\n'
     outstr += prefix + 'data len: ' + str(len(self.data)) + '\n'
     return outstr
 
-"Classe de estatísticas do corpo genérico"
 class ofp_generic_stats_body (ofp_stats_body_base):
+  "Classe de estatísticas do corpo genérico"
   _MIN_LENGTH = 0
   def __init__ (self, **kw):
     self.data = b""
 
     initHelper(self, kw)
 
-  "Define o corpo do pacote"
   def _pack_body (self):
+    "Define o corpo do pacote"
     if hasattr(self.data, "pack"):
       return self.data.pack()
     else:
       return self.data
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed += self._pack_body()
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset, avail):
+    "Define o desempacotamento"
     if avail is None: RuntimeError("Requires length")
     _offset = offset
     offset,self.data = _read(raw, offset, avail)
     return offset
 
-  @staticmethod
-  "Retorna o tamanho"
-  def __len__ ():
+  #@staticmethod
+  def __len__ (self):
+    "Retorna o tamanho"
     return len(self._pack_body())
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if self.data != other.data: return False
     return True
 
-  "Mostra o campo de ofp_generic_stats_body: data len"
   def show (self, prefix=''):
+    "Mostra o campo de ofp_generic_stats_body: data len"
     outstr = ''
     outstr += prefix + 'data len: ' + str(len(self.data)) + '\n'
     return outstr
@@ -4060,23 +4078,25 @@ class ofp_packet_out (ofp_header):
       self.actions = [self.actions]
 
   @property
-  "Define o id do buffer"
   def buffer_id (self):
+    "Define o id do buffer"
     if self._buffer_id == NO_BUFFER: return None
     return self._buffer_id
+
   @buffer_id.setter
-  "Define o id do buffer montador"
   def buffer_id (self, val):
+    "Define o id do buffer montador"
     if val is None: val = NO_BUFFER
     self._buffer_id = val
 
   @property
-  "Define dados"
   def data (self):
+    "Define dados"
     return self._data
+
   @data.setter
-  "Define o dados montados"
   def data (self, data):
+    "Define o dados montados"
     if data is None:
       self._data = b''
     elif isinstance(data, packet_base):
@@ -4096,14 +4116,14 @@ class ofp_packet_out (ofp_header):
       self._data = data
     assert assert_type("data", self._data, (bytes,))
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if self.buffer_id is not None and self.data != b'':
       return "can not have both buffer_id and data set"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     actions = b''.join((i.pack() for i in self.actions))
@@ -4111,19 +4131,19 @@ class ofp_packet_out (ofp_header):
 
     if self.data is not None:
       return b''.join((ofp_header.pack(self),
-        struct.pack("!LHH", self._buffer_id, self.in_port, actions_len),
-        actions, self.data))
+                       struct.pack("!LHH", self._buffer_id, self.in_port, actions_len),
+                       actions, self.data))
     else:
       return b''.join((ofp_header.pack(self),
-      struct.pack("!LHH", self._buffer_id, self.in_port, actions_len),
-      actions))
+                       struct.pack("!LHH", self._buffer_id, self.in_port, actions_len),
+                       actions))
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     _offset = offset
     offset,length = self._unpack_header(raw, offset)
     offset,(self._buffer_id, self.in_port, actions_len) = \
-        _unpack("!LHH", raw, offset)
+      _unpack("!LHH", raw, offset)
     offset,self.actions = _unpack_actions(raw, actions_len, offset)
 
     remaining = length - (offset - _offset)
@@ -4135,13 +4155,13 @@ class ofp_packet_out (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 16 + reduce(operator.add, (len(a) for a in self.actions),
-        0) + (len(self.data) if self.data else 0)
+                       0) + (len(self.data) if self.data else 0)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.buffer_id != other.buffer_id: return False
@@ -4149,8 +4169,8 @@ class ofp_packet_out (ofp_header):
     if self.actions != other.actions: return False
     return True
 
-  "Mostra os campos de ofp_packet_out: header/buffer_id/in_port/actions_len/actions"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_packet_out: header/buffer_id/in_port/actions_len/actions"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4167,17 +4187,18 @@ class ofp_packet_out (ofp_header):
 
 
 ##3.7 Barrier Message
-"Mensagem de resposta da barreira"
+#"Mensagem de resposta da barreira"
 @openflow_s_message("OFPT_BARRIER_REPLY", 19,
     reply_to="ofp_barrier_request")
-"Classe de resposta da barreira"
+
 class ofp_barrier_reply (ofp_header):
+  "Classe de resposta da barreira"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4190,35 +4211,36 @@ class ofp_barrier_reply (ofp_header):
   #  return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
-  def __len__ ():
+  def __len__():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     return True
 
-  "Mostra os campos de ofp_barrier_reply"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_barrier_reply"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
     return outstr
 
-"Mensagem de requisição da barreira"
+#"Mensagem de requisição da barreira"
 @openflow_c_message("OFPT_BARRIER_REQUEST", 18,
     request_for="ofp_barrier_reply")
-"Classe de requisição da barreira"
+
 class ofp_barrier_request (ofp_header):
+  "Classe de requisição da barreira"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4231,18 +4253,18 @@ class ofp_barrier_request (ofp_header):
   #  return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     return True
 
-  "Mostra os campos de ofp_barrier_request"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_barrier_request"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4256,8 +4278,9 @@ Quando os pacotes são recebidos pelo caminho de dados
 e enviadas para o controlador utilizam a mensagem OFPT_PACKET_IN
 """
 @openflow_s_message("OFPT_PACKET_IN", 10)
-"Classe do packet_in"
+
 class ofp_packet_in (ofp_header):
+  "Classe do packet_in"
   _MIN_LENGTH = 18
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4274,41 +4297,41 @@ class ofp_packet_in (ofp_header):
 
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if self.data and (self.total_len < len(self.data)):
       return "total len less than data len"
 
   @property
-  "Define o tamanho total"
   def total_len (self):
+    "Define o tamanho total"
     if self._total_len is None:
       return len(self.data) if self.data else 0
     return self._total_len
 
   @total_len.setter
-  "Define o montador do tamanho total"
   def total_len (self, value):
+    "Define o montador do tamanho total"
     self._total_len = value
 
   @property
-  "Define o id do buffer"
   def buffer_id (self):
+    "Define o id do buffer"
     if self._buffer_id == NO_BUFFER: return None
     return self._buffer_id
   @buffer_id.setter
-  "Define o id do montador do buffer"
   def buffer_id (self, val):
+    "Define o id do montador do buffer"
     if val is None: val = NO_BUFFER
     self._buffer_id = val
 
   @property
-  "Define dados"
   def data (self):
+    "Define dados"
     return self._data
   @data.setter
-  "Define o montador dos dados"
   def data (self, data):
+    "Define o montador dos dados"
     assert assert_type("data", data, (packet_base, str))
     if data is None:
       self._data = ''
@@ -4317,8 +4340,8 @@ class ofp_packet_in (ofp_header):
     else:
       self._data = data
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4330,13 +4353,13 @@ class ofp_packet_in (ofp_header):
     return packed
 
   @property
-  "Está completo"
   def is_complete (self):
+    "Está completo"
     if self.buffer_id is not None: return True
     return len(self.data) == self.total_len
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self._buffer_id, self._total_len, self.in_port, self.reason,
             pad) = _unpack("!LHHBB", raw, offset)
@@ -4344,16 +4367,16 @@ class ofp_packet_in (ofp_header):
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     #FIXME: This is probably wrong, but it's not clear from the
     #       spec what's supposed to be going on here.
     #if len(self.data) < 2:
     #  return 20 + len(self.data)
     return 18 + len(self.data)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.buffer_id != other.buffer_id: return False
@@ -4363,8 +4386,8 @@ class ofp_packet_in (ofp_header):
     if self.data != other.data: return False
     return True
 
-  "Mostra os campos de ofp_packet_in: header/buffer_id/total_len/in_port/reason/data"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_packet_in: header/buffer_id/total_len/in_port/reason/data"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4381,8 +4404,8 @@ quando o fluxo de entradas de tempo fora ou são apagados das tabelas,
 o caminho de dados faz isso com a mensagem OFPT_FLOW_REMOVED
 """
 @openflow_s_message("OFPT_FLOW_REMOVED", 11)
-"Classe do fluxo removido"
 class ofp_flow_removed (ofp_header):
+  "Classe do fluxo removido"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     "Campos do ofp_flow_removed"
@@ -4390,21 +4413,21 @@ class ofp_flow_removed (ofp_header):
     self.cookie = 0 #cookie: identificador emitido pelo controlador de Opaque
     self.priority = 0 #priority: nível de prioridade de entrada de fluxo
     self.reason = 0 #reason: Um dos OFPRR
-    self.duration_sec = 0 
+    self.duration_sec = 0
     self.duration_nsec = 0
     self.idle_timeout = 0 #idle timeout: timeout inativo de modificação do fluxo de original
     self.packet_count = 0 #packet_count: contagem de pacotes
     self.byte_count = 0 #byte_count: contagem de bytes
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.match, ofp_match):
       return "match is not class ofp_match"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4418,28 +4441,28 @@ class ofp_flow_removed (ofp_header):
     packed += struct.pack("!QQ", self.packet_count, self.byte_count)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset = self.match.unpack(raw, offset)
     offset,(self.cookie, self.priority, self.reason) = \
-        _unpack("!QHB", raw, offset)
+      _unpack("!QHB", raw, offset)
     offset = _skip(raw, offset, 1)
     offset,(self.duration_sec, self.duration_nsec, self.idle_timeout) = \
-        _unpack("!LLH", raw, offset)
+      _unpack("!LLH", raw, offset)
     offset = _skip(raw, offset, 2)
     offset,(self.packet_count, self.byte_count) = \
-        _unpack("!QQ", raw, offset)
+      _unpack("!QQ", raw, offset)
     assert length == len(self)
     return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 48 + len(ofp_match)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.match != other.match: return False
@@ -4453,12 +4476,12 @@ class ofp_flow_removed (ofp_header):
     if self.byte_count != other.byte_count: return False
     return True
 
-  """
+  def show (self, prefix=''):
+    """
   Mostra os campos do ofp_flow_removed:
   header/match/cookie/priority/reason/duration_sec/duration_nsec/
   idle_timeout/packet_count/byte_count
   """
-  def show (self, prefix=''):
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4480,8 +4503,9 @@ do caminho de dados, o controlador precisa ser informado com
 a mensagem OFPT_PORT_STATUS
 """
 @openflow_s_message("OFPT_PORT_STATUS", 12)
-"Classe para o status da porta"
+
 class ofp_port_status (ofp_header):
+  "Classe para o status da porta"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     self.reason = 0
@@ -4489,14 +4513,14 @@ class ofp_port_status (ofp_header):
 
     initHelper(self, kw)
 
-  "Função para validação"
   def _validate (self):
+    "Função para validação"
     if not isinstance(self.desc, ofp_phy_port):
       return "desc is not class ofp_phy_port"
     return None
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4506,8 +4530,8 @@ class ofp_port_status (ofp_header):
     packed += self.desc.pack()
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.reason,) = _unpack("!B", raw, offset)
     offset = _skip(raw, offset, 7)
@@ -4516,20 +4540,20 @@ class ofp_port_status (ofp_header):
     return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 64
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.reason != other.reason: return False
     if self.desc != other.desc: return False
     return True
 
-  "Mostra os campos de ofp_port_status: header/reason/desc"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_port_status: header/reason/desc"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4545,8 +4569,8 @@ Eles são usados ​​principalmente por o interruptor
 para indicar uma falha de uma solicitação iniciada pelo controlador.
 """
 @openflow_s_message("OFPT_ERROR", 1)
-"Classe para erro"
 class ofp_error (ofp_header):
+  "Classe para erro"
   _MIN_LENGTH = 12
   def __init__ (self, **kw):
     ofp_header.__init__(self)
@@ -4556,8 +4580,8 @@ class ofp_error (ofp_header):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4566,20 +4590,20 @@ class ofp_error (ofp_header):
     packed += self.data
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.type, self.code) = _unpack("!HH", raw, offset)
     offset,self.data = _read(raw, offset, length - 12)
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 12 + len(self.data)
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.type != other.type: return False
@@ -4587,15 +4611,15 @@ class ofp_error (ofp_header):
     if self.data != other.data: return False
     return True
 
-  "Mostra os campos de ofp_error: header/type/code/datalen"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_error: header/type/code/datalen"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
     t = self.type
     c = self.code
-    if t < len(ofp_error_type):
-      n = ofp_error_type_map[t]
+    if t < len(ofp_error_type_rev_map):
+      n = ofp_error_type_rev_map[t]
       t = "%s (%i)" % (n, t)
       n = 'ofp' + n.lower()[5:] + '_code_map'
       if n in sys.modules[__name__].__dict__:
@@ -4617,14 +4641,15 @@ estabelecido, cada lado da conexão deve enviar
 imediatamente uma mensagem OFPT_HELLO como sua primeira mensagem OpenFlow
 """
 @openflow_sc_message("OFPT_HELLO", 0)
-"Classe ofp_hello. Fazer hanshake"
+
 class ofp_hello (ofp_header):
+  "Classe ofp_hello. Fazer hanshake"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4637,18 +4662,18 @@ class ofp_hello (ofp_header):
   #  return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
-  def __len__ ():
+  def __len__():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna verdadeiro se igual"
   def __eq__ (self, other):
+    "Retorna verdadeiro se igual"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     return True
 
-  "Mostra os campos de ofp_hello"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_hello"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4660,16 +4685,17 @@ solicitação de eco (OFPT_ECHO_REQUEST) e mensagens de resposta (OFPT_ECHO_REPL
 """
 @openflow_sc_message("OFPT_ECHO_REQUEST", 2,
     request_for="ofp_echo_reply")
-"Classe de requisição de eco"
+
 class ofp_echo_request (ofp_header):
+  "Classe de requisição de eco"
   _MIN_LENGTH = 8
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     self.body = b''
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4677,26 +4703,26 @@ class ofp_echo_request (ofp_header):
     packed += self.body
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,self.body = _read(raw, offset, length - 8)
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 8 + len(self.body)
 
-  "Retorna igual se verdadeiro"
   def __eq__ (self, other):
+    "Retorna igual se verdadeiro"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.body != other.body: return False
     return True
 
-  "Mostra os campos de ofp_echo_request"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_echo_request"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4707,16 +4733,17 @@ class ofp_echo_request (ofp_header):
 
 @openflow_sc_message("OFPT_ECHO_REPLY", 3,
     reply_to="ofp_echo_request")
-"Classe de resposta de eco"
+
 class ofp_echo_reply (ofp_header):
+  "Classe de resposta de eco"
   _MIN_LENGTH = 8
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     self.body = b''
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4724,26 +4751,26 @@ class ofp_echo_reply (ofp_header):
     packed += self.body
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,self.body = _read(raw, offset, length - 8)
     assert length == len(self)
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 8 + len(self.body)
 
-  "Retorna igual se verdadeiro"
   def __eq__ (self, other):
+    "Retorna igual se verdadeiro"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.body != other.body: return False
     return True
 
-  "Mostra os campos de ofp_echo_reply"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_echo_reply"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4751,8 +4778,8 @@ class ofp_echo_reply (ofp_header):
     outstr += _format_body(self.body, prefix + '  ') + '\n'
     return outstr
 
-"Classe base para mensagens de fornecedor"
 class ofp_vendor_base (ofp_header):
+  "Classe base para mensagens de fornecedor"
   header_type = 4 # OFPT_VENDOR
   """
   Base class for vendor messages
@@ -4775,8 +4802,8 @@ class ofp_vendor_generic (ofp_vendor_base):
     self.data = b''
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4788,8 +4815,8 @@ class ofp_vendor_generic (ofp_vendor_base):
       packed += self.data
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     _offset = offset
     offset,length = self._unpack_header(raw, offset)
     offset,(self.vendor,) = _unpack("!L", raw, offset)
@@ -4798,20 +4825,20 @@ class ofp_vendor_generic (ofp_vendor_base):
       self.raw = raw[_offset, _offset+length]
     return offset,length
 
-  "Retorna o tamanho"
   def __len__ (self):
+    "Retorna o tamanho"
     return 12 + len(self.data)
 
-  "Retorna igual se verdadeiro"
   def __eq__ (self, other):
+    "Retorna igual se verdadeiro"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.vendor != other.vendor: return False
     if self.data != other.data: return False
     return True
 
-  "Mostra os campos de ofp_vendor_generic: header/vendor/datalen"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_vendor_generic: header/vendor/datalen"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4833,33 +4860,33 @@ class ofp_features_request (ofp_header):
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
     packed += ofp_header.pack(self)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     assert length == len(self)
     return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna igual se verdadeiro"
   def __eq__ (self, other):
+    "Retorna igual se verdadeiro"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     return True
 
-  "Mostra os campos de ofp_features_request"
   def show (self, prefix=''):
+    "Mostra os campos de ofp_features_request"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4871,15 +4898,15 @@ e OFPT_GET_CONFIG_REQUEST, respectivamente.
 """
 @openflow_c_message("OFPT_GET_CONFIG_REQUEST", 7,
     request_for="ofp_get_config_reply")
-"Classe para consulta de parâmetros de configuração de requisição"
 class ofp_get_config_request (ofp_header):
+  "Classe para consulta de parâmetros de configuração de requisição"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4893,18 +4920,18 @@ class ofp_get_config_request (ofp_header):
   #  return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 8
 
-  "Retorna igual se verdadeiro"
   def __eq__ (self, other):
+    "Retorna igual se verdadeiro"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     return True
-  
-  "Mostra os campos de ofp_get_config_request"    
+
   def show (self, prefix=''):
+    "Mostra os campos de ofp_get_config_request"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4913,8 +4940,9 @@ class ofp_get_config_request (ofp_header):
 
 @openflow_s_message("OFPT_GET_CONFIG_REPLY", 8,
     reply_to="ofp_get_config_request")
-"Classe para consulta de parâmetros de configuração de resposta"
+
 class ofp_get_config_reply (ofp_header): # uses ofp_switch_config
+  "Classe para consulta de parâmetros de configuração de resposta"
   def __init__ (self, **kw):
     ofp_header.__init__(self)
     self.flags = 0
@@ -4922,8 +4950,8 @@ class ofp_get_config_reply (ofp_header): # uses ofp_switch_config
 
     initHelper(self, kw)
 
-  "Define o pacote"
   def pack (self):
+    "Define o pacote"
     assert self._assert()
 
     packed = b""
@@ -4931,29 +4959,29 @@ class ofp_get_config_reply (ofp_header): # uses ofp_switch_config
     packed += struct.pack("!HH", self.flags, self.miss_send_len)
     return packed
 
-  "Define o desempacotamento"
   def unpack (self, raw, offset=0):
+    "Define o desempacotamento"
     offset,length = self._unpack_header(raw, offset)
     offset,(self.flags, self.miss_send_len) = \
-        _unpack("!HH", raw, offset)
+      _unpack("!HH", raw, offset)
     assert length == len(self)
     return offset,length
 
   @staticmethod
-  "Retorna o tamanho"
   def __len__ ():
+    "Retorna o tamanho"
     return 12
 
-  "Retorna igual se verdadeiro"
   def __eq__ (self, other):
+    "Retorna igual se verdadeiro"
     if type(self) != type(other): return False
     if not ofp_header.__eq__(self, other): return False
     if self.flags != other.flags: return False
     if self.miss_send_len != other.miss_send_len: return False
     return True
 
-  "Mostra os campos de ofp_get_config_reply: header/flags/miss_send_len"   
   def show (self, prefix=''):
+    "Mostra os campos de ofp_get_config_reply: header/flags/miss_send_len"
     outstr = ''
     outstr += prefix + 'header: \n'
     outstr += ofp_header.show(self, prefix + '  ')
@@ -4961,15 +4989,15 @@ class ofp_get_config_reply (ofp_header): # uses ofp_switch_config
     outstr += prefix + 'miss_send_len: ' + str(self.miss_send_len) + '\n'
     return outstr
 
-"Define o desempacotamento das propriedades da fila"
 def _unpack_queue_props (b, length, offset=0):
- """
-Analisa adereços de fila de um buffer
+  """Define o desempacotamento das propriedades da fila
+
+  Analisa adereços de fila de um buffer
   b é um tampão (bytes)
   compensado, se especificado, é aquele em que b para começar a descodificar
   retornos
-""" 
-"""
+  """
+  """
   Parses queue props from a buffer
   b is a buffer (bytes)
   offset, if specified, is where in b to start decoding
@@ -4993,8 +5021,8 @@ Analisa adereços de fila de um buffer
     offset += l
   return (offset, props)
 
-"Define ações de desempacotamento"
 def _unpack_actions (b, length, offset=0):
+  "Define ações de desempacotamento"
   """
   Analisa ações de um buffer
   b é um tampão (bytes)
@@ -5090,35 +5118,35 @@ _init()
 
 # Values from macro definitions
 "Valores de definições de macro"
-OFP_FLOW_PERMANENT = 0  "Valor utilizado em 'idle_timeout' e 'hard_timeout' para indicar que a entrada é permanente"
-OFP_DL_TYPE_ETH2_CUTOFF = 0x0600 "Interromper o tipo ethernet 2"
-DESC_STR_LEN = 256 "Tamanho da struct"
-OFPFW_ICMP_CODE = OFPFW_TP_DST "Código ICMP é igual ao destino TCP/UDP"
-OFPQ_MIN_RATE_UNCFG = 0xffff  "Se a taxa não for configurada, ela é definida como OFPQ_MIN_RATE_UNCFG, que é 0xffff."
-OFP_VERSION = 0x01 "O bit mais significativo a ser definido no campo versão indica uma Versão experimental OpenFlow"
-OFP_MAX_TABLE_NAME_LEN = 32 "Tamanho máximo do nome da tabela"
-OFP_DL_TYPE_NOT_ETH_TYPE = 0x05ff "Tipo ethernet nao é o tipo link de dados"
-OFP_DEFAULT_MISS_SEND_LEN = 128 "Tamanho enviado perdido"
-OFP_MAX_PORT_NAME_LEN = 16 "Tamanho máximo do nome da porta"
-OFP_SSL_PORT = 6633 "Porta SSL"
-OFPFW_ICMP_TYPE = OFPFW_TP_SRC "Tipo ICMP"
-OFP_TCP_PORT = 6633 "Porta TCP"
-SERIAL_NUM_LEN = 32 "Tamanho do numero de serie"
-OFP_DEFAULT_PRIORITY = 0x8000 "Prioridade padrão"
-OFP_VLAN_NONE = 0xffff "Nenhuma VLAN"
-OFPQ_ALL = 0xffffffff "Tudo"
+OFP_FLOW_PERMANENT = 0  #"Valor utilizado em 'idle_timeout' e 'hard_timeout' para indicar que a entrada é permanente"
+OFP_DL_TYPE_ETH2_CUTOFF = 0x0600 #"Interromper o tipo ethernet 2"
+DESC_STR_LEN = 256 #"Tamanho da struct"
+OFPFW_ICMP_CODE = OFPFW_TP_DST #"Código ICMP é igual ao destino TCP/UDP"
+OFPQ_MIN_RATE_UNCFG = 0xffff  #"Se a taxa não for configurada, ela é definida como OFPQ_MIN_RATE_UNCFG, que é 0xffff."
+OFP_VERSION = 0x01 #"O bit mais significativo a ser definido no campo versão indica uma Versão experimental OpenFlow"
+OFP_MAX_TABLE_NAME_LEN = 32 #"Tamanho máximo do nome da tabela"
+OFP_DL_TYPE_NOT_ETH_TYPE = 0x05ff #"Tipo ethernet nao é o tipo link de dados"
+OFP_DEFAULT_MISS_SEND_LEN = 128 #"Tamanho enviado perdido"
+OFP_MAX_PORT_NAME_LEN = 16 #"Tamanho máximo do nome da porta"
+OFP_SSL_PORT = 6633 #"Porta SSL"
+OFPFW_ICMP_TYPE = OFPFW_TP_SRC #"Tipo ICMP"
+OFP_TCP_PORT = 6633 #"Porta TCP"
+SERIAL_NUM_LEN = 32 #"Tamanho do numero de serie"
+OFP_DEFAULT_PRIORITY = 0x8000 #"Prioridade padrão"
+OFP_VLAN_NONE = 0xffff #"Nenhuma VLAN"
+OFPQ_ALL = 0xffffffff #"Tudo"
 
 ofp_match_data = {
-  'in_port' : (0, OFPFW_IN_PORT), "OFPFW_IN_PORT: porta de entrada do switch"
-  'dl_src' : (EMPTY_ETH, OFPFW_DL_SRC), "EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de origem Ethernet"
-  'dl_dst' : (EMPTY_ETH, OFPFW_DL_DST), "EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de destino Ethernet"
-  'dl_vlan' : (0, OFPFW_DL_VLAN), "VLAN"
+  'in_port' : (0, OFPFW_IN_PORT), #"OFPFW_IN_PORT: porta de entrada do switch"
+  'dl_src' : (EMPTY_ETH, OFPFW_DL_SRC), #"EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de origem Ethernet"
+  'dl_dst' : (EMPTY_ETH, OFPFW_DL_DST), #"EMPTY_ETH: ethernet vazio/OFPFW_DL_SRC: endereço de destino Ethernet"
+  'dl_vlan' : (0, OFPFW_DL_VLAN), #"VLAN"
   'dl_vlan_pcp' : (0, OFPFW_DL_VLAN_PCP),
-  'dl_type' : (0, OFPFW_DL_TYPE), "Tipo de quadro Ethernet"
+  'dl_type' : (0, OFPFW_DL_TYPE), #"Tipo de quadro Ethernet"
   'nw_tos' : (0, OFPFW_NW_TOS),
-  'nw_proto' : (0, OFPFW_NW_PROTO), "Protocolo IP"
+  'nw_proto' : (0, OFPFW_NW_PROTO), #"Protocolo IP"
   'nw_src' : (0, OFPFW_NW_SRC_ALL),
   'nw_dst' : (0, OFPFW_NW_DST_ALL),
-  'tp_src' : (0, OFPFW_TP_SRC), "Porta de entrada TCP/UDP"
-  'tp_dst' : (0, OFPFW_TP_DST), "Porta de destino TCP/UDP"
+  'tp_src' : (0, OFPFW_TP_SRC), #"Porta de entrada TCP/UDP"
+  'tp_dst' : (0, OFPFW_TP_DST), #"Porta de destino TCP/UDP"
 }

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright 2011-2013 James McCauley
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,10 +34,10 @@ def make_type_to_unpacker_table ():
 
   "max: Devolver o maior item em um iterable ou o maior dos dois ou mais argumentos."
 
- "Se um argumento posicional é fornecido, iterable deve ser um iterable não vazio "
- "(como uma string não-vazia, tupla ou lista)."
- "O maior item na iterable é retornado. Se dois ou mais argumentos posicionais são fornecidos, o maior dos argumentos posicionais é retornado."
- top = max(of._message_type_to_class)
+  "Se um argumento posicional é fornecido, iterable deve ser um iterable não vazio "
+  "(como uma string não-vazia, tupla ou lista)."
+  "O maior item na iterable é retornado. Se dois ou mais argumentos posicionais são fornecidos, o maior dos argumentos posicionais é retornado."
+  top = max(of._message_type_to_class)
 
 
   r = [of._message_type_to_class[i].unpack_new for i in range(0, top)]

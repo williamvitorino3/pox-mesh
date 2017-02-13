@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 # Copyright 2011,2012 James McCauley
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -173,7 +174,7 @@ def handle_FEATURES_REPLY (con, msg):
     con.send(of.ofp_set_config(miss_send_len =
                                   con.ofnexus.miss_send_len))
   if con.ofnexus.clear_flows_on_connect:
-    con.send(of.ofp_flow_mod(match=of.ofp_match(),command=of.OFPFC_DELETE)) "OFPFC_DELETE: Excluir todos os fluxos correspondentes ."
+    con.send(of.ofp_flow_mod(match=of.ofp_match(),command=of.OFPFC_DELETE)) #"OFPFC_DELETE: Excluir todos os fluxos correspondentes ."
 
   con.send(barrier)
 
@@ -192,7 +193,7 @@ def handle_STATS_REPLY (con, msg):
 
 "Define as estatisticas da porta"
 def handle_PORT_STATUS (con, msg): #A
-"OFPPR_DELETE: A porta foi removida"
+  "OFPPR_DELETE: A porta foi removida"
   if msg.reason == of.OFPPR_DELETE:
     con.ports._forget(msg.desc)
   else:
@@ -200,12 +201,12 @@ def handle_PORT_STATUS (con, msg): #A
   e = con.ofnexus.raiseEventNoErrors(PortStatus, con, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(PortStatus, con, msg)
-"PACKET_IN: Define a mensagem assincrona"
+#"PACKET_IN: Define a mensagem assincrona"
 def handle_PACKET_IN (con, msg): #A
   e = con.ofnexus.raiseEventNoErrors(PacketIn, con, msg)
   if e is None or e.halt != True:
     con.raiseEventNoErrors(PacketIn, con, msg)
-"ERROR_MSG: define a mensagem de erro"
+#"ERROR_MSG: define a mensagem de erro"
 def handle_ERROR_MSG (con, msg): #A
   err = ErrorIn(con, msg)
   e = con.ofnexus.raiseEventNoErrors(err)
@@ -558,7 +559,7 @@ class PortCollection (object):
 
   def __len__ (self):
     return len(self.keys())
-"getitem: Chamado para implementar avaliação de self[key]. "
+  "getitem: Chamado para implementar avaliação de self[key]. "
   def __getitem__ (self, index):
     if isinstance(index, (int,long)):
       for p in self._ports:
@@ -856,17 +857,17 @@ class Connection (EventMixin):
       self.buf = self.buf[offset:]
 
     return True
-"""
-Isso pressupõe que você não receber várias estatísticas respostas
-    # Para diferentes solicitações fora de ordem / intercaladas.
-"""
+  """
+  Isso pressupõe que você não receber várias estatísticas respostas
+      # Para diferentes solicitações fora de ordem / intercaladas.
+  """
   def _incoming_stats_reply (self, ofp):
     # This assumes that you don't receive multiple stats replies
     # to different requests out of order/interspersed.
     if not ofp.is_last_reply:
       if ofp.type not in [of.OFPST_FLOW, of.OFPST_TABLE,
                                 of.OFPST_PORT, of.OFPST_QUEUE]:
-                  "Não sei como agregar Status de mensagem do tipo"
+                  #"Não sei como agregar Status de mensagem do tipo"
         log.error("Don't know how to aggregate stats message of type " +
                   str(ofp.type))
         self._previous_stats = []
@@ -891,7 +892,7 @@ Isso pressupõe que você não receber várias estatísticas respostas
       s = self._previous_stats
       self._previous_stats = []
       if handler is None: 
-                 "Nenhum manipulador para estatísticas de tipo"
+        #"Nenhum manipulador para estatísticas de tipo"
         log.warn("No handler for stats of type " +
                  str(self._previous_stats[0].type))
         return

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright 2012 James McCauley
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +16,7 @@
 
 pcap_traces = False
 
-"função para iniciar(lançar)"
 def launch ():
+  "função para iniciar(lançar)"
   global pcap_traces
   pcap_traces = True

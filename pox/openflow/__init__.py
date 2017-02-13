@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright 2011 James McCauley
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,12 +65,12 @@ from pox.lib.packet.ethernet import ethernet
 "Evento disparado quando a conexão com um switch OpenFlow tem sido estabelecida ."
 class ConnectionUp (Event):
 
-"Chamado após a instância foi criada (por __new__()), "
-"mas antes de ser retornado para o chamador. "
-"Os argumentos são aqueles passados ​​para a expressão construtor da classe. "
-"Se uma classe base tem um __init__()método, o da classe derivada __init__()método, "
-"se houver, deve chamá-lo explicitamente para garantir a inicialização adequada "
-"da parte da classe base da instância; por exemplo: .BaseClass.__init__(self, [args...])"
+  "Chamado após a instância foi criada (por __new__()), "
+  "mas antes de ser retornado para o chamador. "
+  "Os argumentos são aqueles passados ​​para a expressão construtor da classe. "
+  "Se uma classe base tem um __init__()método, o da classe derivada __init__()método, "
+  "se houver, deve chamá-lo explicitamente para garantir a inicialização adequada "
+  "da parte da classe base da instância; por exemplo: .BaseClass.__init__(self, [args...])"
 
   def __init__ (self, connection, ofp):
     Event.__init__(self)
@@ -76,13 +78,11 @@ class ConnectionUp (Event):
     self.dpid = connection.dpid
     self.ofp = ofp
 
-"""
-Levantadas após o recebimento de uma mensagem de ofp_switch_features
-
-  Isso geralmente acontece como parte de uma conexão automaticamente .
-"""
 class FeaturesReceived (Event):
-
+  """
+    Levantadas após o recebimento de uma mensagem de ofp_switch_features
+    Isso geralmente acontece como parte de uma conexão automaticamente .
+  """
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
@@ -115,11 +115,11 @@ class PortStatus (Event):
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
-    self.dpid = connection.dpid "o DPID do interruptor que causou o evento"
-    self.ofp = ofp "a mensagem OpenFlow que causou o evento ( da libopenflow )"
-    self.modified = ofp.reason == of.OFPPR_MODIFY "Algum atributo da porta mudou"
-    self.added = ofp.reason == of.OFPPR_ADD "A porta foi adicionada"
-    self.deleted = ofp.reason == of.OFPPR_DELETE "A porta foi removida"
+    self.dpid = connection.dpid #"o DPID do interruptor que causou o evento"
+    self.ofp = ofp #"a mensagem OpenFlow que causou o evento ( da libopenflow )"
+    self.modified = ofp.reason == of.OFPPR_MODIFY #"Algum atributo da porta mudou"
+    self.added = ofp.reason == of.OFPPR_ADD #"A porta foi adicionada"
+    self.deleted = ofp.reason == of.OFPPR_DELETE #"A porta foi removida"
     self.port = ofp.desc.port_no
 
 """
@@ -144,17 +144,17 @@ class FlowRemoved (Event):
     self.connection = connection
     self.dpid = connection.dpid
     self.ofp = ofp
-    self.idleTimeout = False "idleTimeout: idle timeout de modificação fluxo inicial."
-    self.hardTimeout = False "hardTimeout: tempo limite rígido de modificação fluxo de originais"
+    self.idleTimeout = False #"idleTimeout: idle timeout de modificação fluxo inicial."
+    self.hardTimeout = False #"hardTimeout: tempo limite rígido de modificação fluxo de originais"
     self.deleted = False
     self.timeout = False
-    if ofp.reason == of.OFPRR_IDLE_TIMEOUT: "OFPRR_IDLE_TIMEOUT: Fluxo tempo ocioso excedeu idle_timeout "
+    if ofp.reason == of.OFPRR_IDLE_TIMEOUT: #"OFPRR_IDLE_TIMEOUT: Fluxo tempo ocioso excedeu idle_timeout "
       self.timeout = True
       self.idleTimeout = True
-    elif ofp.reason == of.OFPRR_HARD_TIMEOUT: "OFPRR_HARD_TIMEOUT: Tempo excedido hard_timeout"
+    elif ofp.reason == of.OFPRR_HARD_TIMEOUT: #"OFPRR_HARD_TIMEOUT: Tempo excedido hard_timeout"
       self.timeout = True
       self.hardTimeout = True
-    elif ofp.reason == of.OFPRR_DELETE: "OFPRR_DELETE: Despejados por um mod fluxo DELETE."
+    elif ofp.reason == of.OFPRR_DELETE: #"OFPRR_DELETE: Despejados por um mod fluxo DELETE."
       self.deleted = True
 
 class RawStatsReply (Event):
@@ -197,19 +197,19 @@ class PortStatsReceived (StatsReply):
 class QueueStatsReceived (StatsReply):
   pass
 
-"""
-Packet -in : transferir o controlador de um pacote para o controlador . Para todos os pacotes enviados para o controlador
-porta reservada usando uma entrada de fluxo ou a entrada de fluxo de mesa -miss , um evento pacote -in é sempre
-enviado aos controladores. Outros processamento , tais como a verificação de TTL , também pode gerar pacotes -in eventos
-para enviar pacotes para o controlador.
 
-Demitido em resposta a eventos PacketIn
-  port (int) - número de porta que o pacote está vindo
-  dados (bytes) - de pacote de dados em bruto
-  analisados ​​( subclasses de pacotes ) - versão analisada do pox.lib.packet
-"""
 class PacketIn (Event):
+  """
+  Packet -in : transferir o controlador de um pacote para o controlador . Para todos os pacotes enviados para o controlador
+  porta reservada usando uma entrada de fluxo ou a entrada de fluxo de mesa -miss , um evento pacote -in é sempre
+  enviado aos controladores. Outros processamento , tais como a verificação de TTL , também pode gerar pacotes -in eventos
+  para enviar pacotes para o controlador.
 
+  Demitido em resposta a eventos PacketIn
+    port (int) - número de porta que o pacote está vindo
+    dados (bytes) - de pacote de dados em bruto
+    analisados ​​( subclasses de pacotes ) - versão analisada do pox.lib.packet
+  """
   def __init__ (self, connection, ofp):
     Event.__init__(self)
     self.connection = connection
@@ -224,9 +224,9 @@ class PacketIn (Event):
       self._parsed = ethernet(self.data)
     return self._parsed
 
-"O pacote como analisado pelo pox.lib.packet"
   @property
   def parsed (self):
+    "O pacote como analisado pelo pox.lib.packet"
     return self.parse()
 
 class ErrorIn (Event):
@@ -374,50 +374,50 @@ class OpenFlowNexus (EventMixin):
   _eventMixin_events = set([
     ConnectionUp,
     ConnectionDown,
-    """
-    Features: O controlador pode solicitar a identidade e as capacidades básicas de um switch através do envio
-    um pedido de recursos ; o interruptor deve responder com uma características responder que especifica a identidade e básico
-    capacidades da chave. Isto é comumente realizada mediante estabelecimento do canal OpenFlow .
-        """
+    #"""
+    #Features: O controlador pode solicitar a identidade e as capacidades básicas de um switch através do envio
+    #um pedido de recursos ; o interruptor deve responder com uma características responder que especifica a identidade e básico
+    #capacidades da chave. Isto é comumente realizada mediante estabelecimento do canal OpenFlow .
+    #"""
     FeaturesReceived,
-    """
-    Port- status: informar o controlador de uma mudança em uma porta . O interruptor é esperado para enviar porta -status
-    mensagens para os controladores como configuração da porta ou alterações Estado do porto. Estes eventos incluem mudança de
-    eventos de configuração de porta , por exemplo, se ele foi trazido para baixo diretamente por um usuário , e mudança de estado da porta
-    eventos , por exemplo, se a ligação caiu.
-    """
+    #"""
+    #Port- status: informar o controlador de uma mudança em uma porta . O interruptor é esperado para enviar porta -status
+    #mensagens para os controladores como configuração da porta ou alterações Estado do porto. Estes eventos incluem mudança de
+    #eventos de configuração de porta , por exemplo, se ele foi trazido para baixo diretamente por um usuário , e mudança de estado da porta
+    #eventos , por exemplo, se a ligação caiu.
+    #"""
     PortStatus,
-    """
-    Fluxo - Removido : informar o controlador sobre a remoção de uma entrada de fluxo de uma tabela de fluxo. Fluxo-
-    mensagens removidas são enviados apenas para as entradas de fluxo com a flag OFPFF_SEND_FLOW_REM . Eles são
-    gerados como resultado de um fluxo controlador excluir pedido ou o fluxo de processo de termo interruptor quando um de
-    o tempo limite de fluxo for excedido
-    """
+    #"""
+    #Fluxo - Removido : informar o controlador sobre a remoção de uma entrada de fluxo de uma tabela de fluxo. Fluxo-
+    #mensagens removidas são enviados apenas para as entradas de fluxo com a flag OFPFF_SEND_FLOW_REM . Eles são
+    #gerados como resultado de um fluxo controlador excluir pedido ou o fluxo de processo de termo interruptor quando um de
+    #o tempo limite de fluxo for excedido
+    #"""
     FlowRemoved,
-    """
-    Packet -in : transferir o controlo de um pacote para o controlador . Para todos os pacotes enviados para o controlador
-    porta reservada usando uma entrada de fluxo ou a entrada de fluxo de mesa -miss , um evento pacote -in é sempre
-    enviado aos controladores. Outros processamento , tais como a verificação de TTL , também pode gerar pacotes -in eventos
-    para enviar pacotes para o controlador.
-    """
+    #"""
+    #Packet -in : transferir o controlo de um pacote para o controlador . Para todos os pacotes enviados para o controlador
+    #porta reservada usando uma entrada de fluxo ou a entrada de fluxo de mesa -miss , um evento pacote -in é sempre
+    #enviado aos controladores. Outros processamento , tais como a verificação de TTL , também pode gerar pacotes -in eventos
+    #para enviar pacotes para o controlador.
+    #"""
     PacketIn,
-    """ 
-    Barreira : Barreira de solicitação / resposta mensagens são utilizados pelo controlador para garantir dependências de mensagens
-    foram cumpridos ou para receber notificações de operações concluídas .
-    """
+    #"""
+    #Barreira : Barreira de solicitação / resposta mensagens são utilizados pelo controlador para garantir dependências de mensagens
+    #foram cumpridos ou para receber notificações de operações concluídas .
+    #"""
     BarrierIn,
     ErrorIn,
     RawStatsReply,
     SwitchDescReceived,
-    "estatísticas do fluxo recebido"
+    #"estatísticas do fluxo recebido"
     FlowStatsReceived,
-    "estatísticas de fluxos agregados"
+    #"estatísticas de fluxos agregados"
     AggregateFlowStatsReceived,
-    "estatísticas da tabela recebida"
+    #"estatísticas da tabela recebida"
     TableStatsReceived,
-    "estatísticas da porta recebida"
+    #"estatísticas da porta recebida"
     PortStatsReceived,
-    "estatísticas da filamrecebida"
+    #"estatísticas da filamrecebida"
     QueueStatsReceived,
     FlowRemoved,
   ])
@@ -457,7 +457,7 @@ class OpenFlowNexus (EventMixin):
                (dpidToStr(dpid),))
       return False
 
-"controla o evento de baixo"
+  "controla o evento de baixo"
   def _handle_DownEvent (self, event):
     for c in self._connections.values():
       try:

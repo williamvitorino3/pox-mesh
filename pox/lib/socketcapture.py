@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 # Copyright 2012 James McCauley
 #
 # This file is part of POX.
