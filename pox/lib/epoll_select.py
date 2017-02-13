@@ -15,6 +15,8 @@
 import select
 
 class EpollSelect(object):
+  """Uma classe que implementa select.select () tipo de comportamento em cima de epoll.
+  Necessário, porque select () só funciona em FD_SETSIZE (normalmente 1024) fd's de cada vez"""
   """ a class that implements select.select() type behavior on top of epoll.
       Necessary, because select() only works on FD_SETSIZE (typically 1024) fd's at a time
   """
@@ -29,6 +31,14 @@ class EpollSelect(object):
     self.lastwl_set = set()
 
   def select(self, rl, wl, xl, timeout=0):
+    """
+    Tenta emular o comportamento de select.select()
+    :param rl: Argumento não usado.
+    :param wl: Argumento não usado.
+    :param xl: Argumento não usado.
+    :param timeout: Argumento não usado.
+    :return: Sem retorno.
+    """
     """ emulate the select semantics on top of _epoll.
         Note this tries to emulate the behavior of select.select()
           - you can pass a raw fd, or an object that answers to #fileno().
@@ -37,9 +47,16 @@ class EpollSelect(object):
 
     # a map of fd's that need to be modified.
     # fd -> flag to be set (0 for unregister fd)
-    modify={}
+    modify = {}
 
     def modify_table(current_obj_list, old_fd_set, op):
+      """
+      Adiciona operações para modificar o fd registrado para operação / máscara epoll 'op'
+      :param current_obj_list: Lista de objetos atual.
+      :param old_fd_set: Set de fd antigo.
+      :param op: Mascara epoll.
+      :return: Retorna o old_fd_set que você deve passar na próxima vez.
+      """
       """ add operations to modify the registered fd's for operation / epoll mask 'op'
           Returns the old_fd_set you should pass in next time
           Also updates the fd_to_obj map.
@@ -113,4 +130,8 @@ class EpollSelect(object):
     return (retrl, retwl, retxl)
 
   def close(self):
+    """
+    Fecha o epol.
+    :return: Sem retorno.
+    """
     self.epoll.close()
