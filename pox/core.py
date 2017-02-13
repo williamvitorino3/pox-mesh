@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright 2011 James McCauley
 #
 # This file is part of POX.
@@ -15,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with POX.  If not, see <http://www.gnu.org/licenses/>.
 
-# Em Português...
+# Em Portugues...
 # Este arquivo é uma parte do POX.
 #
 # POX é software livre: você pode redistribuí-lo e/ou modificá-lo

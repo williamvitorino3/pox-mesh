@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #!/bin/bash -
 
 # Copyright 2011 James McCauley

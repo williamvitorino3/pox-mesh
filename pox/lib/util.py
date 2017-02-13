@@ -339,7 +339,7 @@ def makePinger ():
   raise RuntimeError("Could not allocate a local socket pair")
 
 
-def str_to_bool (s):
+def str_to_bool(s):
   """
   Given a string, parses out whether it is meant to be True or not
   """
@@ -404,6 +404,14 @@ def connect_socket_with_backoff(address, port, max_backoff_seconds=32):
         time.sleep(backoff_seconds)
       backoff_seconds <<= 1
   return sock
+
+def is_listlike (o):
+  """
+  Is this a sequence that isn't like a string or bytes?
+  """
+  if isinstance(o, (bytes, str, bytearray)):
+    return False
+  return isinstance(o, collections.Iterable)
 
 if __name__ == "__main__":
   def cb (t,k,v): print v
