@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright 2011 James McCauley
 #
 # This file is part of POX.
@@ -16,7 +18,9 @@
 # along with POX.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Various utility functions
+Várias funções de utilidade.
+
+Various utility functions.
 """
 
 import traceback
@@ -25,6 +29,7 @@ import sys
 import os
 import time
 import socket
+import collections
 
 #FIXME: ugh, why can't I make importing pox.core work here?
 import logging
@@ -35,70 +40,114 @@ class DirtyList (list):
   #      and it may not be called with good names/parameters.
   #      All you can really rely on is that it will be called in
   #      some way if something may have changed.
-  def __init__ (self, *args, **kw):
+  def __init__(self, *args, **kw):
     list.__init__(self, *args, **kw)
     self.dirty = False
     self.callback = None
 
-  def __setslice__ (self, k, v):
+  def __setslice__(self, k, v):
     #TODO: actually check for change
     self._smudge('__setslice__', k, v)
     list.__setslice__(self, k, v)
 
-  def __delslice__ (self, k):
+  def __delslice__(self, k):
     #TODO: actually check for change
     self._smudge('__delslice__', k, None)
     list.__delslice__(self, k)
 
-  def append (self, v):
+  def append(self, v):
+    """
+    Implementa a adiçao em listas.
+    :param v: Elemento a ser adicionado na lista
+    :return: Sem retorno.
+    """
     self._smudge('append', None, v)
     list.append(self, v)
 
-  def extend (self, v):
+  def extend(self, v):
+    """
+    Implementa a adiçao do elemento v no final da lista.
+    :param v: Elemento a ser adicionado.
+    :return: Sem retorno.
+    """
     self._smudge('extend', None, v)
     list.extend(self, v)
 
-  def insert (self, i, v):
-    self._smudge('insert', k, v)
+  def insert(self, i, v):
+    """
+    Insere elemento na posiçao 'i' especifica.
+    :param i: Posiçao que o elemento sera adicionado.
+    :param v: Elemento a ser adicionado.
+    :return: Sem retorno.
+    """
+    self._smudge('insert', i, v)
     list.extend(self, v)
 
-  def pop (self, i=-1):
+  def pop(self, i=-1):
+    """
+    Remove elemento da posiçao 'i'.
+    :param i: Posiçao do elemento a ser removido.
+    :return: Sem retorno.
+    """
     self._smudge('pop', i, None)
     list.pop(self, i)
 
-  def remove (self, v):
+  def remove(self, v):
+    """
+    Remove a peimeira ocorrencia do elemento 'v' na lista.
+    :param v: Elemento a ser removido.
+    :return: sem retorno.
+    """
     if v in self:
       self._smudge('remove', None, v)
     list.remove(self, v)
 
-  def reverse (self):
+  def reverse(self):
+    """
+    Inverter a ordem dos itens na lista.
+    :return: Sem retorno.
+    """
     if len(self):
       self._smudge('reverse', None, None)
     list.reverse(self)
 
-  def sort (self, *arg, **kw):
+  def sort(self, *arg, **kw):
+    """
+    Ordena os itens da lista.
+    :param arg: Lista de argumentos posicionais.
+    :param kw: Dicionario de argumentos nomeados.
+    :return: Sem retorno.
+    """
     #TODO: check for changes?
     self._smudge('sort', None, None)
     list.sort(self, *arg, **kw)
 
-  def __setitem__ (self, k, v):
+  def __setitem__(self, k, v):
     if isinstance(k, slice):
       #TODO: actually check for change
-      self._smudge('__setitem__slice',k,v)
+      self._smudge('__setitem__slice', k, v)
     elif self[k] != v:
-      self._smudge('__setitem__',k,v)
+      self._smudge('__setitem__', k, v)
     list.__setitem__(self, k, v)
-    assert good
+    # Good nao existe.
+    #assert good
 
-  def __delitem__ (self, k):
+  def __delitem__(self, k):
     list.__delitem__(self, k)
     if isinstance(k, slice):
       #TODO: actually check for change
-      self._smudge('__delitem__slice',k,v)
+      self._smudge('__delitem__slice', k, None)
     else:
       self._smudge('__delitem__', k, None)
 
-  def _smudge (self, reason, k, v):
+  def _smudge(self, reason, k, v):
+    """
+    Atualiza 'self.dirty' para verdadeiro.
+    :param reason: Razao de chamada deste metodo.
+    :param k: Argumento para a funçao 'self.callback'.
+    :param v: Argumento para a funçao 'self.callback'.
+    :return: Sem retorno.
+    """
     if self.callback:
       if self.callback(reason, k, v) is not True:
         self.dirty = True
@@ -106,46 +155,71 @@ class DirtyList (list):
       self.dirty = True
 
 
-class DirtyDict (dict):
+class DirtyDict(dict):
   """
+  Um dict que rastreia se os valores foram alterados superficialmente.
+
   A dict that tracks whether values have been changed shallowly.
   If you set a callback, it will be called when the value changes, and
   passed three values: "add"/"modify"/"delete", key, value
   """
-  def __init__ (self, *args, **kw):
+  def __init__(self, *args, **kw):
     dict.__init__(self, *args, **kw)
     self.dirty = False
     self.callback = None
 
-  def _smudge (self, reason, k, v):
+  def _smudge(self, reason, k, v):
+    """
+    Atualiza 'self.dirty' para verdadeiro.
+    :param reason: Razao de chamada deste metodo.
+    :param k: Argumento para a funçao 'self.callback'.
+    :param v: Argumento para a funçao 'self.callback'.
+    :return: Sem retorno.
+    """
     if self.callback:
       if self.callback(reason, k, v) is not True:
         self.dirty = True
     else:
       self.dirty = True
 
-  def __setitem__ (self, k, v):
+  def __setitem__(self, k, v):
     if k not in self:
-      self._smudge('__setitem__add',k,v)
+      self._smudge('__setitem__add', k, v)
     elif self[k] != v:
-      self._smudge('__setitem__modify',k,v)
+      self._smudge('__setitem__modify', k, v)
     dict.__setitem__(self, k, v)
 
-  def __delitem__ (self, k):
+  def __delitem__(self, k):
     self._smudge('__delitem__', k, None)
     dict.__delitem__(self, k)
 
 def set_extend (l, index, item, emptyValue = None):
+  """
+  Adiciona item à lista l no índice de posição.
+  Se o índice estiver além do final da lista,
+  ele irá preencher a lista até que ela seja grande o suficiente,
+  usando emptyValue para as novas entradas.
+  :param l: Lista a ser utilizada.
+  :param index: Posiçao a ser adicionada valor.
+  :param item: Item Item a ser adicionado  na lista.
+  :param emptyValue: Valores vazios para preenchimento.
+  :return: Sem retorno.
+  """
   """
   Adds item to the list l at position index.  If index is beyond the end
   of the list, it will pad the list out until it's large enough, using
   emptyValue for the new entries.
   """
   if index >= len(l):
-    l += ([emptyValue] * (index - len(self) + 1))
+    l += ([emptyValue] * (index - len(l) + 1))
   l[index] = item
 
 def strToDPID (s):
+  """
+  Converte um DPID na forma de sequência canônica em um int longo.
+  :param s: DPID a ser convertido.
+  :return: Intero longo.
+  """
   """
   Convert a DPID in the canonical string form into a long int.
   """
@@ -157,6 +231,12 @@ def strToDPID (s):
   return a | (b << 48)
 
 def dpidToStr (dpid, alwaysLong = False):
+  """
+  Converte um DPID de um inteiro longo para a forma de sequência canônica.
+  :param dpid: DPID a ser convertido.
+  :param alwaysLong: Variavel de verificaçao.
+  :return: DPID em forma de String.
+  """
   """
   Convert a DPID from a long into into the canonical string form.
   """
@@ -176,6 +256,14 @@ def dpidToStr (dpid, alwaysLong = False):
 
 def assert_type(name, obj, types, none_ok=True):
   """
+  Afirma que um parâmetro é de um determinado tipo.
+  :param name: Nome do parâmetro para mensagens de erro.
+  :param obj: Valor do parâmetro a ser verificado.
+  :param types: Tipo ou lista ou tupla de tipos que é aceitável.
+  :param none_ok: Se 'None' é um valor ok.
+  :return: Booleano.
+  """
+  """
   Assert that a parameter is of a given type.
   Raise an Assertion Error with a descriptive error msg if not.
 
@@ -191,7 +279,7 @@ def assert_type(name, obj, types, none_ok=True):
       raise AssertionError("%s may not be None" % name)
 
   if not isinstance(types, (tuple, list)):
-    types = [ types ]
+    types = [types]
 
   for cls in types:
     if isinstance(obj, cls):
@@ -205,10 +293,16 @@ def assert_type(name, obj, types, none_ok=True):
 
 def initHelper (obj, kw):
   """
+  Dentro de __init__ de uma classe, isso irá copiar argumentos de palavras-chave para campos do mesmo nome.
+  :param obj: Objeto a ser utilizado.
+  :param kw: Argumentos nomeados a serem copiados.
+  :return: Sem retorno.
+  """
+  """
   Inside a class's __init__, this will copy keyword arguments to fields
   of the same name.  See libopenflow for an example.
   """
-  for k,v in kw.iteritems():
+  for k, v in kw.iteritems():
     if not hasattr(obj, k):
       raise TypeError(obj.__class__.__name__ + " constructor got "
       + "unexpected keyword argument '" + k + "'")
@@ -216,32 +310,53 @@ def initHelper (obj, kw):
 
 def makePinger ():
   """
+  Um pinger é basicamente uma coisa para deixá-lo acordar um select().
+  :return: SocketPinger com a conexao, caso consiga estabelecer conexao.
+  """
+  """
   A pinger is basically a thing to let you wake a select().
   On Unix systems, this makes a pipe pair.  But on Windows, select() only
   works with sockets, so it makes a pair of connected sockets.
   """
 
   class PipePinger (object):
-    def __init__ (self, pair):
+    def __init__(self, pair):
       self._w = pair[1]
       self._r = pair[0]
       assert os is not None
 
-    def ping (self):
-      if os is None: return #TODO: Is there a better fix for this?
+    def ping(self):
+      """
+      Implementa o ping.
+      :return: Sem retorno.
+      """
+      if os is None:
+        return #TODO: Is there a better fix for this?
       os.write(self._w, ' ')
 
-    def fileno (self):
+    def fileno(self):
+      """
+      Retorna 'self._r'.
+      :return: Retorna 'self._r'.
+      """
       return self._r
 
-    def pongAll (self):
+    def pongAll(self):
+      """
+      Le todo o arquivo 'self._r'.
+      :return: Sem retorno.
+      """
       #TODO: make this actually read all
       os.read(self._r, 1024)
 
-    def pong (self):
+    def pong(self):
+      """
+      Le uma byte do arquivo 'self._r'
+      :return: Sem retorno.
+      """
       os.read(self._r, 1)
 
-    def __del__ (self):
+    def __del__(self):
       try:
         os.close(self._w)
       except:
@@ -252,17 +367,37 @@ def makePinger ():
         pass
 
   class SocketPinger (object):
-    def __init__ (self, pair):
+    def __init__(self, pair):
       self._w = pair[1]
       self._r = pair[0]
-    def ping (self):
+
+    def ping(self):
+      """
+      Implementa o ping.
+      :return: Sem retorno.
+      """
       self._w.send(' ')
-    def pong (self):
+
+    def pong(self):
+      """
+      Recebe 1 byte de informaçao.
+      :return: Sem retorno.
+      """
       self._r.recv(1)
+
     def pongAll (self):
+      """
+      Recebe toda a informaçao.
+      :return: Sem retorno.
+      """
       #TODO: make this actually read all
       self._r.recv(1024)
-    def fileno (self):
+
+    def fileno(self):
+      """
+      Retorna o descritor do arquivo 'self._r', caso exista.
+      :return: descritor do arquivo 'self._r', caso exista.
+      """
       return self._r.fileno()
 
   #return PipePinger((os.pipe()[0],os.pipe()[1]))  # To test failure case
@@ -277,7 +412,11 @@ def makePinger ():
   import socket
   import select
 
-  def tryConnect ():
+  def tryConnect():
+    """
+    Tenta estabelecer conexao.
+    :return: Falso caso nao consiga conexao, ou uma tupla de conexoes.
+    """
     l = socket.socket()
     l.setblocking(0)
 
@@ -341,6 +480,11 @@ def makePinger ():
 
 def str_to_bool(s):
   """
+  Dada uma string, analisa se ela deve ser verdadeira ou não.
+  :param s: String a ser avaliada.
+  :return: Booleano.
+  """
+  """
   Given a string, parses out whether it is meant to be True or not
   """
   s = str(s).lower() # Make sure
@@ -360,7 +504,12 @@ def str_to_bool(s):
   return False
 
 
-def hexdump (data):
+def hexdump(data):
+  """
+  Pega um hexa decimal.
+  :param data: informaçao a ser tratada.
+  :return: String com um valor hexadecimal.
+  """
   if isinstance(data, str):
     data = [ord(c) for c in data]
   o = ""
@@ -373,7 +522,7 @@ def hexdump (data):
   for i,chunk in enumerate(chunks(data,16)):
     if i > 0: o += "\n"
     o += "%04x: " % (i * 16,)
-    l = ' '.join("%02x" % (c,) for  c in chunk)
+    l = ' '.join("%02x" % (c,) for c in chunk)
     l = "%-48s" % (l,)
     l = l[:3*8-1] + "  " + l[3*8:]
     t = ''.join([filt(x) for x in chunk])
@@ -381,7 +530,15 @@ def hexdump (data):
     o += l
   return o
 
+
 def connect_socket_with_backoff(address, port, max_backoff_seconds=32):
+  """
+  Conecte o soquete com backoff.
+  :param address: Endereço do servidor.
+  :param port: Porta do servidor.
+  :param max_backoff_seconds: Tempo limite.
+  :return: Retornar o soquete conectado, ou levanta uma exceção se a conexão for malsucedido.
+  """
   '''
   Connect to the given address and port. If the connection attempt fails, 
   exponentially back off, up to the max backoff
@@ -407,6 +564,11 @@ def connect_socket_with_backoff(address, port, max_backoff_seconds=32):
 
 def is_listlike (o):
   """
+  Verifica se 'o' e interavel.
+  :param o: Elemento a ser verificaso.
+  :return: False se o for do tipo: bytes, str, bytearray. Ou se ele e interavel.
+  """
+  """
   Is this a sequence that isn't like a string or bytes?
   """
   if isinstance(o, (bytes, str, bytearray)):
@@ -414,8 +576,9 @@ def is_listlike (o):
   return isinstance(o, collections.Iterable)
 
 if __name__ == "__main__":
-  def cb (t,k,v): print v
-  l = DirtyList([10,20,30,40,50])
+  def cb(t, k, v):
+    print v
+  l = DirtyList([10, 20, 30, 40, 50])
   l.callback = cb
 
   l.append(3)
