@@ -53,6 +53,8 @@ IGMP_PROTOCOL = 2
 
 class igmp (packet_base):
   """
+  Mensagem IGMP.
+
   IGMP Message
   """
 
@@ -81,7 +83,12 @@ class igmp (packet_base):
 
     self._init(kw)
 
-  def hdr (self, payload):
+  def hdr(self, payload):
+    """
+    Pega as informações do pacote em uma string e retorna.
+    :param payload: Argumento não utilizado.
+    :return: informaçoes de um pacote.
+    """
     s = struct.pack("!BBHi", self.ver_and_type, self.max_response_time,
                     0, self.address.toSigned(networkOrder=False))
     s += self.extra
@@ -91,7 +98,12 @@ class igmp (packet_base):
     s += self.extra
     return s
 
-  def parse (self, raw):
+  def parse(self, raw):
+    """
+    Analiza as informações do pacote.
+    :param raw: Sequência de bytes do pacote.
+    :return: Sem retorno.
+    """
     assert isinstance(raw, bytes)
     self.raw = raw
     dlen = len(raw)
@@ -114,7 +126,7 @@ class igmp (packet_base):
     else:
       self.parsed = True
 
-  def __str__ (self):
+  def __str__(self):
     s = "[IGMP "
     s += "vt:%02x %s" % (self.ver_and_type, self.address)
     return s + "]"
