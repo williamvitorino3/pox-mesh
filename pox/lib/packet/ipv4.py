@@ -1,3 +1,5 @@
+#
+
 # Copyright 2011 James McCauley
 # Copyright 2008 (C) Nicira, Inc.
 #
@@ -51,14 +53,18 @@ from packet_base import packet_base
 from pox.lib.addresses import IPAddr, IP_ANY, IP_BROADCAST
 
 class ipv4(packet_base):
-    "IP packet struct"
+    """
+    Estrutura do pacote IP.
+
+    IP packet struct
+    """
 
     MIN_LEN = 20
 
     IPv4 = 4
     ICMP_PROTOCOL = 1
-    TCP_PROTOCOL  = 6
-    UDP_PROTOCOL  = 17
+    TCP_PROTOCOL = 6
+    UDP_PROTOCOL = 17
     IGMP_PROTOCOL = 2
 
     DF_FLAG = 0x02
@@ -71,20 +77,20 @@ class ipv4(packet_base):
 
         self.prev = prev
 
-        self.v     = 4
-        self.hl    = ipv4.MIN_LEN / 4
-        self.tos   = 0
+        self.v = 4
+        self.hl = ipv4.MIN_LEN / 4
+        self.tos = 0
         self.iplen = ipv4.MIN_LEN
         ipv4.ip_id = (ipv4.ip_id + 1) & 0xffff
-        self.id    = ipv4.ip_id
+        self.id = ipv4.ip_id
         self.flags = 0
-        self.frag  = 0
-        self.ttl   = 64
+        self.frag = 0
+        self.ttl = 64
         self.protocol = 0
-        self.csum  = 0
+        self.csum = 0
         self.srcip = IP_ANY
         self.dstip = IP_ANY
-        self.next  = b''
+        self.next = b''
 
         if raw is not None:
             self.parse(raw)
@@ -101,8 +107,13 @@ class ipv4(packet_base):
         return s
 
     def parse(self, raw):
+        """
+        Analiza as informações do pacote.
+        :param raw: Sequência de bytes do pacote.
+        :return: Sem retorno.
+        """
         assert isinstance(raw, bytes)
-        self.next = None # In case of unfinished parsing
+        self.next = None    # In case of unfinished parsing
         self.raw = raw
         dlen = len(raw)
         if dlen < ipv4.MIN_LEN:
@@ -161,6 +172,10 @@ class ipv4(packet_base):
             self.next = raw[self.hl*4:length]
 
     def checksum(self):
+        """
+        Implementação do checksum.
+        :return: Validação da informação do pacote.
+        """
         data = struct.pack('!BBHHHBBHII', (self.v << 4) + self.hl, self.tos,
                                  self.iplen, self.id,
                                  (self.flags << 13) | self.frag, self.ttl,
@@ -170,6 +185,11 @@ class ipv4(packet_base):
 
 
     def hdr(self, payload):
+        """
+        Pega as informações do pacote em uma string e retorna.
+        :param payload: Argumento não utilizado.
+        :return: Informaçoes de um pacote.
+        """
         self.iplen = self.hl * 4 + len(payload)
         self.csum = self.checksum()
         return struct.pack('!BBHHHBBHII', (self.v << 4) + self.hl, self.tos,
