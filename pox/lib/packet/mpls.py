@@ -36,7 +36,10 @@ from packet_utils import *
 
 
 class mpls(packet_base):
-    "mpls header"
+    """
+    Leitor MPLS.
+    """
+    """mpls header"""
 
     MIN_LEN = 4
 
@@ -62,6 +65,11 @@ class mpls(packet_base):
         return s
 
     def parse(self, raw):
+        """
+        Analisa os dados do pacote.
+        :param raw: Linha de bytes do pacote.
+        :return: Sem retorno.
+        """
         assert isinstance(raw, bytes)
         self.raw = raw
         dlen = len(raw)
@@ -86,6 +94,11 @@ class mpls(packet_base):
         self.next = raw[mpls.MIN_LEN:]
 
     def hdr(self, payload):
+        """
+        Pega as informações do pacote em uma string e retorna.
+        :param payload: Argumento não utilizado.
+        :return: Informaçoes de um pacote.
+        """
         label = self.label & 0xfffff
         tc = self.tc & 0x7
         s = self.s & 0x1
