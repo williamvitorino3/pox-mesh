@@ -61,29 +61,49 @@ class packet_base (object):
         def __str__(self):
             # optionally convert to human readable string
     """
-    def __init__ (self):
+    def __init__(self):
         self.next = None
         self.prev = None
         self.parsed = False
         self.raw = None
 
-    def _init (self, kw):
+    def _init(self, kw):
+        """
+        Atualiza as informações de payload.
+        :param kw: Lista de informações.
+        :return: Sem retorno.
+        """
         if 'payload' in kw:
           self.set_payload(kw['payload'])
           del kw['payload']
         initHelper(self, kw)
 
     def msg(self, *args):
+        """
+        Mostra mensagens de informação de Log.
+        :param args: Argumentos a serem mostrados.
+        :return: Sem retorno.
+        """
         """ Shortcut for logging """
         #TODO: Remove?
         lg.info(*args)
 
     def err(self, *args):
+        """
+        Mostra mensagem de erro no Log.
+        :param args: Argumantos da mensagem.
+        :return: Sem retorno.
+        """
         """ Shortcut for logging """
         #TODO: Remove?
         lg.error(*args)
 
     def warn(self, *args):
+        """
+        mostra mensagens de aviso no Log.
+        :param args: Argumentos da mensagem.
+        :return: Sem retorno.
+        """
         """ Shortcut for logging """
         #TODO: Remove?
         lg.warning(*args)
@@ -107,6 +127,10 @@ class packet_base (object):
             "" if self.next else " *")
 
     def dump(self):
+        """
+        Cria uma string com as informações do pacote.
+        :return: String com as informações do pacote.
+        """
         p = self
         m = []
         while p is not None:
@@ -134,6 +158,11 @@ class packet_base (object):
 
     def find(self, proto):
         """
+        Localiza a camada de protocolo especificada com base no seu tipo de classe ou nome.
+        :param proto: Prototipo.
+        :return: Pacote encontrado.
+        """
+        """
         Find the specified protocol layer based on its class type or name.
         """
         if not isinstance(proto, basestring):
@@ -147,7 +176,11 @@ class packet_base (object):
                 return None
 
     @property
-    def payload (self):
+    def payload(self):
+        """
+        A propriedade payload packet.
+        :return: Próximo payload do pacote.
+        """
         """
         The packet payload property.
         Reading this property is generally the same as the "next" field.
@@ -158,10 +191,20 @@ class packet_base (object):
         return self.next
 
     @payload.setter
-    def payload (self, new_payload):
-      self.set_payload(new_payload)
+    def payload(self, new_payload):
+        """
+        Setter do payload.
+        :param new_payload: Valor à ser atribuído ao payload.
+        :return: Sem retorno.
+        """
+        self.set_payload(new_payload)
 
     def set_payload(self, payload):
+        """
+        Defina a carga útil do pacote.
+        :param payload: Carga útil.
+        :return: Sem retorno.
+        """
         '''
         Set the packet payload.  Expects bytes or a packet_base subclass.
         '''
@@ -174,22 +217,46 @@ class packet_base (object):
             raise TypeError("payload must be string or packet subclass")
 
     def parse(self, raw):
+        """
+        Função não implementada.
+        :param raw: Linha de bytes do pacote.
+        :return: Sem retorno.
+        """
         '''Override me with packet parsing code'''
         raise NotImplementedError("parse() not implemented")
 
     def pre_hdr(self):
+        """
+        Função não implementada.
+        :return: Sem retrono.
+        """
         '''Override to prepare before payload is packed'''
         pass
 
     def hdr(self, payload):
+        """
+        Função não implementada.
+        :param payload: Payload do pacote.
+        :return: Sem retorno.
+        """
         '''Override me to return packet headers'''
         raise NotImplementedError("hdr() not implemented")
 
     @classmethod
-    def unpack (cls, raw, prev=None):
+    def unpack(cls, raw, prev=None):
+        """
+        Chama a função cls passada por parametro.
+        :param raw: Linha de bytes do pacote.
+        :param prev: Previa do pacote.
+        :return: Retorno da função cls
+        """
         return cls(raw=raw, prev=prev)
 
     def pack(self):
+        """
+        Converte o Header e o payload para Bytes.
+        :return: Bytes.
+        """
         '''Convert header and payload to bytes'''
 
         if self.parsed is False and self.raw is not None and self.next is None:
