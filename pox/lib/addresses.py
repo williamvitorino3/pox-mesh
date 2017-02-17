@@ -289,7 +289,7 @@ class EthAddr (object):
     object.__setattr__(self, a, v)
 
 
-class IPAddr (object):
+class IPAddr(object):
   """
   Representa o endereço IPv4.
 

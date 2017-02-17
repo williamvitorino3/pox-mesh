@@ -38,6 +38,13 @@
 #======================================================================
 
 """
+Casses do pacote IPv6
+
+Isso ainda é difícil. Há um número de coisas restantes a fazer
+(tipos adicionais do encabeçamento da extensão, inferência da carga útil)
+e há provavelmente uns lugares onde a API não é completamente direita contudo.
+Mas é um começo.
+
 IPv6 packet classes
 
 This is still rough.  There are a number of things remaining to do
@@ -60,12 +67,22 @@ from pox.lib.util import init_helper
 
 _extension_headers = {}
 
-def extension_header_def (header_type):
+def extension_header_def(header_type):
   """
-  Extension Header decorator
+  Cabeçalho de extensão do decorador.
+  :param header_type: Tipo de arquivo lido.
+  :return:
+  """
+  """
+  Extension Header decorator.
   """
   #TODO: Switch to using generic class registry
-  def f (cls):
+  def f(cls):
+    """
+    Adiciona a extenção cls no dicionário de estenções lidas.
+    :param cls: Extenção lida.
+    :return: Extenção com tipo modificado.
+    """
     _extension_headers[header_type] = cls
     cls.TYPE = header_type
     return cls
@@ -73,11 +90,20 @@ def extension_header_def (header_type):
 
 
 class ExtensionHeader (object):
+  """
+  Leitor de extenções.
+  """
   next_header_type = None
 
 
 class NormalExtensionHeader (ExtensionHeader):
   """
+  Uma superclasse para muitos ExtensionHeaders.
+
+  Muitos cabeçalhos de extensão seguem o mesmo
+  formato básico, que também é sugerido para cabeçalhos
+  de extensão futuro no RFC 6564.
+
   A superclass for many ExtensionHeaders
 
   Many Extension Headers follow the same basic format, which is also suggested
@@ -86,13 +112,17 @@ class NormalExtensionHeader (ExtensionHeader):
 
   #TYPE = <type number>
 
-  def __init__ (self, *args, **kw):
+  def __init__(self, *args, **kw):
     self.payload_length = 0
     self._init(*args, **kw)
 
     init_helper(self, kw)
 
-  def __len__ (self):
+  def __len__(self):
+    """
+    Retorna o tamanho do pacote.
+    :return: Inteiro.
+    """
     """
     Returns the packed length
     """
@@ -100,7 +130,14 @@ class NormalExtensionHeader (ExtensionHeader):
     return ((l + 7) / 8) - 1
 
   @classmethod
-  def unpack_new (cls, raw, offset = 0, max_length = None):
+  def unpack_new(cls, raw, offset=0, max_length=None):
+    """
+    Desembala uma nova instância desta classe de um buffer.
+    :param raw: Bytes do pacote.
+    :param offset: posição original deste fragmento.
+    :param max_length: Tamanho máximo do pacote.
+    :return: novo_offset, objeto
+    """
     """
     Unpacks a new instance of this class from a buffer
 
@@ -108,7 +145,7 @@ class NormalExtensionHeader (ExtensionHeader):
     """
     if max_length and max_length < 2:
       raise TruncatedException()
-    nh,l = struct.unpack_from("!BB", raw, offset)
+    nh, l = struct.unpack_from("!BB", raw, offset)
     max_length -= 2
     l = l * 8 + 6
     if max_length is not None and max_length < l:
@@ -120,11 +157,21 @@ class NormalExtensionHeader (ExtensionHeader):
     d['next_header_type'] = nh
     return offset, cls(**d)
 
-  def pack (self):
+  def pack(self):
+    """
+    Cria um pacote.
+    :return: Pacotecriado em bytes + corpo do pacote do leitor de extenções em bytes.
+    """
     o = struct.pack("!BB", self.next_header_type, len(self))
     return o + self._pack_body()
 
-  def _init (self, *args, **kw):
+  def _init(self, *args, **kw):
+    """
+    Chamado durante a inicialização
+    :param args: Lista de argumentos posicionais.
+    :param kw: Dicionário de argumentos nomeados.
+    :return: Sem retorno.
+    """
     """
     Called during initialization
 
@@ -132,7 +179,11 @@ class NormalExtensionHeader (ExtensionHeader):
     """
     pass
 
-  def _pack_body (self):
+  def _pack_body(self):
+    """
+    Retorna o corpo deste cabeçalho de extensão preenchido em bytes.
+    :return: Bytes.
+    """
     """
     Returns the body of this Extension Header packed into bytes
 
@@ -141,7 +192,15 @@ class NormalExtensionHeader (ExtensionHeader):
     return b''
 
   @classmethod
-  def _unpack_body (cls, raw, offset, next_header_type, length):
+  def _unpack_body(cls, raw, offset, next_header_type, length):
+    """
+    Descompacta a parte do corpo de um cabeçalho de extensão
+    :param raw: Bytes do pacote.
+    :param offset: posição original deste fragmento.
+    :param next_header_type: Próximo Header Type.
+    :param length: Tamanho do pacote
+    :return: Dicionário.
+    """
     """
     Unpacks the body portion of an Extension Header
 
@@ -152,7 +211,9 @@ class NormalExtensionHeader (ExtensionHeader):
 
 class FixedExtensionHeader (ExtensionHeader):
   """
-  A superclass for fixed length Extension Headers
+  Uma superclasse para cabeçalhos de extensão de comprimento fixo.
+
+  A superclass for fixed length Extension Headers.
   """
 
   #TYPE = <type number>
@@ -164,14 +225,21 @@ class FixedExtensionHeader (ExtensionHeader):
 
     init_helper(self, kw)
 
-  def __len__ (self):
+  def __len__(self):
     """
     Returns the packed length
     """
     return self.LENGTH
 
   @classmethod
-  def unpack_new (cls, raw, offset = 0, max_length = None):
+  def unpack_new(cls, raw, offset=0, max_length=None):
+    """
+    Desembala uma nova instância desta classe de um buffer.
+    :param raw: Dados do pacote.
+    :param offset: posição original deste fragmento.
+    :param max_length: Tamanho máximo.
+    :return: Tupla com offset e outra intância desta classe.
+    """
     """
     Unpacks a new instance of this class from a buffer
     """
@@ -184,12 +252,22 @@ class FixedExtensionHeader (ExtensionHeader):
     d['next_header_type'] = nh
     return offset, cls(**d)
 
-  def pack (self):
+  def pack(self):
+    """
+    Cria um pacote.
+    :return: Pacote criado.
+    """
     o = struct.pack("!B", self.next_header_type) + self._pack_body()
     assert len(o) == self.LENGTH, "Bad packed length"
     return o
 
-  def _init (self, *args, **kw):
+  def _init(self, *args, **kw):
+    """
+    Chamado durante a inicialização.
+    :param args: Lista de argumentos posicionais.
+    :param kw: Dicionário de argumentos nomeados.
+    :return: Sem retorno.
+    """
     """
     Called during initialization
 
@@ -197,7 +275,11 @@ class FixedExtensionHeader (ExtensionHeader):
     """
     pass
 
-  def _pack_body (self):
+  def _pack_body(self):
+    """
+    Retorna o corpo deste cabeçalho de extensão preenchido em bytes.
+    :return: Bytes.
+    """
     """
     Returns the body of this Extension Header packed into bytes
 
@@ -208,6 +290,14 @@ class FixedExtensionHeader (ExtensionHeader):
   @classmethod
   def _unpack_body (self, raw, offset, next_header_type, length):
     """
+    Descompacta a parte do corpo de um cabeçalho de extensão
+    :param raw: Bytes do pacote.
+    :param offset: posição original deste fragmento.
+    :param next_header_type: Próximo Header Type.
+    :param length: Tamanho do pacote
+    :return: Dicionário.
+    """
+    """
     Unpacks the body portion of an Extension Header
 
     Override me.
@@ -217,27 +307,72 @@ class FixedExtensionHeader (ExtensionHeader):
 
 class DummyExtensionHeader (NormalExtensionHeader):
   """
+  Apenas salva os dados do corpo bruto.
+
   Just saves the raw body data
   """
-  def _init (self, *args, **kw):
+  def _init(self, *args, **kw):
+    """
+    Chamado durante a inicialização.
+    :param args: Lista de argumentos posicionais.
+    :param kw: Dicionário de argumentos nomeados.
+    :return: Sem retorno.
+    """
     self.raw_body = b''
-  def _pack_body (self):
+
+  def _pack_body(self):
+    """
+    Retorna o corpo deste cabeçalho de extensão preenchido em bytes.
+    :return: Bytes.
+    """
     return self.raw_body
+
   @classmethod
-  def _unpack_body (self, raw, offset, next_header_type, length):
-    return {'raw_body':raw[offset:offset+length]}
+  def _unpack_body(self, raw, offset, next_header_type, length):
+    """
+    Descompacta a parte do corpo de um cabeçalho de extensão
+    :param raw: Bytes do pacote.
+    :param offset: posição original deste fragmento.
+    :param next_header_type: Próximo Header Type.
+    :param length: Tamanho do pacote
+    :return: Dicionário.
+    """
+    return {'raw_body': raw[offset:offset+length]}
 
 
 class DummyFixedExtensionHeader (FixedExtensionHeader):
   """
+
+  Apenas salva os dados do corpo bruto.
+
   Just saves the raw body data
   """
-  def _init (self, *args, **kw):
+  def _init(self, *args, **kw):
+    """
+    Chamado durante a inicialização.
+    :param args: Lista de argumentos posicionais.
+    :param kw: Dicionário de argumentos nomeados.
+    :return: Sem retorno.
+    """
     self.raw_body = '\x00' * (self.LENGTH - 1)
-  def _pack_body (self):
+
+  def _pack_body(self):
+    """
+    Retorna o corpo deste cabeçalho de extensão preenchido em bytes.
+    :return: Bytes.
+    """
     return self.raw_body
+
   @classmethod
-  def _unpack_body (self, raw, offset, next_header_type, length):
+  def _unpack_body(self, raw, offset, next_header_type, length):
+    """
+    Descompacta a parte do corpo de um cabeçalho de extensão
+    :param raw: Bytes do pacote.
+    :param offset: posição original deste fragmento.
+    :param next_header_type: Próximo Header Type.
+    :param length: Tamanho do pacote
+    :return: Dicionário.
+    """
     return {'raw_body':raw[offset:offset+length]}
 
 
@@ -276,7 +411,7 @@ class ipv6 (packet_base):
   IGMP_PROTOCOL = 2
   NO_NEXT_HEADER = 59
 
-  def __init__ (self, raw=None, prev=None, **kw):
+  def __init__(self, raw=None, prev=None, **kw):
     packet_base.__init__(self)
 
     self.prev = prev
@@ -299,9 +434,11 @@ class ipv6 (packet_base):
     self._init(kw)
 
   @property
-  def payload_type (self):
+  def payload_type(self):
     """
+    Procura e retorna o tipo do ultimo Header.
     The last header type
+    :return: Tipo do ultimo Header.
     """
     if len(self.extension_headers):
       if isinstance(self.extension_headers[-1], ExtensionHeader):
@@ -311,7 +448,12 @@ class ipv6 (packet_base):
     return None
 
   @payload_type.setter
-  def payload_type (self, value):
+  def payload_type(self, value):
+    """
+    Seta o tipo de payload do ultimo header.
+    :param value: Valor a ser setado.
+    :return: Sem retorno.
+    """
     if len(self.extension_headers):
       if isinstance(self.extension_headers[-1], ExtensionHeader):
         self.extension_headers[-1].next_header_type = value
@@ -320,9 +462,15 @@ class ipv6 (packet_base):
     else:
       self.next_header_type = value
 
-  def parse (self, raw, offset=0):
+  def parse(self, raw, offset=0):
+    """
+    Analisa os dados do pacote.
+    :param raw: Linha de bytes do pacote.
+    :param offset: Posição inicias o offset.
+    :return: Sem retorno.
+    """
     assert isinstance(raw, bytes)
-    self.next = None # In case of unfinished parsing
+    self.next = None  # In case of unfinished parsing
     self.raw = raw
     if len(raw) < self.MIN_LEN:
       self.msg('warning IP packet data too short to parse header:'
@@ -386,14 +534,24 @@ class ipv6 (packet_base):
     if isinstance(self.next, packet_base) and not self.next.parsed:
       self.next = raw[offset:offset+length]
 
-  def add_header (self, eh):
+  def add_header(self, eh):
+    """
+    Adiciona um header com o mesmo tipo de eh
+    :param eh: Exemplo para tirar o tipo.
+    :return: Sem retorno.
+    """
     if self.extension_headers:
       assert isinstance(self.extension_headers[-1], ExtensionHeader)
       self.extension_headers[-1].next_header_type = eh.TYPE
     else:
       self._next_header_type = eh.TYPE
 
-  def hdr (self, payload):
+  def hdr(self, payload):
+    """
+    Pega as informações do pacote em uma string e retorna.
+    :param payload: Argumento não utilizado.
+    :return: Informaçoes de um pacote.
+    """
     vtcfl = self.v << 28
     vtcfl |= (self.flow & 0xfffff)
     vtcfl |= (self.tc & 0xff) << 20
@@ -422,7 +580,11 @@ class ipv6 (packet_base):
 
     return r
 
-  def _to_str (self):
+  def _to_str(self):
+    """
+    Transforma as informações do pacote em String.
+    :return: String com as informações do pacote.
+    """
     ehs = [ipproto_to_str(self.next_header_type)]
     for eh in self.extension_headers:
       ehs.append(ipproto_to_str(eh.next_header_type))
