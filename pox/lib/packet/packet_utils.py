@@ -17,6 +17,8 @@
 # developed by Nicira, Inc.
 
 """
+Varias funcionalidades e informações para a biblioteca de pacotes.
+
 Various functionality and data for the packet library
 """
 
@@ -51,14 +53,13 @@ _ethtype_to_str[0xffff] = 'BAD'
 
 
 # IP protocol to string
-#TODO: This should probably be integrated with the decorator used in
-#      the ipv6 module.
-_ipproto_to_str[0]  = 'HOP_OPTS'
-_ipproto_to_str[1]  = 'ICMP'
-_ipproto_to_str[2]  = 'IGMP'
-_ipproto_to_str[4]  = 'IPIP'
-_ipproto_to_str[6]  = 'TCP'
-_ipproto_to_str[9]  = 'IGRP'
+#TODO: This should probably be integrated with the decorator used in the ipv6 module.
+_ipproto_to_str[0] = 'HOP_OPTS'
+_ipproto_to_str[1] = 'ICMP'
+_ipproto_to_str[2] = 'IGMP'
+_ipproto_to_str[4] = 'IPIP'
+_ipproto_to_str[6] = 'TCP'
+_ipproto_to_str[9] = 'IGRP'
 _ipproto_to_str[17] = 'UDP'
 _ipproto_to_str[43] = 'IPV6_ROUTING'
 _ipproto_to_str[44] = 'IPV6_FRAG'
@@ -77,7 +78,14 @@ class TruncatedException (RuntimeError):
   pass
 
 
-def checksum (data, start = 0, skip_word = None):
+def checksum(data, start=0, skip_word=None):
+  """
+  Faz o cálculo padão do checksum internet na informação iniciada no byte de início.
+  :param data: Informação do pacote.
+  :param start: Byte de início.
+  :param skip_word: Palavra à ser pulada.
+  :return: Byte ordenado.
+  """
   """
   Calculate standard internet checksum over data starting at start'th byte
 
@@ -96,13 +104,13 @@ def checksum (data, start = 0, skip_word = None):
     for i in range(0, len(arr)):
       if i == skip_word:
         continue
-      start +=  arr[i]
+      start += arr[i]
   else:
     for i in range(0, len(arr)):
-      start +=  arr[i]
+      start += arr[i]
 
   if len(data) % 2 != 0:
-    start += struct.unpack('H', data[-1]+'\0')[0] # Specify order?
+    start += struct.unpack('H', data[-1]+'\0')[0]   # Specify order?
 
   start  = (start >> 16) + (start & 0xffff)
   start += (start >> 16)
@@ -112,7 +120,12 @@ def checksum (data, start = 0, skip_word = None):
   return ntohs(~start & 0xffff)
 
 
-def ethtype_to_str (t):
+def ethtype_to_str(t):
+  """
+  Pega um número de tipo ou tamanho ethernet.
+  :param t: Número de tipo ou tamanho ethernet.
+  :return: Representação legível pelo ser humano.
+  """
   """
   Given numeric ethernet type or length, return human-readable representation
   """
@@ -121,7 +134,12 @@ def ethtype_to_str (t):
   return _ethtype_to_str.get(t, "%04x" % (t,))
 
 
-def ipproto_to_str (t):
+def ipproto_to_str(t):
+  """
+  Pega a representação numérica do protocolo IP (ou next_header IPv6).
+  :param t: Representação numérica do protocolo.
+  :return: Nome do protocolo.
+  """
   """
   Given a numeric IP protocol number (or IPv6 next_header), give human name
   """

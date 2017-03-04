@@ -44,7 +44,11 @@ from packet_base import packet_base
 #_ipv4 = None
 
 class udp(packet_base):
-    "UDP packet struct"
+    """
+    Implementa a estrutura do pacote UDP.
+
+    UDP packet struct
+    """
 
     MIN_LEN = 8
 
@@ -74,6 +78,11 @@ class udp(packet_base):
         return s
 
     def parse(self, raw):
+        """
+        Analisa as informações do pacote.
+        :param raw: Linha à ser analizada.
+        :return: Sem retorno.
+        """
         assert isinstance(raw, bytes)
         self.raw = raw
         dlen = len(raw)
@@ -116,11 +125,21 @@ class udp(packet_base):
 
 
     def hdr(self, payload):
+        """
+        Concatena as informações do pacote.
+        :param payload: Argumento não utilizado.
+        :return: Pacote de informações.
+        """
         self.len = len(payload) + udp.MIN_LEN
         self.csum = self.checksum()
         return struct.pack('!HHHH', self.srcport, self.dstport, self.len, self.csum)
 
     def checksum(self, unparsed=False):
+        """
+        Calcula o checksum.
+        :param unparsed: Não analisado.
+        :return: checksum.
+        """
         """
         Calculates the checksum.
         If unparsed, calculates it on the raw, unparsed data.  This is

@@ -37,7 +37,11 @@ from packet_utils       import *
 
 
 class vlan(packet_base):
+    """
+    Implementa o 802.1q vlan header.
+
     "802.1q vlan header"
+    """
 
     MIN_LEN = 4
 
@@ -64,6 +68,11 @@ class vlan(packet_base):
         return s
 
     def parse(self, raw):
+        """
+        Analisa as informações do pacote.
+        :param raw: Linha à ser analizada.
+        :return:
+        """
         assert isinstance(raw, bytes)
         self.raw = raw
         dlen = len(raw)
@@ -83,11 +92,19 @@ class vlan(packet_base):
         self.next = ethernet.parse_next(self,self.eth_type,raw,vlan.MIN_LEN)
 
     @property
-    def effective_ethertype (self):
-      return ethernet._get_effective_ethertype(self)
+    def effective_ethertype(self):
+        """
+        Getter do ethernet type.
+        :return: Pacote ethernet.
+        """
+        return ethernet._get_effective_ethertype(self)
 
     @property
-    def type (self):
+    def type(self):
+        """
+        Getter do eth_type.
+        :return: Eth_type.
+        """
         """
         This is just an alias for eth_type.
 
@@ -97,7 +114,12 @@ class vlan(packet_base):
         """
         return self.eth_type
 
-    def hdr (self, payload):
+    def hdr(self, payload):
+        """
+        Concatena as informações do pacote.
+        :param payload: argumento não utilizado.
+        :return: Struct de informações.
+        """
         pcpid  = self.pcp << 13
         pcpid |= self.cfi << 12
         pcpid |= self.id

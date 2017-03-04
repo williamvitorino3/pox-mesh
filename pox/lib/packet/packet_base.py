@@ -264,7 +264,7 @@ class packet_base (object):
 
         self.pre_hdr()
 
-        if self.next == None:
+        if self.next is None:
             return self.hdr(b'')
         elif isinstance(self.next, packet_base):
             rest = self.next.pack()

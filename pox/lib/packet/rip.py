@@ -67,6 +67,8 @@ RIP_RESPONSE = 2
 
 class rip (packet_base):
   """
+  Implementa as mensagem RIP.
+
   RIP Message
   """
 
@@ -89,13 +91,23 @@ class rip (packet_base):
 
     self._init(kw)
 
-  def hdr (self, payload):
+  def hdr(self, payload):
+    """
+    Concatena as informações em um pacote.
+    :param payload: Argumento não utilizado.
+    :return: Pacote de informações.
+    """
     s = struct.pack("!BBH", self.command, self.version, 0)
     for e in self.entries:
       s += e.pack()
     return s
 
-  def parse (self, raw):
+  def parse(self, raw):
+    """
+    Analisa os dados do pacote.
+    :param raw: Linha de bytes do pacote.
+    :return: Sem retorno.
+    """
     assert isinstance(raw, bytes)
     self.raw = raw
     dlen = len(raw)
@@ -123,9 +135,8 @@ class rip (packet_base):
 
     self.parsed = True
 
-  def __str__ (self):
-    cmd = {RIP_REQUEST:"REQ",RIP_RESPONSE:"RESP"}.get(self.command,
-                                                      str(self.command))
+  def __str__(self):
+    cmd = {RIP_REQUEST: "REQ", RIP_RESPONSE: "RESP"}.get(self.command, str(self.command))
 
     s = "[RIP ver:%i cmd:%s num:%i|" % (self.version,
         cmd, len(self.entries))
@@ -133,11 +144,15 @@ class rip (packet_base):
       s += str(e) + "|"
     s = s[:-1] + "]"
     return s
+
 RIPMessage = rip
 
 
 class RIPEntry (packet_base):
-  def __init__ (self, raw=None, prev=None, **kw):
+  """
+  Implementa as entradas RIP.
+  """
+  def __init__(self, raw=None, prev=None, **kw):
     #TODO: netmask initializer?
     packet_base.__init__(self)
 
@@ -154,11 +169,20 @@ class RIPEntry (packet_base):
     self._init(kw)
 
   @property
-  def netmask (self):
+  def netmask(self):
+    """
+    Retorna a mascara de rede.
+    :return: Mascara de rede.
+    """
     return self._netmask
 
   @netmask.setter
-  def netmask (self, netmask):
+  def netmask(self, netmask):
+    """
+    Setter da mascara de rede.
+    :param netmask: Nova mascara de rede.
+    :return: Sem retorno.
+    """
     if isinstance(netmask, int):
       netmask = cidr_to_netmask(netmask)
     elif not isintance(netmask, IPAddr):
@@ -166,7 +190,11 @@ class RIPEntry (packet_base):
     self._netmask = netmask
 
   @property
-  def network_bits (self):
+  def network_bits(self):
+    """
+    Retorna a quantidade de bits de rede.
+    :return: quantidade de bits de rede.
+    """
     """
     Returns the number of network bits.  May raise an exception
     if the netmask is not CIDR-compatible.
@@ -174,10 +202,20 @@ class RIPEntry (packet_base):
     return netmask_to_cidr(self._netmask)
 
   @network_bits.setter
-  def network_bits (self, bits):
+  def network_bits(self, bits):
+    """
+    Setter dos bits de rede.
+    :param bits: Bits reservados para rede.
+    :return: Sem retorno.
+    """
     self._netmask = cidr_to_netmask(bits)
 
-  def hdr (self, payload):
+  def hdr(self, payload):
+    """
+    Concatena as informações em um pacote.
+    :param payload: Argumento não utilizado.
+    :return: Pacote de informações.
+    """
     s = struct.pack("!HHiiii", self.address_family, self.route_tag,
                     self.ip.toSigned(networkOrder=False),
                     self.netmask.toSigned(networkOrder=False),
@@ -186,14 +224,18 @@ class RIPEntry (packet_base):
 
     return s
 
-  def parse (self, raw):
-    self.address_family, self.route_tag, ip, netmask, next_hop, self.metric \
-     = struct.unpack("!HHiiii", raw)
-    self.ip = IPAddr(ip, networkOrder = False)
-    self._netmask = IPAddr(netmask, networkOrder = False)
-    self.next_hop = IPAddr(next_hop, networkOrder = False)
+  def parse(self, raw):
+    """
+    Analisa os dados do pacote.
+    :param raw: Linha de bytes do pacote.
+    :return: Sem retorno.
+    """
+    self.address_family, self.route_tag, ip, netmask, next_hop, self.metric = struct.unpack("!HHiiii", raw)
+    self.ip = IPAddr(ip, networkOrder=False)
+    self._netmask = IPAddr(netmask, networkOrder=False)
+    self.next_hop = IPAddr(next_hop, networkOrder=False)
 
-  def __str__ (self):
+  def __str__(self):
     s = "tag:%s ip:%s/%s nh:%s m:%s" % (self.route_tag, self.ip,
         self._netmask, self.next_hop, self.metric)
     return s

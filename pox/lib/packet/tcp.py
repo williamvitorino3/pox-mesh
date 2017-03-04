@@ -54,39 +54,47 @@ lg = logging.getLogger('packet')
 
 class tcp_opt:
 
-    EOL      = 0
-    NOP      = 1
-    MSS      = 2
-    WSOPT    = 3
+    EOL = 0
+    NOP = 1
+    MSS = 2
+    WSOPT = 3
     SACKPERM = 4
-    SACK     = 5
-    TSOPT    = 8
+    SACK = 5
+    TSOPT = 8
 
     def __init__(self, type, val):
         self.type = type
-        self.val  = val
+        self.val = val
 
     def to_bytes(self):
+        """
+        Retorna o objeto em Byte.
+        :return: Byte.
+        """
         if self.type == tcp_opt.EOL or self.type == tcp_opt.NOP:
-            return struct.pack('B',self.type)
+            return struct.pack('B', self.type)
         elif self.type == tcp_opt.MSS:
-            return struct.pack('!BBH',self.type,4,self.val)
+            return struct.pack('!BBH', self.type, 4, self.val)
         elif self.type == tcp_opt.WSOPT:
-            return struct.pack('!BBB',self.type,3,self.val)
+            return struct.pack('!BBB', self.type, 3, self.val)
         elif self.type == tcp_opt.SACKPERM:
-            return struct.pack('!BB',self.type,2)
+            return struct.pack('!BB', self.type, 2)
         elif self.type == tcp_opt.SACK:
             return struct.pack("!" + "II" * len(self.val),
                                *[x for p in self.val for x in p])
         elif self.type == tcp_opt.TSOPT:
-            return struct.pack('!BBII',self.type,10,self.val[0],self.val[1])
+            return struct.pack('!BBII', self.type, 10, self.val[0], self.val[1])
         else:
             lg.info('(tcp_opt to_bytes) warning, unknown option type ' +
                     str(self.type))
             return ''
 
 class tcp(packet_base):
-    "TCP packet struct"
+    """
+    Estrutura do pacote TCP.
+
+    TCP packet struct
+    """
 
     MIN_LEN = 20
 
@@ -100,41 +108,135 @@ class tcp(packet_base):
     CWR_flag = 0x80
 
     @property
-    def FIN (self): return True if self.flags & self.FIN_flag else False
+    def FIN(self):
+        """
+        Getter do FIN TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.FIN_flag else False
     @property
-    def SYN (self): return True if self.flags & self.SYN_flag else False
+    def SYN(self):
+        """
+        Getter do FYN TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.SYN_flag else False
     @property
-    def RST (self): return True if self.flags & self.RST_flag else False
+    def RST(self):
+        """
+        Getter do RST TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.RST_flag else False
     @property
-    def PSH (self): return True if self.flags & self.PSH_flag else False
+    def PSH(self):
+        """
+        Getter do PSH TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.PSH_flag else False
     @property
-    def ACK (self): return True if self.flags & self.ACK_flag else False
+    def ACK(self):
+        """
+        Getter do ACK TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.ACK_flag else False
     @property
-    def URG (self): return True if self.flags & self.URG_flag else False
+    def URG(self):
+        """
+        Getter do URG TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.URG_flag else False
     @property
-    def ECN (self): return True if self.flags & self.ECN_flag else False
+    def ECN(self):
+        """
+        Getter do ECN TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.ECN_flag else False
     @property
-    def CWR (self): return True if self.flags & self.CWR_flag else False
+    def CWR(self):
+        """
+        Getter do CWR TCP.
+        :return: Booleano.
+        """
+        return True if self.flags & self.CWR_flag else False
 
     @FIN.setter
-    def FIN (self, value): self._setflag(self.FIN_flag, value)
+    def FIN(self, value):
+        """
+        Setter do FIN TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.FIN_flag, value)
     @SYN.setter
-    def SYN (self, value): self._setflag(self.SYN_flag, value)
+    def SYN(self, value):
+        """
+        Setter do FYN TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.SYN_flag, value)
     @RST.setter
-    def RST (self, value): self._setflag(self.RST_flag, value)
+    def RST(self, value):
+        """
+        Setter do RST TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.RST_flag, value)
     @PSH.setter
-    def PSH (self, value): self._setflag(self.PSH_flag, value)
+    def PSH(self, value):
+        """
+        Setter do PSH TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.PSH_flag, value)
     @ACK.setter
-    def ACK (self, value): self._setflag(self.ACK_flag, value)
+    def ACK(self, value):
+        """
+        Setter do ACK TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.ACK_flag, value)
     @URG.setter
-    def URG (self, value): self._setflag(self.URG_flag, value)
+    def URG(self, value):
+        """
+        Setter do UGR TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.URG_flag, value)
     @ECN.setter
-    def ECN (self, value): self._setflag(self.ECN_flag, value)
+    def ECN(self, value):
+        """
+        Setter do ECN TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.ECN_flag, value)
     @CWR.setter
-    def CWR (self, value): self._setflag(self.CWR_flag, value)
+    def CWR(self, value):
+        """
+        Setter do CWR TCP.
+        :param value: Valor à ser atribuído.
+        :return: Sem retorno.
+        """
+        self._setflag(self.CWR_flag, value)
 
-    def _setflag (self, flag, value):
-      self.flags = (self.flags & ~flag) | (flag if value else 0)
+    def _setflag(self, flag, value):
+        """
+
+        :param flag: Valor à ser comparado.
+        :param value: Valor à ser comparado.
+        :return: Sem retorno.
+        """
+        self.flags = (self.flags & ~flag) | (flag if value else 0)
 
     def __init__(self, raw=None, prev=None, **kw):
         packet_base.__init__(self)
@@ -162,14 +264,22 @@ class tcp(packet_base):
 
     def __str__(self):
         f = ''
-        if self.SYN: f += 'S'
-        if self.ACK: f += 'A'
-        if self.FIN: f += 'F'
-        if self.RST: f += 'R'
-        if self.PSH: f += 'P'
-        if self.URG: f += 'U'
-        if self.ECN: f += 'E'
-        if self.CWR: f += 'C'
+        if self.SYN:
+            f += 'S'
+        if self.ACK:
+            f += 'A'
+        if self.FIN:
+            f += 'F'
+        if self.RST:
+            f += 'R'
+        if self.PSH:
+            f += 'P'
+        if self.URG:
+            f += 'U'
+        if self.ECN:
+            f += 'E'
+        if self.CWR:
+            f += 'C'
 
         s = '[TCP %s>%s seq:%s ack:%s f:%s]' % (self.srcport,
             self.dstport, self.seq, self.ack, f)
@@ -177,7 +287,11 @@ class tcp(packet_base):
         return s
 
     def parse_options(self, raw):
-
+        """
+        Analisa as informações das opções
+        :param raw: Linha de bytes.
+        :return: Byte ordenado.
+        """
         self.options = []
         dlen = len(raw)
 
@@ -238,6 +352,12 @@ class tcp(packet_base):
         return i
 
     def parse(self, raw):
+        """
+        Analisa os dados do pacote.
+        :param raw: Linha de bytes do pacote.
+        :return: Sem retorno.
+        """
+
         assert isinstance(raw, bytes)
         self.next = None # In case of unfinished parsing
         self.raw = raw
@@ -270,10 +390,16 @@ class tcp(packet_base):
             self.msg(e)
             return
 
-        self.next   = raw[self.hdr_len:]
+        self.next = raw[self.hdr_len:]
         self.parsed = True
 
-    def hdr(self, payload, calc_checksum = True):
+    def hdr(self, payload, calc_checksum=True):
+        """
+        Concatena as informações em um pacote.
+        :param payload: Argumento não utilizado.
+        :param calc_checksum: Verifica o cálculo do checksum.
+        :return: Pacote de informações.
+        """
         if calc_checksum:
             self.csum = self.checksum(payload=payload)
             csum = self.csum
@@ -290,6 +416,12 @@ class tcp(packet_base):
         return packet
 
     def checksum(self, unparsed=False, payload=None):
+        """
+        Calcula o checksum.
+        :param unparsed: Não analisado.
+        :param payload: Informações.
+        :return: Checksum.
+        """
         """
         Calculates the checksum.
         If unparsed, calculates it on the raw, unparsed data.  This is
